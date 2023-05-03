@@ -12,10 +12,14 @@ import {
   Skeleton,
 } from "@chakra-ui/react";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import { color, motion } from "framer-motion";
+import { color, motion, animate, useScroll, useSpring } from "framer-motion";
 import Typed from "typed.js";
-import { MutableRefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TechStackItem, FileMap } from "./types/types";
+import SpanExtraBold from "../components/Span/SpanExtraBold";
+import TechStack from "@/components/TechStack";
+import JSConfetti from "js-confetti";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const MotionElementJSX = ({
   children,
@@ -35,133 +39,44 @@ const MotionElementJSX = ({
   );
 };
 
-const SpanExtraBold = ({
-  innerHTML,
-  color,
-  ref,
-}: {
-  innerHTML: string;
-  color: string;
-  ref?: MutableRefObject<any>;
-}) => {
-  return (
-    <Text as="span" color={color} className="font-extrabold" ref={ref}>
-      {innerHTML}
-    </Text>
-  );
-};
-
-const ImageTech = ({
-  src,
-  alt,
-  delay = 0,
-}: {
-  src: string;
-  alt: string;
-  delay: number;
-}) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1, delay: delay || 0 }}
-    >
-      <div>
-        <Image src={src} alt={alt} maxH="170px" />
-      </div>
-    </motion.div>
-  );
-};
-
-const TechStack = () => {
-  // I want to use Skeleton with Chakra UI
-  const [TechStack, setTechStack] = useState<TechStackItem[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const [orientation, setOrientation] = useState<"vertical" | "horizontal">(
-    "vertical"
-  );
-
-  useEffect(() => {
-    fetch("/api/getTechStack")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data.TechStack);
-        setTechStack(data.TechStack);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    // Lorsque la taille est trop petite on fait en sorte que les tabs soient horizontaux
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setOrientation("horizontal");
-      } else {
-        setOrientation("vertical");
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return (
-    <>
-      <Skeleton isLoaded={!isLoading}>
-        <Tabs
-          backgroundColor="transparent"
-          orientation={orientation}
-          variant="soft-rounded"
-          colorScheme="gray"
-        >
-          <TabList>
-            {TechStack.map((item, index) => (
-              <Tab key={index}>{item.category}</Tab>
-            ))}
-          </TabList>
-          <TabPanels>
-            {TechStack.map((item, index) => (
-              <TabPanel key={index}>
-                <Wrap>
-                  {item.files.map((file, index) => (
-                    <WrapItem key={index}>
-                      <VStack>
-                        <ImageTech src={file.src} alt={file.name} delay={0} />
-                        <Text fontSize="sm" color="white">
-                          {file.name}
-                        </Text>
-                      </VStack>
-                    </WrapItem>
-                  ))}
-                </Wrap>
-              </TabPanel>
-            ))}
-          </TabPanels>
-        </Tabs>
-      </Skeleton>
-    </>
-  );
+const confetti = () => {
+  const jsConfetti = new JSConfetti();
+  jsConfetti.addConfetti({
+    emojis: ["🎉", "🎊", "🎈", "🎁"],
+    emojiSize: 40,
+    confettiNumber: 50,
+    confettiRadius: 6,
+    colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d"],
+    confettiSource: { x: 0, y: 0 },
+    confettiStartVelocity: 30,
+    confettiAcceleration: 0,
+    duration: 3000,
+    stagger: 0,
+    rotation: 0,
+    maxCount: 0,
+    ticks: 200,
+    zIndex: 10,
+    width: window.innerWidth,
+    height: window.innerHeight,
+    disableForReducedMotion: false,
+    timeout: 0,
+  });
 };
 
 export default function Home() {
   const textMe = useRef(null);
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const typed = new Typed(textMe.current, {
       strings: [
         "Je suis étudiant",
         "Je suis développeur",
-        "Je suis passionné par le métal",
+        "Je suis métaleux",
         "Cinéphile",
-        "Audiofile",
       ],
-      typeSpeed: 80,
-      backSpeed: 80,
+      typeSpeed: 100,
+      backSpeed: 100,
       loop: true,
       cursorChar: "|",
       smartBackspace: true,
@@ -175,15 +90,19 @@ export default function Home() {
 
   return (
     <>
+     <motion.div
+        className="progress-bar"
+        style={{ scaleX: scrollYProgress }}
+      />
       <Box
         margin="0"
         w="full"
-        paddingTop="5vh"
+        paddingTop="0vh"
         minH="100vh"
         bgGradient="background-color: rgb(51, 65, 85); background-image: radial-gradient(at 82% 12%, rgb(30, 58, 138) 0, transparent 75%), radial-gradient(at 30% 36%, rgb(217, 70, 239) 0, transparent 73%), radial-gradient(at 80% 14%, rgb(148, 163, 184) 0, transparent 68%), radial-gradient(at 5% 78%, rgb(136, 19, 55) 0, transparent 65%), radial-gradient(at 98% 94%, rgb(136, 19, 55) 0, transparent 33%), radial-gradient(at 86% 91%, rgb(236, 252, 203) 0, transparent 76%)"
         className="flex flex-col items-center justify-center overflow-hidden"
       >
-        <div className="flex lg:flex-row flex-col lg:space-x-10 space-y-10  items-center justify-center overflow-hidden min-h-[80vh] lg:h-[80vh]">
+        <div className="flex lg:flex-row flex-col lg:space-x-10 space-y-10  items-center justify-center overflow-hidden min-h-[100vh] lg:h-[100vh]">
           <VStack
             spacing={4}
             w="50%"
@@ -191,14 +110,54 @@ export default function Home() {
             justify="left"
             className="pl-0 lg:pl-2"
           >
+            <motion.div
+              //Fait un while hover qui est indépendant du reste
+              whileHover={{
+                scale: 1.1,
+                x: 50,
+
+                transition: { duration: 0.2 },
+              }}
+              //Fait un while tap qui est indépendant du reste
+              whileTap={{
+                scale: 0.9,
+                x: -50,
+                transition: { duration: 0.2 },
+
+                // FrontFlip
+                rotateX: 180,
+              }}
+            >
+              <motion.div
+                animate={{
+                  x: [0, -2, -2, 0, 2, 4, 4, 2, 0],
+                  y: [0, -2, -4, -6, -6, -4, -2, 0],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                }}
+              >
+                <Box
+                  borderRadius="lg"
+                  border="2px solid white"
+                  paddingX="1.5"
+                  width="fit-content"
+                  bg="white"
+                  onClick={() => confetti()}
+                >
+                  Florian Mangin, 19 ans
+                </Box>
+              </motion.div>
+            </motion.div>
             <MotionElementJSX delay={0.1}>
               <Text
                 fontSize="4xl"
                 color="white"
                 className="font-semibold tracking-wide"
               >
-                Passionné de{" "}
-                <SpanExtraBold innerHTML="technologie" color="teal.400" />,
+                Futur ingénieur{" "}
+                <SpanExtraBold innerHTML="logiciel" color="teal.400" />,
                 j&apos;apprends sans cesse.
               </Text>
               <Text
@@ -212,18 +171,46 @@ export default function Home() {
             <MotionElementJSX delay={0.3}>
               <Text fontSize="xl" color="white">
                 Si vous cherchez un passionné de technologie curieux et précis
-                dans ses méthodes, qui ne cesse jamais d&apos;apprendre, alors vous
-                êtes au bon endroit. Avec des compétences solides en travail
-                d&apos;équipe, conception d&apos;applications et analyse de données,
-                combinées à une expertise en bases de données, frameworks et
-                langages de programmation, je suis prêt à relever tous les défis
-                que l'avenir de la technologie nous réserve.
+                dans ses méthodes, qui ne cesse jamais d&apos;apprendre, alors
+                vous êtes au bon endroit. Avec des compétences solides en
+                travail d&apos;équipe, conception d&apos;applications et analyse
+                de données, combinées à une expertise en bases de données,
+                frameworks et langages de programmation, je suis prêt à relever
+                tous les défis que l&apos;avenir de la technologie nous réserve.
               </Text>
             </MotionElementJSX>
           </VStack>
           <MotionElementJSX delay={0.5}>
             <Image src="/techstack/Databases/mysql.png" alt="1" />
           </MotionElementJSX>
+
+          {/* Mise en place d'un indicateur qui est une fleche pour regarder vers le bas */}
+          <div onClick={
+            () => {
+              // Scroll smooth vers le bas
+              window.scrollTo({
+                top: window.innerHeight,
+                behavior: "smooth",
+              });
+            }
+          }>
+            <ChevronDownIcon
+              position={"absolute"}
+              top={"85vh"}
+              left={"50%"}
+              boxSize={10}
+              color={"white"}
+              className="animate-bounce"
+            />
+            <ChevronDownIcon
+              position={"absolute"}
+              top={"86vh"}
+              left={"50%"}
+              boxSize={10}
+              color={"white"}
+              className="animate-bounce"
+            />
+          </div>
         </div>
 
         <motion.div
@@ -244,7 +231,6 @@ export default function Home() {
           </div>
         </motion.div>
       </Box>
-      {/* https://chakra-ui.com/docs/components/tabs */}
     </>
   );
 }
