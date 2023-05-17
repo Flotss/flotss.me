@@ -46,20 +46,6 @@ const confetti = () => {
     emojiSize: 40,
     confettiNumber: 50,
     confettiRadius: 6,
-    colors: ["#a864fd", "#29cdff", "#78ff44", "#ff718d"],
-    confettiSource: { x: 0, y: 0 },
-    confettiStartVelocity: 30,
-    confettiAcceleration: 0,
-    duration: 3000,
-    stagger: 0,
-    rotation: 0,
-    maxCount: 0,
-    ticks: 200,
-    zIndex: 10,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    disableForReducedMotion: false,
-    timeout: 0,
   });
 };
 
@@ -90,7 +76,7 @@ export default function Home() {
 
   return (
     <>
-     <motion.div
+      <motion.div
         className="progress-bar"
         style={{ scaleX: scrollYProgress }}
       />
@@ -181,19 +167,26 @@ export default function Home() {
             </MotionElementJSX>
           </VStack>
           <MotionElementJSX delay={0.5}>
-            <Image src="/techstack/Databases/mysql.png" alt="1" />
+            <div className="relative w-60 lg:w-[30em]">
+              <Image
+                src="avatar.jpg"
+                alt="1"
+                objectFit="cover"
+                borderRadius="full"
+              />
+            </div>
           </MotionElementJSX>
 
           {/* Mise en place d'un indicateur qui est une fleche pour regarder vers le bas */}
-          <div onClick={
-            () => {
+          <div
+            onClick={() => {
               // Scroll smooth vers le bas
               window.scrollTo({
                 top: window.innerHeight,
                 behavior: "smooth",
               });
-            }
-          }>
+            }}
+          >
             <ChevronDownIcon
               position={"absolute"}
               top={"85vh"}
