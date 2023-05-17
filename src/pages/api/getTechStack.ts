@@ -26,7 +26,6 @@ export default function handler(
     true,
     /^\.\/.*\/.*\.png$/
   );
-  console.log(files.keys());
 
   // Create an array of tech stack items
   const techStack: TechStackItem[] = [];
