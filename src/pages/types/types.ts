@@ -2,7 +2,7 @@ interface FileMap {
   [fileName: string]: string;
 }
 
-export default interface TechStackItem {
+export interface TechStackItem {
   category: string;
   files: FileMap[];
 }

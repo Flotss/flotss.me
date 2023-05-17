@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Group } from "next/dist/shared/lib/router/utils/route-regex";
-import { FileMap, TechStackItem } from "../types/types";
+import { TechStackItem } from "../types/types";
 
 type Data = {
   TechStack: TechStackItem[] | null;

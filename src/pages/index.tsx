@@ -11,11 +11,9 @@ import {
   Heading,
   Skeleton,
 } from "@chakra-ui/react";
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { color, motion, animate, useScroll, useSpring } from "framer-motion";
 import Typed from "typed.js";
 import { useEffect, useRef, useState } from "react";
-import  TechStackItem  from "./types/types";
 import SpanExtraBold from "../components/Span/SpanExtraBold";
 import TechStack from "@/components/TechStack";
 import JSConfetti from "js-confetti";
