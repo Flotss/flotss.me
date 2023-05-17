@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { TechStackItem }  from "../pages/types/types";
+import { TechStackItem } from "../types/types";
 import SpanExtraBold from "./Span/SpanExtraBold";
 import {
   Image,

@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { TechStackItem } from "../types/types";
+import { TechStackItem } from "../../types/types";
 
 type Data = {
   TechStack: TechStackItem[] | null;
@@ -51,7 +51,7 @@ export default function handler(
     let fileName = file.split("/")[2].replace(".png", "");
 
     // Add the file to the tech stack item
-    techStackItem.files.push({ name : fileName, src: fileSrc });
+    techStackItem.files.push({ name: fileName, src: fileSrc });
   });
 
   // Sort the tech stack
