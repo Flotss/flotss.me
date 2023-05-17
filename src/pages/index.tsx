@@ -29,8 +29,8 @@ const MotionElementJSX = ({
   return (
     <motion.div
       initial={{ opacity: 0, y: -50 }}
-      whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 1, delay: delay || 0 }}
+      animate={{ opacity: 1, y: 0 }}
     >
       {children}
     </motion.div>
@@ -75,7 +75,7 @@ export default function Home() {
   return (
     <>
       <motion.div
-        className="progress-bar"
+        className="progress-bar absolute"
         style={{ scaleX: scrollYProgress }}
       />
       <Box
@@ -83,26 +83,26 @@ export default function Home() {
         w="full"
         paddingTop="0vh"
         minH="100vh"
-        bgGradient="background-color: rgb(51, 65, 85); background-image: radial-gradient(at 82% 12%, rgb(30, 58, 138) 0, transparent 75%), radial-gradient(at 30% 36%, rgb(217, 70, 239) 0, transparent 73%), radial-gradient(at 80% 14%, rgb(148, 163, 184) 0, transparent 68%), radial-gradient(at 5% 78%, rgb(136, 19, 55) 0, transparent 65%), radial-gradient(at 98% 94%, rgb(136, 19, 55) 0, transparent 33%), radial-gradient(at 86% 91%, rgb(236, 252, 203) 0, transparent 76%)"
+        bgGradient="background-color: #cde085;
+        background-image: linear-gradient(180deg, #cde085 -20%, #447f00 30%, #395849 54%, #16161a 93%);        
+        "
         className="flex flex-col items-center justify-center overflow-hidden"
       >
-        <div className="flex lg:flex-row flex-col lg:space-x-10 space-y-10  items-center justify-center overflow-hidden min-h-[100vh] lg:h-[100vh]">
+        <div className="flex lg:flex-row flex-col lg:space-x-10 space-y-10  items-center justify-center overflow-hidden min-h-[100vh] lg:h-[100vh] w-[100%]">
           <VStack
             spacing={4}
-            w="50%"
             align="left"
             justify="left"
-            className="pl-0 lg:pl-2"
+            className="lg:w-[50%] w-[100%] lg:pr-0 lg:pl-0 pl-10 pr-10"
           >
             <motion.div
-              //Fait un while hover qui est indépendant du reste
+              className="cursor-pointer w-[fit-content]"
               whileHover={{
                 scale: 1.1,
                 x: 50,
 
                 transition: { duration: 0.2 },
               }}
-              //Fait un while tap qui est indépendant du reste
               whileTap={{
                 scale: 0.9,
                 x: -50,
@@ -153,7 +153,8 @@ export default function Home() {
               </Text>
             </MotionElementJSX>
             <MotionElementJSX delay={0.3}>
-              <Text fontSize="xl" color="white">
+              {/* TODO: Voir si je fais une description */}
+              {/* <Text fontSize="xl" color="white" className="text-justify">
                 Si vous cherchez un passionné de technologie curieux et précis
                 dans ses méthodes, qui ne cesse jamais d&apos;apprendre, alors
                 vous êtes au bon endroit. Avec des compétences solides en
@@ -161,7 +162,7 @@ export default function Home() {
                 de données, combinées à une expertise en bases de données,
                 frameworks et langages de programmation, je suis prêt à relever
                 tous les défis que l&apos;avenir de la technologie nous réserve.
-              </Text>
+              </Text> */}
             </MotionElementJSX>
           </VStack>
           <MotionElementJSX delay={0.5}>
@@ -184,6 +185,7 @@ export default function Home() {
                 behavior: "smooth",
               });
             }}
+            className="hidden lg:block cursor-pointer"
           >
             <ChevronDownIcon
               position={"absolute"}
@@ -203,25 +205,24 @@ export default function Home() {
             />
           </div>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.2, delay: 0.5 }}
-        >
-          <div className="flex flex-col justify-center  border-2 rounded-lg text-white bg-slate-600  min-h-[40vh] px-16 py-8 m-[5vh] space-y-10  md:space-y-0  shadow-2xl">
-            <Text className="text-4xl font-semibold mb-5 text-white break-words lg:self-auto self-center">
-              Tech Stack
-            </Text>
-            <Box
-              h="calc(100% - 4rem)"
-              className="shadow-2xl bg-slate-500 flex flex-col lg:flex-row justify-start"
-            >
-              <TechStack />
-            </Box>
-          </div>
-        </motion.div>
       </Box>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, delay: 0.5 }}
+      >
+        <div className="flex flex-col justify-center  border-2 rounded-lg text-white bg-bgElem  min-h-[40vh] px-16 py-8 m-[5vh] space-y-10  md:space-y-0  shadow-2xl">
+          <Text className="text-4xl font-semibold mb-5 text-white break-words lg:self-auto self-center">
+            Tech Stack
+          </Text>
+          <Box
+            h="calc(100% - 4rem)"
+            className="shadow-2xl bg-bgElem/50 flex flex-col lg:flex-row justify-start"
+          >
+            <TechStack />
+          </Box>
+        </div>
+      </motion.div>
     </>
   );
 }

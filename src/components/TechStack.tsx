@@ -13,6 +13,11 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Card,
+  CardHeader,
+  Heading,
+  CardBody,
+  CardFooter,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
@@ -39,7 +44,6 @@ const ImageTech = ({
 };
 
 const TechStack = () => {
-  // I want to use Skeleton with Chakra UI
   const [TechStack, setTechStack] = useState<TechStackItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -48,16 +52,17 @@ const TechStack = () => {
   );
 
   useEffect(() => {
-    fetch("/api/getTechStack")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data.TechStack);
-        setTechStack(data.TechStack);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    setTimeout(() => {
+      fetch("/api/getTechStack")
+        .then((response) => response.json())
+        .then((data) => {
+          setTechStack(data.TechStack);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }, 0);
 
     // Lorsque la taille est trop petite on fait en sorte que les tabs soient horizontaux
     const handleResize = () => {
@@ -82,9 +87,14 @@ const TechStack = () => {
           backgroundColor="transparent"
           orientation={orientation}
           variant="soft-rounded"
-          colorScheme="gray"
+
+          // Pointer is surounded by a halo of red when hovering
+          _focus={{
+            boxShadow: "none",
+          }}
+          
         >
-          <TabList>
+          <TabList >
             {TechStack.map((item, index) => (
               <Tab key={index}>{item.category}</Tab>
             ))}
@@ -95,12 +105,29 @@ const TechStack = () => {
                 <Wrap>
                   {item.files.map((file, index) => (
                     <WrapItem key={index}>
-                      <VStack>
-                        <ImageTech src={file.src} alt={file.name} delay={0} />
-                        <Text fontSize="sm" color="white">
-                          {file.name}
-                        </Text>
-                      </VStack>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          transition={{ duration: 1, delay: index * 0.2 }}
+                        >
+                          <Card
+                            transform={"scale(0.9)"}
+                            className="transition duration-150 ease-out hover:ease-in hover:scale-100 bg-bgItem"
+                          >
+                            <CardHeader>
+                              <ImageTech
+                                src={file.src}
+                                alt={file.name}
+                                delay={0}
+                              />
+                            </CardHeader>
+                            <CardBody className="flex justify-center items-center">
+                              <Text fontSize="lg" color="black">
+                                {file.name}
+                              </Text>
+                            </CardBody>
+                          </Card>
+                        </motion.div>
                     </WrapItem>
                   ))}
                 </Wrap>

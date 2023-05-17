@@ -36,7 +36,7 @@ const SocialButton = ({
       transition={"background 0.3s ease"}
       isExternal
       _hover={{
-        bg: useColorModeValue("blackAlpha.200", "whiteAlpha.200"),
+        transform: "scale(1.2)",
       }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
@@ -48,8 +48,7 @@ const SocialButton = ({
 export default function Footer() {
   return (
     <Box
-      bg={useColorModeValue("gray.200", "gray.900")}
-      color={useColorModeValue("gray.700", "gray.200")}
+      className="bg-secondary text-white"
     >
       <Container
         as={Stack}

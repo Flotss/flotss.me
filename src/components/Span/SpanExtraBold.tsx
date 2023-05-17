@@ -11,9 +11,9 @@ const SpanExtraBold = ({
 }) => {
   return (
     <>
-    <Text as="span" color={color} className="font-extrabold">
-      {innerHTML}
-    </Text>
+      <Text as="span" color={color} className="font-extrabold">
+        {innerHTML}
+      </Text>
     </>
   );
 };
