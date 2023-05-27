@@ -10,6 +10,7 @@ import {
   WrapItem,
   Heading,
   Skeleton,
+  Link,
 } from "@chakra-ui/react";
 import { color, motion, animate, useScroll, useSpring } from "framer-motion";
 import Typed from "typed.js";
@@ -18,6 +19,7 @@ import SpanExtraBold from "../components/Span/SpanExtraBold";
 import TechStack from "@/components/TechStack";
 import JSConfetti from "js-confetti";
 import { ChevronDownIcon } from "@chakra-ui/icons";
+import Head from "next/head";
 
 const MotionElementJSX = ({
   children,
@@ -74,6 +76,18 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>Accueil</title>
+        <meta
+          name="description"
+          content="Florian Mangin, étudiant en informatique, développeur web et mobile, métaleux, cinéphile"
+        />
+        <meta
+          name="keywords"
+          content="Florian Mangin, étudiant, développeur, web, mobile, métaleux, cinéphile"
+        />
+        <meta name="author" content="Florian Mangin" />
+      </Head>
       <motion.div
         className="progress-bar absolute"
         style={{ scaleX: scrollYProgress }}
