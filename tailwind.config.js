@@ -14,8 +14,8 @@ module.exports = {
         hightlight: "#7f5af0",
         tertiary: "#2cb67d",
 
-        bgElem : "#242629",
-        bgItem : "#16161a"  
+        bgElem: "#242629",
+        bgItem: "#16161a",
       },
     },
   },

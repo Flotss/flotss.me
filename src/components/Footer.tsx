@@ -48,7 +48,7 @@ const SocialButton = ({
 export default function Footer() {
   return (
     <Box
-      className="bg-secondary text-white"
+      className="bg-secondary text-white w-full bottom-0 left-0 right-0"
     >
       <Container
         as={Stack}

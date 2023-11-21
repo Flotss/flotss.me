@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { TechStackItem } from "../types/types";
-import SpanExtraBold from "./Span/SpanExtraBold";
 import {
   Image,
-  VStack,
   Wrap,
   WrapItem,
   Text,
@@ -15,9 +13,7 @@ import {
   TabPanel,
   Card,
   CardHeader,
-  Heading,
   CardBody,
-  CardFooter,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
