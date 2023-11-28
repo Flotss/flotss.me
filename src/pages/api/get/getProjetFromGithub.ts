@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import dotenv from "dotenv";
 import fetch from "node-fetch";
 import { Repo } from "@/types/types";
 
@@ -28,7 +27,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Repo[]>
 ) {
-  dotenv.config();
   const owner = "Flotss";
   const repos = await getRepos(owner);
 
