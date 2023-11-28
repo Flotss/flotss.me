@@ -1,0 +1,12 @@
+[
+    {
+        "key": "ctrl+shift+B",
+        "command": "workbench.action.tasks.runTask",
+        "args": "Run npm run dev on startup"
+    },
+    {
+        "key": "ctrl+shift+J",
+        "command": "workbench.action.tasks.runTask",
+        "args": "openBrowser"
+    }
+]

@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run npm run dev on startup",
+			"type": "shell",
+			"command": "npm run dev",
+			"windows": {
+				"command": "npm run dev"
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "new",
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"openBrowser"
+			]
+		},
+		{
+			"label": "openBrowser",
+			"type": "shell",
+			"command": "start",
+			"args": [
+				"http://localhost:3000"
+			],
+			"runOptions": {
+				"runOn": "folderOpen"
+			},
+			"presentation": {
+				"reveal": "never",
+				"clear": true,
+				"echo": false
+			}
+		}
+	]
+}
