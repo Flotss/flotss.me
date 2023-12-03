@@ -16,7 +16,6 @@ export default function Repos(): JSX.Element {
             const response = await fetch("api/get/repos");
             const data = await response.json();
             
-
             if (response.status == 400) {
                 toast({
                     title: 'Netwoking Error',
@@ -45,7 +44,7 @@ export default function Repos(): JSX.Element {
         };
 
         fetchRepos();
-    }, []);
+    }, [toast]);
 
 
     if (loading) {
