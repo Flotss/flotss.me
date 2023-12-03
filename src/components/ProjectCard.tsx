@@ -17,7 +17,6 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
     <Link href={`projects/${name}`}>
       <Box
         className="bg-gray-800 rounded-xl md:max-w-2xl  transition duration-500 ease-in-out transform hover:rounded-3xl hover:-translate-y-1 hover:scale-105"
-
         p={8}
         width="25rem"
         height="10rem"

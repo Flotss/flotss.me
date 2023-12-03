@@ -26,7 +26,6 @@ export default async function handler(
   const owner = "Flotss";
 
   const { name } = req.query;
-  console.log(name);
   try {
     if (name != undefined) {
       const repo = await getRepo(owner, name as string);
@@ -40,21 +39,24 @@ export default async function handler(
 
     let repos: Repo[];
     repos = await getRepos(owner);
-    repos.sort((a, b) => {
-      if (a.archived && b.archived) {
-        return 1
-      }else {
-        return -1
-      }
-    })
 
     if (repos.length === 0) {
       res.status(404).json([]);
       return;
     }
+
+    // repos.sort((a, b) => {
+    //   if (a.archived && b.archived) {
+    //     return 1
+    //   }else {
+    //     return -1
+    //   }
+    // })
+
+    
     res.status(200).json(repos);
   } catch (e) {
-    res.status(405);
+    res.status(400).json([])
   }
 }
 
