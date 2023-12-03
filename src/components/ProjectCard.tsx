@@ -1,60 +1,60 @@
-import { Box, Image, Text } from "@chakra-ui/react";
+import { Badge, Box, Divider, Image, ScaleFade, Text } from "@chakra-ui/react";
+import Link from "next/link";
+import { StarIcon } from '@chakra-ui/icons'
+import { Repo } from "@/types/types";
 
 interface ProjectCardProps {
-  name: string;
-  description: string;
-  commits: number;
+  repo: Repo;
 }
 
 
-export default function ProjectCard(props: ProjectCardProps) : JSX.Element {
-  const { name, description, commits } = props;
-
+export default function ProjectCard(props: ProjectCardProps): JSX.Element {
+  const { repo } = props;
+  const { name, description, stars, archived } = repo;
 
 
   return (
-    <Box
-      className="max-w-lg mx-auto bg-gray-800 rounded-xl shadow-md overflow-hidden md:max-w-2xl hover:shadow-xl transition-shadow duration-300"
-      p={8}
-    >
-      <Box display="flex">
-        <Box flexShrink={0}>
-          <Image
-            alt="Project thumbnail"
-            className="h-48 w-full object-cover md:w-48"
-            height="192"
-            src="/next.svg"
-            style={{
-              aspectRatio: "448/192",
-              objectFit: "cover",
-            }}
-            width="448"
-          />
-        </Box>
-        <Box pl={8} textAlign="left">
-          <Text
-            className="uppercase tracking-wide text-xl text-gray-300 font-semibold"
-            mt={0}
-            mb={1}
-            fontSize="xl"
-            fontWeight="semibold"
-          >
-            {name}
-          </Text>
-          <Text
-            className="block mt-1 text-sm leading-tight font-medium text-gray-300"
-            mt={0}
-            mb={2}
-            fontSize="sm"
-            fontWeight="medium"
-          >
-{description}
-          </Text>
-          <Text mt={2} color="gray.500">
-            Number of commits: {commits}
-          </Text>
+    <Link href={`projects/${name}`}>
+      <Box
+        className="bg-gray-800 rounded-xl md:max-w-2xl  transition duration-500 ease-in-out transform hover:rounded-3xl hover:-translate-y-1 hover:scale-105"
+
+        p={8}
+        width="25rem"
+        height="10rem"
+      >
+        <Box className="flex flex-col">
+          <Box className="flex justify-between">
+            <Text
+              className="uppercase tracking-wide text-xl text-gray-300 font-semibold mt-0 mb-1 items-center"
+              fontSize="xl"
+              fontWeight="semibold"
+            >
+              {name}
+              {archived && <Badge ml={1} fontSize='0.8em' marginBottom={1} colorScheme='blackAlpha'>Archived</Badge>}
+            </Text>
+            {/* <Box className="flex justify-between  items-center space-x-1">
+              <Text
+                className="tracking-wide text-gray-300"
+                fontSize="xl"
+                fontWeight="semibold"
+              >
+                {stars}
+              </Text>
+              <StarIcon />
+            </Box> */}
+          </Box>
+          <Divider />
+          {description && (
+            <Text
+              className="block mt-1 text-sm leading-tight font-medium text-gray-300 mb-2"
+              fontSize="sm"
+              fontWeight="medium"
+            >
+              {description}
+            </Text>
+          )}
         </Box>
       </Box>
-    </Box>
+    </Link>
   );
 }

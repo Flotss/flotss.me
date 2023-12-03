@@ -1,31 +1,25 @@
-import { Box, Flex, Skeleton, SkeletonText, Spinner } from "@chakra-ui/react";
+import { Box, Divider, SkeletonText,  } from "@chakra-ui/react";
 
 export default function ProjectCardSkeleton(): JSX.Element {
   return (
     <Box
-      maxW="2xl"
-      mx="auto"
-      bg="gray.800"
-      rounded="xl"
-      shadow="md"
-      overflow="hidden"
-      className="hover:shadow-xl transition-shadow duration-300"
+      className="bg-gray-800 rounded-xl md:max-w-2xl"
       p={8}
+      width="25rem"
+      height="10rem"
     >
-      <Flex>
-        {/* Left side with a spinner */}
-        <Box flexShrink={0} mr={4}>
-          <Spinner size="lg" />
+      <Box className="flex flex-col py-3">
+        <Box className="flex space-x-2">
+          <SkeletonText noOfLines={1} width="8rem" />
+          <SkeletonText noOfLines={1} width="5rem" />
         </Box>
-        
-        {/* Right side with SkeletonText lines */}
-        <Box flex="1">
-          <SkeletonText height="20px" width="80%" my="5px" />
-          <SkeletonText height="20px" width="70%" my="5px" />
-          <SkeletonText height="20px" width="60%" my="5px" />
+        <Divider className="my-4" />
+        <Box className="space-y-2">
+          <SkeletonText noOfLines={1} width="13rem" />
+          <SkeletonText noOfLines={1} width="18rem" />
+          <SkeletonText noOfLines={1} width="15rem" />
         </Box>
-      </Flex>
+      </Box>
     </Box>
- 
-    );
+  );
 }

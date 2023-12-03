@@ -6,5 +6,16 @@ export type Repo = {
   api_url: string;
   created_at: string;
   updated_at: string;
-  commits_number: number;
+  stars: number;
+  archived: boolean;
+  commits_number?: number;
+  readme? : string;
+  owner? : Owner;
+};
+
+export type Owner = {
+  login: string;
+  avatar_url: string;
+  url: string;
+  html_url: string;
 };
