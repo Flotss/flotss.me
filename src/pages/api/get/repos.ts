@@ -45,13 +45,15 @@ export default async function handler(
       return;
     }
 
-    // repos.sort((a, b) => {
-    //   if (a.archived && b.archived) {
-    //     return 1
-    //   }else {
-    //     return -1
-    //   }
-    // })
+    repos.sort((a, b) => {
+      if (a.archived && !b.archived) {
+        return 1;
+      } else if (a.archived == b.archived) {
+        return 0;
+      } else {
+        return -1;
+      }
+    })
 
     
     res.status(200).json(repos);
