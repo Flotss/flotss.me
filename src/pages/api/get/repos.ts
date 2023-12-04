@@ -53,12 +53,11 @@ export default async function handler(
       } else {
         return -1;
       }
-    })
+    });
 
-    
     res.status(200).json(repos);
   } catch (e) {
-    res.status(400).json([])
+    res.status(400).json([]);
   }
 }
 
@@ -107,7 +106,6 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
   );
 
   const reponseJson: any = await response.json();
-  console.log(reponseJson);
 
   if (!reponseJson) {
     return null;
@@ -165,6 +163,7 @@ async function getAllCommits(owner: string, repoName: string): Promise<any[]> {
     }
 
     commits = commits.concat(data);
+    page++;
   }
 
   return commits;
