@@ -12,13 +12,16 @@ export default function Header() {
         <span className="sr-only">Portfolio du développeur</span>
       </Link>
       <nav className="ml-auto flex gap-4 sm:gap-6">
-        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="#">
+        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="/">
           Accueil
+        </Link> 
+        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="/projects">
+          Mes projets
         </Link>
-        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="#">
+        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="/about-me">
           À propos
         </Link>
-        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="#">
+        <Link className="text-sm font-medium hover:text-[#A0AEC0]" href="/contact">
           Contact
         </Link>
       </nav>

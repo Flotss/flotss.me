@@ -1,7 +1,12 @@
-export default function projects () {
+import Repos from "@/components/Repos";
+import Title from "@/components/Title";
+
+
+export default function projects() {
     return (
-        <div>
-            <h1>Mes projets</h1>
-        </div>
+        <>
+            <Title title="Mes projets" />
+            <Repos />
+        </>
     )
 }

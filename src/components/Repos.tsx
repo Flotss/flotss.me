@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Repo } from "@/types/types";
-import ProjectCard from "./ProjectCard";
-import ProjectCardSkeleton from "./ProjectCardSkeleton";
+import ProjectCard from "./Card/ProjectCard";
+import ProjectCardSkeleton from "./Card/ProjectCardSkeleton";
 import { ScaleFade, useToast } from "@chakra-ui/react";
 
 

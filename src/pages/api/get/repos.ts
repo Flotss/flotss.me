@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetch from "node-fetch";
-import { Repo } from "@/types/types";
+import { Commit, Repo } from "@/types/types";
 import headers from "../headersApiGithub";
 
 // Définition du type des référentiels
@@ -30,7 +30,7 @@ export default async function handler(
     if (name != undefined) {
       const repo = await getRepo(owner, name as string);
       if (repo) {
-        res.status(200).json([repo]);
+        res.status(200).json(repo);
       } else {
         res.status(404).json([]);
       }
@@ -86,7 +86,7 @@ async function getRepos(owner: string): Promise<Repo[]> {
           name: rep.name,
           description: rep.description,
           url: rep.html_url,
-          api_url: rep.url,
+          html_url: rep.url,
           created_at: rep.created_at,
           updated_at: rep.updated_at,
           stars: rep.stargazers_count,
@@ -118,19 +118,89 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     name: reponseJson.name,
     description: reponseJson.description,
     url: reponseJson.html_url,
-    api_url: reponseJson.url,
+    html_url: reponseJson.url,
     created_at: reponseJson.created_at,
     updated_at: reponseJson.updated_at,
-    commits_number: commits.length,
     stars: reponseJson.stargazers_count,
     archived: reponseJson.archived,
+    language: reponseJson.language,
+    homepage: reponseJson.homepage,
+    git_url: reponseJson.git_url,
+    ssh_url: reponseJson.ssh_url,
+    clone_url: reponseJson.clone_url,
+    svn_url: reponseJson.svn_url,
+    forked: reponseJson.fork,
+    commits: commits,
     owner: {
       login: reponseJson.owner.login,
       avatar_url: reponseJson.owner.avatar_url,
       url: reponseJson.owner.url,
       html_url: reponseJson.owner.html_url,
     },
+    collaborators: [],
+    languages: [],
+    open_issues_count: reponseJson.open_issues_count,
+    license: reponseJson.license?.name,
+    subscribers_count: reponseJson.subscribers_count,
+    forks_count: reponseJson.forks_count,
+    watchers_count: reponseJson.watchers_count,
   };
+
+  // Récupération des collaborateurs
+  const collaboratorsResponse = await fetch(
+    `https://api.github.com/repos/${owner}/${repoName}/collaborators`,
+    { headers }
+  );
+  if (collaboratorsResponse.ok) {
+    const collaboratorsJson: unknown = await collaboratorsResponse.json();
+    const collaborators: any[] = collaboratorsJson as any[];
+
+    repo.collaborators = collaborators.map((collaborator) => {
+      return {
+        login: collaborator.login,
+        avatar_url: collaborator.avatar_url,
+        url: collaborator.url,
+        html_url: collaborator.html_url,
+      };
+    });
+  } else {
+    repo.collaborators = [];
+  }
+
+  // Récupération des langages
+  const languagesResponse = await fetch(
+    `https://api.github.com/repos/${owner}/${repoName}/languages`,
+    { headers }
+  );
+  if (languagesResponse.ok) {
+    const languagesJson: unknown = await languagesResponse.json();
+    const languages: any = languagesJson as any;
+
+    const total = Object.values(languages).reduce(
+      (acc: number, value: unknown) => acc + (value as number),
+      0
+    );
+
+    repo.languages = Object.keys(languages).map((key) => {
+      return {
+        name: key,
+        percentage: Math.round(((languages[key] as number) / total) * 100),
+      };
+    });
+
+    repo.languages.sort((a, b) => {
+      if (a.percentage < b.percentage) {
+        return 1;
+      } else if (a.percentage == b.percentage) {
+        return 0;
+      } else {
+        return -1;
+      }
+    });
+
+  } else {
+    repo.languages = [];
+  }
 
   // Récupération du fichier README.md
   const readmeResponse = await fetch(
@@ -151,7 +221,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
 async function getAllCommits(owner: string, repoName: string): Promise<any[]> {
   let page = 1;
   const per_page = 100; // Valeur maximale et recommandée par GitHub
-  let commits: any[] = [];
+  let commits: Commit[] = [];
 
   while (true) {
     const url = `https://api.github.com/repos/${owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
@@ -161,8 +231,19 @@ async function getAllCommits(owner: string, repoName: string): Promise<any[]> {
     if (data.length === 0) {
       break;
     }
+    
+    data.forEach((commit: any) => {
+      const commitObject: Commit = {
+        author: {
+          name: commit.commit.author.name,
+          date: commit.commit.author.date,
+        },
+        message: commit.commit.message,
+        url: commit.html_url,
+      };
+      commits.push(commitObject);
+    });
 
-    commits = commits.concat(data);
     page++;
   }
 
