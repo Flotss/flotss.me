@@ -9,6 +9,7 @@ import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { StyledBox } from "@/components/StyledBox";
+import ErrorCode from "@/components/ErrorCode";
 
 
 
