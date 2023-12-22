@@ -1,4 +1,3 @@
-"use client";
 import {
   Box,
   Link,
@@ -8,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import { BsGithub, BsLinkedin } from "react-icons/bs";
 import { ReactNode } from "react";
+import { StyledBox } from "@/components/StyledBox";
 
 const SocialButton = ({
   children,
@@ -44,12 +44,12 @@ const SocialButton = ({
 
 export default function Footer() {
   return (
-    <Box className="px-4 lg:px-6 h-14 flex items-center justify-between border-t border-[#2D3748]">
+    <Box className="px-4 lg:px-6 h-14 mx-5 sm:mx-20 flex items-center justify-between sticky top-[100vh] bg-box-color rounded-full">
       <nav className="flex gap-10">
-        <SocialButton label="GitHub" href="#">
+        <SocialButton label="GitHub" href="https://github.com/flotss">
           <BsGithub />
         </SocialButton>
-        <SocialButton label="LinkedIn" href="#">
+        <SocialButton label="LinkedIn" href="https://www.linkedin.com/in/florian-mangin-784604208/">
           <BsLinkedin />
         </SocialButton>
       </nav>

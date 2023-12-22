@@ -16,9 +16,9 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
   return (
     <Link href={`projects/${name}`}>
       <Box
-        className="bg-gray-800 rounded-xl md:max-w-2xl  transition duration-500 ease-in-out transform hover:rounded-3xl hover:-translate-y-1 hover:scale-105"
+        className="glow bg-box-color rounded-xl md:max-w-2xl transition duration-500 ease-in-out transform hover:rounded-3xl hover:-translate-y-1 hover:scale-105 overflow-ellipsis"
         p={8}
-        width="25rem"
+        width="26rem"
         height="10rem"
       >
         <Box className="flex flex-col">
@@ -29,7 +29,7 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
               fontWeight="semibold"
             >
               {name}
-              {archived && <Badge ml={1} fontSize='0.8em' marginBottom={1} colorScheme='blackAlpha'>Archived</Badge>}
+              {archived && <Badge ml={1} fontSize='0.8em' marginBottom={1} colorScheme='whiteAlpha'>Archived</Badge>}
             </Text>
             {/* <Box className="flex justify-between  items-center space-x-1">
               <Text

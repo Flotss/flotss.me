@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import fetch from "node-fetch";
-import { Commit, Repo } from "@/types/types";
+import { Collaborator, Commit, Repo } from "@/types/types";
 import headers from "../headersApiGithub";
 
 // Définition du type des référentiels
@@ -21,7 +21,7 @@ const repositories: RepositoryName[] = [
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Repo[] | Repo>
+  res: NextApiResponse<Repo[] | Repo | { message: string }>
 ) {
   const owner = "Flotss";
 
@@ -32,7 +32,7 @@ export default async function handler(
       if (repo) {
         res.status(200).json(repo);
       } else {
-        res.status(404).json([]);
+        res.status(404).json({ message: "Repo not found" });
       }
       return;
     }
@@ -56,9 +56,11 @@ export default async function handler(
     });
 
     res.status(200).json(repos);
-  } catch (e) {
-    res.status(400).json([]);
+  } catch (e : any) {
+    res.status(400).json({ message: e.message + " from repos.ts " + e.name });
+    return;
   }
+  return;
 }
 
 // Fonction asynchrone pour récupérer les référentiels
@@ -85,12 +87,35 @@ async function getRepos(owner: string): Promise<Repo[]> {
           id: rep.id,
           name: rep.name,
           description: rep.description,
-          url: rep.html_url,
-          html_url: rep.url,
+          url: rep.url,
+          html_url: rep.html_url,
           created_at: rep.created_at,
           updated_at: rep.updated_at,
           stars: rep.stargazers_count,
           archived: rep.archived,
+          language: "",
+          homepage: "",
+          git_url: "",
+          ssh_url: "",
+          clone_url: "",
+          svn_url: "",
+          forked: false,
+          commits: [],
+          readme: "",
+          owner: {
+            login: "",
+            avatar_url: "",
+            url: "",
+            html_url: ""
+          },
+          collaborators: [],
+          languages: [],
+          pullrequests: [],
+          open_issues_count: 0,
+          license: "",
+          subscribers_count: 0,
+          forks_count: 0,
+          watchers_count: 0
         };
         repos.push(repo);
       }
@@ -107,18 +132,26 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
 
   const reponseJson: any = await response.json();
 
-  if (!reponseJson) {
+  if (!reponseJson || reponseJson.message == "Not Found") {
     return null;
+  }
+  if (
+    reponseJson.message &&
+    reponseJson.message.includes("API rate limit exceeded")
+  ) {
+    throw new Error("API rate limit exceeded");
   }
 
   const commits = await getAllCommits(owner, repoName);
+
+  console.log(reponseJson);
 
   const repo: Repo = {
     id: reponseJson.id,
     name: reponseJson.name,
     description: reponseJson.description,
-    url: reponseJson.html_url,
-    html_url: reponseJson.url,
+    url: reponseJson.url,
+    html_url: reponseJson.html_url,
     created_at: reponseJson.created_at,
     updated_at: reponseJson.updated_at,
     stars: reponseJson.stargazers_count,
@@ -131,37 +164,52 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     svn_url: reponseJson.svn_url,
     forked: reponseJson.fork,
     commits: commits,
+    collaborators: [],
+    languages: [],
+    pullrequests: [],
+    open_issues_count: reponseJson.open_issues_count,
+    license: reponseJson.license ? reponseJson.license.name : "",
+    subscribers_count: reponseJson.subscribers_count,
+    forks_count: reponseJson.forks_count,
+    watchers_count: reponseJson.watchers_count,
+    readme: "",
     owner: {
+      login: "",
+      avatar_url: "",
+      url: "",
+      html_url: ""
+    }
+  };
+
+
+  if (reponseJson.owner) {
+    repo.owner = {
       login: reponseJson.owner.login,
       avatar_url: reponseJson.owner.avatar_url,
       url: reponseJson.owner.url,
       html_url: reponseJson.owner.html_url,
-    },
-    collaborators: [],
-    languages: [],
-    open_issues_count: reponseJson.open_issues_count,
-    license: reponseJson.license?.name,
-    subscribers_count: reponseJson.subscribers_count,
-    forks_count: reponseJson.forks_count,
-    watchers_count: reponseJson.watchers_count,
-  };
+    };
+  }
 
   // Récupération des collaborateurs
   const collaboratorsResponse = await fetch(
     `https://api.github.com/repos/${owner}/${repoName}/collaborators`,
     { headers }
   );
+
   if (collaboratorsResponse.ok) {
     const collaboratorsJson: unknown = await collaboratorsResponse.json();
     const collaborators: any[] = collaboratorsJson as any[];
 
+
     repo.collaborators = collaborators.map((collaborator) => {
-      return {
+      const collaboratorNew : Collaborator = {
         login: collaborator.login,
         avatar_url: collaborator.avatar_url,
         url: collaborator.url,
         html_url: collaborator.html_url,
       };
+      return collaboratorNew;
     });
   } else {
     repo.collaborators = [];
@@ -197,10 +245,47 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
         return -1;
       }
     });
-
   } else {
     repo.languages = [];
   }
+
+
+  // Récupération des pull requests
+  const pullrequestsResponse = await fetch(
+    `https://api.github.com/repos/${owner}/${repoName}/pulls`,
+    { headers }
+  );
+
+  if (pullrequestsResponse.ok) {
+    const pullrequestsJson: unknown = await pullrequestsResponse.json();
+    const pullrequests: any[] = pullrequestsJson as any[];
+
+    repo.pullrequests = pullrequests.map((pullrequest) => {
+      return {
+        url: pullrequest.url,
+        id: pullrequest.id,
+        node_id: pullrequest.node_id,
+        html_url: pullrequest.html_url,
+        diff_url: pullrequest.diff_url,
+        patch_url: pullrequest.patch_url,
+        issue_url: pullrequest.issue_url,
+        number: pullrequest.number,
+        title: pullrequest.title,
+        user: {
+          login: pullrequest.user.login,
+          avatar_url: pullrequest.user.avatar_url,
+          url: pullrequest.user.url,
+          html_url: pullrequest.user.html_url,
+        },
+        body: pullrequest.body,
+      };
+    });
+  } else {
+    repo.pullrequests = [];
+  }
+
+
+
 
   // Récupération du fichier README.md
   const readmeResponse = await fetch(
@@ -211,7 +296,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     const readme = await readmeResponse.text();
     repo.readme = readme;
   } else {
-    repo.readme = undefined;
+    repo.readme = "";
   }
 
   return repo;
@@ -219,30 +304,31 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
 
 // Fonction asynchrone pour récupérer tous les commits d'un référentiel
 async function getAllCommits(owner: string, repoName: string): Promise<any[]> {
+  const per_page = 100; // Nombre de commits par page
   let page = 1;
-  const per_page = 100; // Valeur maximale et recommandée par GitHub
   let commits: Commit[] = [];
 
   while (true) {
     const url = `https://api.github.com/repos/${owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
     const response = await fetch(url, { headers });
-    const data: any = await response.json();
+    const data: unknown = await response.json();
+    const commitsResponse: any[] = Array.isArray(data) ? data : [];
 
-    if (data.length === 0) {
+    if (commitsResponse.length === 0) {
       break;
     }
-    
-    data.forEach((commit: any) => {
-      const commitObject: Commit = {
-        author: {
-          name: commit.commit.author.name,
-          date: commit.commit.author.date,
-        },
-        message: commit.commit.message,
-        url: commit.html_url,
-      };
-      commits.push(commitObject);
-    });
+
+    const commitPromises = commitsResponse.map((commit: any) => ({
+      author: {
+        name: commit.commit.author.name,
+        date: commit.commit.author.date,
+      },
+      message: commit.commit.message,
+      url: commit.html_url,
+    }));
+
+    const commitsToAdd = await Promise.all(commitPromises);
+    commits = commits.concat(commitsToAdd);
 
     page++;
   }

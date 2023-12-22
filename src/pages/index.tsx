@@ -1,5 +1,7 @@
 import Repos from "@/components/Repos";
-import { Button } from "@chakra-ui/react";
+import Title from "@/components/Title";
+import { Box, Button, Grid } from "@chakra-ui/react";
+import { StyledBox } from "@/components/StyledBox";
 
 
 const moveToProjets = () => {
@@ -10,48 +12,24 @@ const moveToProjets = () => {
 export default function Home() {
   return (
     <>
-      <div className="flex flex-col justify-center space-y-8 text-center">
-        <div className="space-y-2 mt-32">
-          <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 pb-5">
-            Hello ! My name is Flotss
-          </h1>
-          <p className="max-w-[600px] text-zinc-200 md:text-xl dark:text-zinc-100 mx-auto">
+      <Grid className="grid grid-cols-2 grid-rows-1 lg:space-x-5 space-y-5 lg:space-y-0 pt-5 mx-5 sm:mx-20">
+        <StyledBox className="col-span-2 lg:col-span-1 space-y-2">
+          <Title title="Hello ! My name is Flotss" />
+          <p className="max-w-[600px] text-zinc-200 md:text-xl text-center dark:text-zinc-100 mx-auto">
             I&apos;m student in engineering school, and a passionate coder on an internship, always ready to tackle new software challenges! 🚀
           </p>
-        </div>
-      </div>
-      <main className="flex-1 px-6 py-12">
-        {/* Section of my techstack */}
-        <section className="text-center space-y-4" id="techstack">
-          <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl xl:text-4xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 pb-5">
-            My Tech Stack
-          </h2>
+        </StyledBox>
+        <StyledBox className="col-span-2 lg:col-span-1  space-y-4" id="tech-stack">
+          <Title title="My Tech Stack" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl"></Title>
           <p className="text-[#A0AEC0]">
             A brief description about the developer
           </p>
           <div className="flex justify-center gap-x-4">
           </div>
-        </section>
-        <section className="text-center space-y-4" id="home">
-          <h2 className="text-2xl font-bold tracking-tighter sm:text-3xl xl:text-4xl/none bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 pb-5">
-            Check out some of my projects below
-          </h2>
-          <Button
-            className="text-[#E2E8F0] border-[#E2E8F0] hover:bg-[#4A5568]"
-            variant="outline"
-            onClick={moveToProjets}
-          >
-            See My Work
-          </Button>
-        </section>
-        <section className="text-center space-y-4 py-12" id="about">
-          <h2 className="text-2xl font-bold text-[#E2E8F0]">About Me</h2>
-          <p className="text-[#A0AEC0]">
-            A brief description about the developer
-          </p>
-        </section>
-        <Repos />
-      </main>
+        </StyledBox>
+      </Grid>
+      <Title title="My Projects" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl mt-10"></Title>
+      <Repos />
     </>
   );
 }
