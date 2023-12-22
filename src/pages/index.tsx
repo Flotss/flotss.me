@@ -28,8 +28,10 @@ export default function Home() {
           </div>
         </StyledBox>
       </Grid>
-      <Title title="My Projects" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl mt-10"></Title>
-      <Repos />
+      <StyledBox className="mx-5 sm:mx-20 my-5 bg-[#292929]">
+        <Title title="My Projects" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl mt-10"></Title>
+        <Repos />
+      </StyledBox>
     </>
   );
 }
