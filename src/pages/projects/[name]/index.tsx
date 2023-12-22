@@ -88,6 +88,7 @@ export default function Project() {
             if (storedRepoData) {
                 const parsedData = JSON.parse(storedRepoData);
                 // if the date of the last request is more than 1 hour
+                console.log("d");
                 if (new Date().getTime() - parsedData.lastRequestDate > 3600000) {
                     localStorage.removeItem(name as string);
                     fetchRepoDataFromApi();
@@ -103,13 +104,13 @@ export default function Project() {
     }, [router.query, toast]);
 
 
-    if (error == "404") {
+    if (error == "404" && !repo) {
         return (
             <ErrorCode code={"404"} message={"Le repository n'existe pas"} />
         )
     }
 
-    if (error == "400") {
+    if (error == "400" && !repo) {
         return (
             <ErrorCode code={"400"} message={"Erreur lors de la récupération des données"} />
         )
@@ -120,7 +121,7 @@ export default function Project() {
         return (
             <div className="flex flex-col items-center justify-center px-20 py-10 space-x-5">
                 <div className="grid grid-flow-row-dense grid-cols-5  grid-rows-1 w-full  space-x-5">
-                    <Box className="col-span-2 sm:grid-cols-5 rounded-3xl bg-[#131312] p-8 space-y-2" >
+                    <Box className="col-span-2 sm:grid-cols-5 rounded-3xl bg-box-color p-8 space-y-2" >
                         <Skeleton width={"30%"}>
                             <Box className="text-7xl">.</Box>
                         </Skeleton>
@@ -128,7 +129,7 @@ export default function Project() {
                             <SkeletonText key={index} noOfLines={1} width={`${Math.floor(Math.random() * 40) + 40}%`}></SkeletonText>
                         ))}
                     </Box>
-                    <Box className="col-span-1 rounded-3xl bg-[#131312] p-8 space-y-2" >
+                    <Box className="col-span-1 rounded-3xl bg-box-color p-8 space-y-2" >
                         <Skeleton>
                             <Box className="text-6xl">.</Box>
                         </Skeleton>
@@ -141,7 +142,7 @@ export default function Project() {
                             ))}
                         </Flex>
                     </Box>
-                    <Box className="col-span-2 rounded-3xl  bg-[#131312] p-8 space-y-2" >
+                    <Box className="col-span-2 rounded-3xl  bg-box-color p-8 space-y-2" >
                         <Flex direction={"column"} gap={2}>
                             {Array.from({ length: 3 }).map((_, index) => (
                                 <Skeleton key={index}>
@@ -157,7 +158,7 @@ export default function Project() {
                     ))}
                 </Flex>
                 <div className="grid grid-flow-row-dense grid-cols-5 grid-rows-1 w-full  space-x-5">
-                    <Box className="col-span-3 rounded-3xl bg-[#131312] p-8 space-y-2" width={"100%"}>
+                    <Box className="col-span-3 rounded-3xl bg-box-color p-8 space-y-2" width={"100%"}>
                         <Skeleton width={"30%"}>
                             <Box className="text-5xl">.</Box>
                         </Skeleton>
@@ -166,7 +167,7 @@ export default function Project() {
                             <SkeletonText key={index} noOfLines={4} width={`${Math.floor(Math.random() * 40) + 40}%`}></SkeletonText>
                         ))}
                     </Box>
-                    <Box className="col-span-2 rounded-3xl bg-[#131312] p-8 space-y-2" width={"100%"}>
+                    <Box className="col-span-2 rounded-3xl bg-box-color p-8 space-y-2" width={"100%"}>
                         <Skeleton width={"30%"}>
                             <Box className="text-5xl">.</Box>
                         </Skeleton>
@@ -217,14 +218,13 @@ export default function Project() {
                                                 name={collaborator.login}
                                                 src={collaborator.avatar_url}
                                                 size={repo.collaborators.length <= 4 ? "md" : "xs"}
-                                                showBorder={true}
                                             />
                                             {collaborator.login == "Flotss" && <Badge ml="1" colorScheme="green">Me</Badge>}
                                         </Box>
                                     </Link>
                                 </PopoverTrigger>
                                 <PopoverContent width={`${collaborator.login.length / 1.5}rem`}>
-                                    <PopoverHeader className="bg-[#131312]  flex justify-center items-center ">
+                                    <PopoverHeader className="bg-box-color  flex justify-center items-center ">
                                         {collaborator.login}
                                     </PopoverHeader>
                                 </PopoverContent>
@@ -232,24 +232,25 @@ export default function Project() {
                         ))}
                     </Flex>
                 </StyledBox>
-                <StyledBox className="flex justify-center items-center col-span-5 lgrepo:col-span-2 mt-5 lgrepo:mt-0" >
+                <StyledBox className="flex justify-center items-center flex-col col-span-5 lgrepo:col-span-2 mt-5 lgrepo:mt-0" >
+                    <Title title={"Clone"} className="text-lg mdrepo:text-xl lgrepo:text-2xl" />
                     <Box gap={2} className="flex justify-center items-center lgrepo:flex-col md:flex-row flex-col w-full" >
-                        <Button as="a" href={repo.html_url} target="_blank" rel="noopener noreferrer" className="w-full" height="4.5rem">
+                        <ButtonCopy as="a" href={repo.html_url} target="_blank" rel="noopener noreferrer">
                             View on GitHub
-                        </Button>
-                        <Button colorScheme="blue" onClick={copyInClipBoard(repo.clone_url)} className="w-full" height="4.5rem">
-                            Clone (SSH)
-                        </Button>
-                        <Button colorScheme="blue" onClick={copyInClipBoard(repo.ssh_url)} className="w-full" height="4.5rem">
+                        </ButtonCopy>
+                        <ButtonCopy colorScheme="blue" onClick={copyInClipBoard(repo.clone_url)} >
                             Clone (HTTPS)
-                        </Button>
+                        </ButtonCopy>
+                        <ButtonCopy colorScheme="blue" onClick={copyInClipBoard(repo.ssh_url)}>
+                            Clone (SSH)
+                        </ButtonCopy>
                     </Box>
                 </StyledBox>
             </div>
             <Flex width={"100%"} gap={5} className="items-center justify-evenly" flexWrap="wrap">
                 {repo.languages.map((language, index) => {
                     return (
-                        <Box key={index} className={`w-${(100 / repo.languages.length).toFixed(2)} rounded-3xl px-6 py-1 bg-[#131312] flex justify-center items-center`}>
+                        <Box key={index} className={`w-${(100 / repo.languages.length).toFixed(2)} rounded-3xl px-6 py-1 bg-box-color flex justify-center items-center`}>
                             <StyledText>{language.name}</StyledText>
                         </Box>
                     )
@@ -259,6 +260,23 @@ export default function Project() {
         </div>
     )
 }
+
+interface ButtonCopyProps {
+    children: React.ReactNode;
+    colorScheme?: string;
+    onClick?: () => void;
+    className?: string;
+    as?: React.ElementType;
+    href?: string;
+    target?: string;
+    rel?: string;
+}
+
+const ButtonCopy = ({ colorScheme, children, onClick, className, as, href, target, rel }: ButtonCopyProps) => (
+    <Button colorScheme={colorScheme} onClick={onClick} className={`w-full lgrepo:py-9 md:py-7 py-9 ${className}`} as={as} href={href} target={target} rel={rel}>
+        {children}
+    </Button>
+);
 
 
 
@@ -295,9 +313,9 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
 
     return (
         <Box className="grid grid-flow-row-dense grid-cols-3 lg:grid-cols-5 grid-rows-1 w-full  lg:space-x-5 space-y-5 lg:space-y-0">
-            <Box
-                ref={refFirstBox} // TODO : ADD REF TO THE STYLEDBOX
-                className="col-span-3 rounded-3xl bg-[#131312] p-8 space-y-2"
+            <Box // TODO : Change Box to StyledBox
+                ref={refFirstBox}
+                className="col-span-3 rounded-3xl bg-box-color p-8 space-y-2"
                 style={{ minHeight: '500px' }}
             >
                 <Title title={"Readme"} className="text-5xl" />
@@ -306,8 +324,8 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
                     {repo.readme}
                 </ReactMarkdown>
             </Box>
-            <Box
-                className="lg:col-span-2 col-span-3 rounded-3xl bg-[#131312] p-8 space-y-2"
+            <StyledBox
+                className="lg:col-span-2 col-span-3 rounded-3xl bg-box-color p-8 space-y-2"
                 style={{ height: `${boxHeight}px` }}
             >
                 <Title title={"Commits"} className="text-5xl" />
@@ -329,135 +347,7 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
                         </Box>
                     ))}
                 </Box>
-            </Box>
+            </StyledBox>
         </Box>
     );
 }
-
-
-
-
-
-
-
-/*
-export type Repo = {
-id: number;
-name: string;
-description: string;
-url: string;
-html_url: string;
-created_at: string;
-updated_at: string;
-stars: number;
-archived: boolean;
-language: string;
-homepage: string;
-git_url: string;
-ssh_url: string;
-clone_url: string;
-svn_url: string;
-forked: boolean;
-commits: Commit[];
-readme: string;
-owner: Owner;
-collaborators: Collaborator[];
-languages: Language[];
-open_issues_count: number;
-license: string;
-subscribers_count: number;
-};
-
-export type Owner = {
-login: string;
-avatar_url: string;
-url: string;
-html_url: string;
-};
-
-// https://api.github.com/repos/OWNER/REPO/collaborators
-export type Collaborator = {
-login: string;
-avatar_url: string;
-url: string;
-html_url: string;
-};
-
-
-https://api.github.com/repos/flotss/flotss.me/languages
-{
-"HTML": 0.854490406750501,
-"CSS": 0.145509593249499
-}
-
-export type Language = {
-name: string;
-percentage: number;
-};
-*/
-
-// eslint-disable-next-line react-hooks/exhaustive-deps
-// let repoTest: Repo = {
-//     id: 1,
-//     name: "ObjectAidJava",
-//     description: "🌐 Inspiré de ObjectAid d'Eclipse, ce projet permet de créer des schémas UML pour vos projets Java.",
-//     url: "https://api.github.com/repos/Flotss/ObjectAidJava",
-//     html_url: "https://github.com/Flotss/ObjectAidJava",
-//     created_at: "2022-12-14T14:37:15Z",
-//     updated_at: "2023-12-03T18:21:36Z",
-//     stars: 1,
-//     archived: false,
-//     language: "TypeScript",
-//     homepage: "https://example.com",
-//     git_url: "https://github.com/Flotss/ObjectAidJava.git",
-//     ssh_url: "git@github.com:Flotss/ObjectAidJava.git",
-//     clone_url: "https://github.com/Flotss/ObjectAidJava.git",
-//     svn_url: "https://github.com/Flotss/ObjectAidJava",
-//     forked: false,
-//     commits_number: 1,
-//     readme: "testtesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttes ttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttesttest",
-//     owner: {
-//         login: "Flotss",
-//         avatar_url: "https://gravatar.com/avatar/e8eccdda1319f97e3eea2ba1859a4745?s=800&d=robohash&r=x",
-//         url: "https://api.github.com/users/Flotss",
-//         html_url: "https://github.com/flotss",
-//     },
-//     collaborators: [
-//         {
-//             login: "jane_sm",
-//             avatar_url: "https://gravatar.com/avatar/e8eccdda1319f97e3eea2ba1859a4745?s=800&d=robohash&r=x",
-//             url: "https://api.github.com/users/Maxouxax",
-//             html_url: "https://github.com/maxouxax",
-//         },
-//         {
-//             login: "jane_smithjane_smithjane_smith",
-//             avatar_url: "https://gravatar.com/avatar/e8eccdda1319f97e3eea2ba1859a4745?s=800&d=robohash&r=x",
-//             url: "https://api.github.com/users/Maxouxax",
-//             html_url: "https://github.com/maxouxax",
-//         },
-//         {
-//             login: "jane_smith",
-//             avatar_url: "https://gravatar.com/avatar/e8eccdda1319f97e3eea2ba1859a4745?s=800&d=robohash&r=x",
-//             url: "https://api.github.com/users/Maxouxax",
-//             html_url: "https://github.com/maxouxax",
-//         },
-//     ],
-//     languages: [
-//         {
-//             name: "JavaScript",
-//             percentage: 80,
-//         },
-//         {
-//             name: "TypeScript",
-//             percentage: 20,
-//         }
-//     ],
-//     open_issues_count: 5,
-//     license: "MIT",
-//     subscribers_count: 10,
-//     forks_count: 5,
-//     watchers_count: 10,
-// };
-
-// useEffect(() => {
-//                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
