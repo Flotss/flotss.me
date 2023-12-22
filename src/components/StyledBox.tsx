@@ -8,8 +8,10 @@ interface StyledBoxProps {
     style?: React.CSSProperties;
 }
 
-export const StyledBox = ({ children, className, ...props }: StyledBoxProps) => (
-    <Box className={`rounded-3xl bg-[#131312] p-8 ${className}`} {...props}>
-        {children}
-    </Box>
-);
+export const StyledBox = ({ children, className, ...props }: StyledBoxProps) => {
+    return (
+        <Box className={`rounded-3xl bg-box-color p-8 ${className}`} {...props}>
+            {children}
+        </Box>
+    );
+};
