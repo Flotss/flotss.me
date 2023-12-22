@@ -37,15 +37,27 @@ export default function Repos(): JSX.Element {
                 return;
             }
 
+            const reposData = {
+                repos: data,
+                lastRequestDate: new Date().getTime(),
+            }
+
             setRepos(data);
             setLoading(false);
-            localStorage.setItem("repos", JSON.stringify(data)); // Save data in localStorage
+            localStorage.setItem("repos", JSON.stringify(reposData)); // Save data in localStorage
         };
 
         const cachedRepos = localStorage.getItem("repos");
         if (cachedRepos) {
-            setRepos(JSON.parse(cachedRepos));
-            setLoading(false);
+            const { lastRequestDate } = JSON.parse(cachedRepos);
+
+            if (new Date().getTime() - lastRequestDate > 3600000) {
+                fetchRepos();
+                return;
+            } else {
+                setRepos(JSON.parse(cachedRepos).repos);
+                setLoading(false);
+            }
         } else {
             fetchRepos();
         }
