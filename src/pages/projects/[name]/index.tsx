@@ -104,21 +104,13 @@ export default function Project() {
 
     if (error == "404") {
         return (
-            <StyledBox className="flex flex-col items-center justify-center px-5 sm:px-20 py-5 space-y-5 mx-5 sm:mx-20 mt-5">
-                <Title title={"404"} className="text-5xl" />
-                <Divider />
-                <Text className="text-2xl">Le repository n&apos;existe pas</Text>
-            </StyledBox>
+            <ErrorCode code={"404"} message={"Le repository n'existe pas"} />
         )
     }
 
     if (error == "400") {
         return (
-            <StyledBox className="flex flex-col items-center justify-center px-5 sm:px-20 py-5 space-y-5 mx-5 sm:mx-20 mt-5">
-                <Title title={"400"} className="text-5xl" />
-                <Divider />
-                <Text className="text-2xl">Erreur lors de la récupération des données</Text>
-            </StyledBox>
+            <ErrorCode code={"400"} message={"Erreur lors de la récupération des données"} />
         )
     }
 
