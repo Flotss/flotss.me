@@ -14,7 +14,30 @@ export default function Home() {
         url: "",
         html_url: "",
         created_at: "",
-        updated_at: ""
+        updated_at: "",
+        language: "",
+        homepage: "",
+        git_url: "",
+        ssh_url: "",
+        clone_url: "",
+        svn_url: "",
+        forked: false,
+        commits: [],
+        readme: "",
+        owner: {
+            login: "",
+            avatar_url: "",
+            url: "",
+            html_url: ""
+        },
+        open_issues_count: 0,
+        license: "",
+        subscribers_count: 0,
+        forks_count: 0,
+        watchers_count: 0,
+        languages: [],
+        collaborators: [],
+        pullrequests: []
     };
 
     return (
