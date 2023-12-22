@@ -19,7 +19,7 @@ export default function Home() {
             I&apos;m student in engineering school, and a passionate coder on an internship, always ready to tackle new software challenges! 🚀
           </p>
         </StyledBox>
-        <StyledBox className="col-span-2 lg:col-span-1  space-y-4" id="tech-stack">
+        <StyledBox className="col-span-2 lg:col-span-1  space-y-4">
           <Title title="My Tech Stack" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl"></Title>
           <p className="text-[#A0AEC0]">
             A brief description about the developer
