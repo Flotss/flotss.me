@@ -31,16 +31,18 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
               {name}
               {archived && <Badge ml={1} fontSize='0.8em' marginBottom={1} colorScheme='whiteAlpha'>Archived</Badge>}
             </Text>
-            {/* <Box className="flex justify-between  items-center space-x-1">
-              <Text
-                className="tracking-wide text-gray-300"
-                fontSize="xl"
-                fontWeight="semibold"
-              >
-                {stars}
-              </Text>
-              <StarIcon />
-            </Box> */}
+            {stars > 0 && 
+              <Box className="flex justify-between  items-center space-x-1">
+                <Text
+                  className="tracking-wide text-gray-300"
+                  fontSize="xl"
+                  fontWeight="semibold"
+                >
+                  {stars}
+                </Text>
+                <StarIcon />
+              </Box>
+            }
           </Box>
           <Divider />
           {description && (
