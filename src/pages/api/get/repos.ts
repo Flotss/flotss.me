@@ -3,12 +3,12 @@ import fetch from "node-fetch";
 import { Collaborator, Commit, Repo } from "@/types/types";
 import headers from "../headersApiGithub";
 
-// Définition du type des référentiels
+// Define the type of repositories
 type RepositoryName = {
   name: string;
 };
 
-// Définition de la liste des référentiels
+// Define the list of repositories
 const repositories: RepositoryName[] = [
   { name: "UpdateGenius" },
   { name: "CrazyCharlyDay" },
@@ -19,6 +19,11 @@ const repositories: RepositoryName[] = [
   { name: "flotss.me" },
 ];
 
+/**
+ * Handler function for the API endpoint.
+ * Retrieves repositories based on the owner and name query parameters.
+ * Returns a single repository if name is provided, otherwise returns a list of repositories.
+ */
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Repo[] | Repo | { message: string }>
@@ -56,14 +61,18 @@ export default async function handler(
     });
 
     res.status(200).json(repos);
-  } catch (e : any) {
+  } catch (e: any) {
     res.status(400).json({ message: e.message + " from repos.ts " + e.name });
     return;
   }
   return;
 }
 
-// Fonction asynchrone pour récupérer les référentiels
+/**
+ * Asynchronous function to retrieve repositories.
+ * @param owner The owner of the repositories.
+ * @returns A promise that resolves to an array of repositories.
+ */
 async function getRepos(owner: string): Promise<Repo[]> {
   let repos: Repo[] = [];
 
@@ -79,7 +88,7 @@ async function getRepos(owner: string): Promise<Repo[]> {
     throw new Error("API rate limit exceeded");
   }
 
-  // Utilisation de Promise.all pour attendre que toutes les promesses se résolvent
+  // Use Promise.all to wait for all promises to resolve
   await Promise.all(
     reposResponse.map(async (rep: any) => {
       if (repositories.some((repo) => repo.name === rep.name)) {
@@ -124,6 +133,13 @@ async function getRepos(owner: string): Promise<Repo[]> {
 
   return repos;
 }
+
+/**
+ * Asynchronous function to retrieve a single repository.
+ * @param owner The owner of the repository.
+ * @param repoName The name of the repository.
+ * @returns A promise that resolves to the repository object, or null if not found.
+ */
 async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
   const response = await fetch(
     `https://api.github.com/repos/${owner}/${repoName}`,
@@ -143,8 +159,6 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
   }
 
   const commits = await getAllCommits(owner, repoName);
-
-  console.log(reponseJson);
 
   const repo: Repo = {
     id: reponseJson.id,
@@ -191,7 +205,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     };
   }
 
-  // Récupération des collaborateurs
+  // Retrieve collaborators
   const collaboratorsResponse = await fetch(
     `https://api.github.com/repos/${owner}/${repoName}/collaborators`,
     { headers }
@@ -201,9 +215,8 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     const collaboratorsJson: unknown = await collaboratorsResponse.json();
     const collaborators: any[] = collaboratorsJson as any[];
 
-
     repo.collaborators = collaborators.map((collaborator) => {
-      const collaboratorNew : Collaborator = {
+      const collaboratorNew: Collaborator = {
         login: collaborator.login,
         avatar_url: collaborator.avatar_url,
         url: collaborator.url,
@@ -215,7 +228,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     repo.collaborators = [];
   }
 
-  // Récupération des langages
+  // Retrieve languages
   const languagesResponse = await fetch(
     `https://api.github.com/repos/${owner}/${repoName}/languages`,
     { headers }
@@ -249,8 +262,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     repo.languages = [];
   }
 
-
-  // Récupération des pull requests
+  // Retrieve pull requests
   const pullrequestsResponse = await fetch(
     `https://api.github.com/repos/${owner}/${repoName}/pulls`,
     { headers }
@@ -284,10 +296,7 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
     repo.pullrequests = [];
   }
 
-
-
-
-  // Récupération du fichier README.md
+  // Retrieve README.md file
   const readmeResponse = await fetch(
     `https://raw.githubusercontent.com/${owner}/${repoName}/main/README.md`,
     { headers }
@@ -302,9 +311,14 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
   return repo;
 }
 
-// Fonction asynchrone pour récupérer tous les commits d'un référentiel
+/**
+ * Asynchronous function to retrieve all commits of a repository.
+ * @param owner The owner of the repository.
+ * @param repoName The name of the repository.
+ * @returns A promise that resolves to an array of commits.
+ */
 async function getAllCommits(owner: string, repoName: string): Promise<any[]> {
-  const per_page = 100; // Nombre de commits par page
+  const per_page = 100; // Number of commits per page
   let page = 1;
   let commits: Commit[] = [];
 
