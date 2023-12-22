@@ -88,7 +88,6 @@ export default function Project() {
             if (storedRepoData) {
                 const parsedData = JSON.parse(storedRepoData);
                 // if the date of the last request is more than 1 hour
-                console.log("d");
                 if (new Date().getTime() - parsedData.lastRequestDate > 3600000) {
                     localStorage.removeItem(name as string);
                     fetchRepoDataFromApi();
