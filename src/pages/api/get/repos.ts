@@ -127,16 +127,8 @@ async function getRepo(owner: string, repoName: string): Promise<Repo | null> {
   
   const repo: Repo = reponseJson as Repo;
   
+  // Retrieve commits
   repo.commits = await getAllCommits(owner, repoName);
-
-  // if (reponseJson.owner) {
-  //   repo.owner = {
-  //     login: reponseJson.owner.login,
-  //     avatar_url: reponseJson.owner.avatar_url,
-  //     url: reponseJson.owner.url,
-  //     html_url: reponseJson.owner.html_url,
-  //   };
-  // }
 
   // Retrieve collaborators
   const collaboratorsResponse = await fetch(
