@@ -4,6 +4,12 @@ import ProjectCard from "./Card/ProjectCard";
 import ProjectCardSkeleton from "./Card/ProjectCardSkeleton";
 import { ScaleFade, useToast } from "@chakra-ui/react";
 
+/**
+ * The `Repos` component displays a list of GitHub repositories. It fetches data from an API and can also use cached data from localStorage.
+ * It handles loading states, error handling, and rendering the repository cards.
+ *
+ * @returns {JSX.Element} - The rendered Repos component.
+ */
 export default function Repos(): JSX.Element {
     const [repos, setRepos] = useState<Repo[]>([]);
     const [loading, setLoading] = useState(true);
@@ -11,6 +17,10 @@ export default function Repos(): JSX.Element {
     const toast = useToast();
 
     useEffect(() => {
+        /**
+         * Fetches GitHub repositories from the API.
+         * Handles different response statuses, such as rate limiting and not found.
+         */
         const fetchRepos = async () => {
             const response = await fetch("api/get/repos");
             const data = await response.json();
@@ -47,6 +57,7 @@ export default function Repos(): JSX.Element {
             localStorage.setItem("repos", JSON.stringify(reposData)); // Save data in localStorage
         };
 
+        // Check if cached data is available and not expired
         const cachedRepos = localStorage.getItem("repos");
         if (cachedRepos) {
             const { lastRequestDate } = JSON.parse(cachedRepos);
@@ -64,6 +75,7 @@ export default function Repos(): JSX.Element {
     }, [toast]);
 
     if (loading) {
+        // Display skeleton loading cards while data is being fetched
         const skeletons = Array.from({ length: 6 }).map((_, index) => (
             <ProjectCardSkeleton key={index} />
         ));
@@ -74,6 +86,7 @@ export default function Repos(): JSX.Element {
         );
     }
 
+    // Render the repository cards when data is available
     return (
         <section className="flex flex-wrap gap-x-5 gap-y-5 lg:flex-row py-8 mx-5 sm:mx-20 justify-center" id="projects">
             {repos.map((repo) => (
