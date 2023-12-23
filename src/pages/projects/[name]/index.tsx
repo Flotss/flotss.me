@@ -67,6 +67,10 @@ export default function Project() {
     useEffect(() => {
         const { name } = router.query;
 
+        if (!name) {
+            return;
+        }
+
         async function fetchRepoDataFromApi() {
             const response = await fetch(`/api/get/repos?name=${name}`);
 
@@ -127,7 +131,7 @@ export default function Project() {
          */
         function fetchRepoData(): void {
             const storedRepoData = localStorage.getItem(name as string);
-            if (storedRepoData) {
+            if (storedRepoData != null) {
                 const parsedData = JSON.parse(storedRepoData);
                 // if the date of the last request is more than 1 hour
                 if (new Date().getTime() - parsedData.lastRequestDate > 3600000) {
@@ -142,7 +146,7 @@ export default function Project() {
         }
 
         fetchRepoData();
-    }, [router.query, toast]);
+    }, [router.query ,toast]);
 
     if (error == "404" && !repo) {
         return <ErrorCode code={"404"} message={"Le repository n'existe pas"} />;
