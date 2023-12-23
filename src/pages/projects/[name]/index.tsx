@@ -146,7 +146,7 @@ export default function Project() {
         }
 
         fetchRepoData();
-    }, [router.query ,toast]);
+    }, [router.query, toast]);
 
     if (error == "404" && !repo) {
         return <ErrorCode code={"404"} message={"Le repository n'existe pas"} />;
@@ -166,17 +166,17 @@ export default function Project() {
     // If the repository data is not available yet, display a skeleton
     if (!repo) {
         return (
-            <div className="flex flex-col items-center justify-center px-20 py-10 space-x-5">
-                <div className="grid grid-flow-row-dense grid-cols-5  grid-rows-1 w-full  space-x-5">
-                    <Box className="col-span-2 sm:grid-cols-5 rounded-3xl bg-box-color p-8 space-y-2" >
+            <div className="flex flex-col items-center justify-center px-5 sm:px-20 py-5 space-y-5">
+                <div className="grid grid-flow-row-dense grid-cols-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 grid-rows-1 lgrepo:space-x-5  w-full">
+                    <StyledBox className="mdrepo:col-span-2 col-span-3 space-y-5" >
                         <Skeleton width={"30%"}>
                             <Box className="text-7xl">.</Box>
                         </Skeleton>
                         {Array.from({ length: 8 }).map((_, index) => (
                             <SkeletonText key={index} noOfLines={1} width={`${Math.floor(Math.random() * 40) + 40}%`}></SkeletonText>
                         ))}
-                    </Box>
-                    <Box className="col-span-1 rounded-3xl bg-box-color p-8 space-y-2" >
+                    </StyledBox>
+                    <StyledBox className="col-span-3 mdrepo:col-span-1 lgrepo:col-span-1 mdrepo:ml-5  mt-5 mdrepo:mt-0" >
                         <Skeleton>
                             <Box className="text-6xl">.</Box>
                         </Skeleton>
@@ -188,24 +188,27 @@ export default function Project() {
                                 <SkeletonCircle key={index} />
                             ))}
                         </Flex>
-                    </Box>
-                    <Box className="col-span-2 rounded-3xl  bg-box-color p-8 space-y-2" >
-                        <Flex direction={"column"} gap={2}>
+                    </StyledBox>
+                    <StyledBox className="flex flex-col space-y-2 justify-center items-center col-span-5 lgrepo:col-span-2 mt-5 lgrepo:mt-0" >
+                        <Skeleton width={"30%"}>
+                            <Box className="text-3xl">.</Box>
+                        </Skeleton>
+                        <Box gap={2} className="flex justify-center items-center lgrepo:flex-col md:flex-row flex-col w-full">
                             {Array.from({ length: 3 }).map((_, index) => (
-                                <Skeleton key={index}>
-                                    <h1 className="text-7xl">.</h1>
+                                <Skeleton key={index} className="w-full">
+                                    <h1 className="text-6xl">.</h1>
                                 </Skeleton>
                             ))}
-                        </Flex>
-                    </Box>
+                        </Box>
+                    </StyledBox>
                 </div>
                 <Flex width={"100%"} gap={5} className="py-5 justify-around">
                     {Array.from({ length: 5 }).map((_, index) => (
                         <SkeletonCircle key={index} width="100%" height={"2rem"} />
                     ))}
                 </Flex>
-                <div className="grid grid-flow-row-dense grid-cols-5 grid-rows-1 w-full  space-x-5">
-                    <Box className="col-span-3 rounded-3xl bg-box-color p-8 space-y-2" width={"100%"}>
+                <div className="grid grid-flow-row-dense grid-cols-3 lg:grid-cols-5 grid-rows-1 w-full lg:space-x-5 space-y-5 lg:space-y-0">
+                    <StyledBox className="col-span-3 space-y-2">
                         <Skeleton width={"30%"}>
                             <Box className="text-5xl">.</Box>
                         </Skeleton>
@@ -213,8 +216,8 @@ export default function Project() {
                         {Array.from({ length: 5 }).map((_, index) => (
                             <SkeletonText key={index} noOfLines={4} width={`${Math.floor(Math.random() * 40) + 40}%`}></SkeletonText>
                         ))}
-                    </Box>
-                    <Box className="col-span-2 rounded-3xl bg-box-color p-8 space-y-2" width={"100%"}>
+                    </StyledBox>
+                    <StyledBox className="col-span-2 space-y-2">
                         <Skeleton width={"30%"}>
                             <Box className="text-5xl">.</Box>
                         </Skeleton>
@@ -222,7 +225,7 @@ export default function Project() {
                         {Array.from({ length: 4 }).map((_, index) => (
                             <SkeletonText key={index} noOfLines={4} width={`${Math.floor(Math.random() * 40) + 40}%`}></SkeletonText>
                         ))}
-                    </Box>
+                    </StyledBox>
                 </div>
             </div>
         )
@@ -371,7 +374,7 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
 
 
     return (
-        <Box className="grid grid-flow-row-dense grid-cols-3 lg:grid-cols-5 grid-rows-1 w-full  lg:space-x-5 space-y-5 lg:space-y-0">
+        <Box className="grid grid-flow-row-dense grid-cols-3 lg:grid-cols-5 grid-rows-1 w-full lg:space-x-5 space-y-5 lg:space-y-0">
             <Box // TODO : Change Box to StyledBox
                 ref={refFirstBox}
                 className="col-span-3 rounded-3xl bg-box-color p-8 space-y-2"
@@ -392,16 +395,14 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
                 <Box className="flex flex-col space-y-2 p-2 scrollbar" style={{ overflowY: 'auto', }} height={`${boxHeight - 180}px`}>
                     {commits.map((commit, index) => (
                         <Box key={index} width={"100%"} height={"100%"}>
-                            <Link href={commit.url} isExternal>
-                                <a className="no-underline">
-                                    <Box className="bg-[#202020] hover:rounded-3xl hover:scale-[1.02] rounded-3xl px-4 py-2 space-y-2 transition-all duration-300 ease-in-out">
-                                        <h1 className="text-xl">{commit.message}</h1>
-                                        <div className="flex items-start justify-start space-x-2">
-                                            <h1 className="text-lg">Date: {new Date(commit.author.date).toLocaleDateString()}</h1>
-                                            <h1 className="text-lg">Auteur: {commit.author.name}</h1>
-                                        </div>
-                                    </Box>
-                                </a>
+                            <Link href={commit.url} isExternal className="no-underline">
+                                <Box className="bg-[#202020] hover:rounded-3xl hover:scale-[1.02] rounded-3xl px-4 py-2 space-y-2 transition-all duration-300 ease-in-out">
+                                    <h1 className="text-xl">{commit.message}</h1>
+                                    <div className="flex items-start justify-start space-x-2">
+                                        <h1 className="text-lg">Date: {new Date(commit.author.date).toLocaleDateString()}</h1>
+                                        <h1 className="text-lg">Auteur: {commit.author.name}</h1>
+                                    </div>
+                                </Box>
                             </Link>
                         </Box>
                     ))}
