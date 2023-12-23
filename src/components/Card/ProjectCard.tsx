@@ -1,4 +1,4 @@
-import { Badge, Box, Divider, Image, ScaleFade, Text } from "@chakra-ui/react";
+import { Badge, Box, Divider, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { StarIcon } from '@chakra-ui/icons'
 import { Repo } from "@/types/types";
@@ -7,11 +7,16 @@ interface ProjectCardProps {
   repo: Repo;
 }
 
-
+/**
+ * Renders a card component for a project.
+ *
+ * @param {ProjectCardProps} props - The props for the ProjectCard component.
+ * @param {Repo} props.repo - The repository object containing project details.
+ * @returns {JSX.Element} The rendered ProjectCard component.
+ */
 export default function ProjectCard(props: ProjectCardProps): JSX.Element {
   const { repo } = props;
   const { name, description, stars, archived } = repo;
-
 
   return (
     <Link href={`projects/${name}`}>
