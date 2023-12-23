@@ -1,18 +1,44 @@
 import { Repo } from "@/types/types";
 import { useRouter } from "next/router";
-import { useEffect, useState, useRef } from "react";
-import { Badge, Box, Divider, Flex, Popover, PopoverContent, PopoverHeader, PopoverTrigger, Skeleton, SkeletonCircle, SkeletonText, Text, Avatar, useToast, Link, Button, Menu, MenuButton, MenuItem, MenuList, Image } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import {
+    Badge,
+    Box,
+    Divider,
+    Flex,
+    Popover,
+    PopoverContent,
+    PopoverHeader,
+    PopoverTrigger,
+    Skeleton,
+    SkeletonCircle,
+    SkeletonText,
+    Text,
+    Avatar,
+    useToast,
+    Link,
+    Button,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuList,
+    Image,
+} from "@chakra-ui/react";
 import Title from "@/components/Title";
-import ReactMarkdown from 'react-markdown';
-import gfm from 'remark-gfm';
-import rehypeSlug from 'rehype-slug';
-import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import ReactMarkdown from "react-markdown";
+import gfm from "remark-gfm";
+import rehypeSlug from "rehype-slug";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import { StyledBox } from "@/components/StyledBox";
 import ErrorCode from "@/components/ErrorCode";
 
-
-
+/**
+ * The `Project` component displays information about a GitHub repository.
+ * It fetches data from an API or local storage and handles various HTTP status errors.
+ *
+ * @returns {JSX.Element} - The rendered `Project` component.
+ */
 export default function Project() {
     const router = useRouter();
 
@@ -20,18 +46,23 @@ export default function Project() {
     const [error, setError] = useState<string | undefined>(undefined); // 404 or 400
     const toast = useToast();
 
+    /**
+     * Copies text to the clipboard and displays a toast notification.
+     *
+     * @param {string | undefined} text - The text to copy to the clipboard.
+     */
     const copyInClipBoard = (text: string | undefined) => () => {
         if (!text) return;
 
         navigator.clipboard.writeText(text);
         toast({
-            title: "Copié dans le presse papier",
+            title: "Copié dans le presse-papier",
             description: text,
             status: "success",
             duration: 4000,
             isClosable: true,
         });
-    }
+    };
 
     useEffect(() => {
         const { name } = router.query;
@@ -41,7 +72,7 @@ export default function Project() {
 
             if (!response.ok) {
                 if (response.status == 400) {
-                    const message = await response.json().then(data => data.message);
+                    const message = await response.json().then((data) => data.message);
                     displayToast("Erreur", message, "error");
                     setError("400");
                 }
@@ -50,7 +81,6 @@ export default function Project() {
                     displayToast("Erreur", "Le repository n'existe pas", "error");
                     setError("404");
                 }
-                // setError(true);
                 return;
             }
 
@@ -61,8 +91,13 @@ export default function Project() {
             saveRepoDataToLocalStorage(repo, name as string);
         }
 
-        // Function to display toast notifications
-        type ToastStatus = "info" | "warning" | "success" | "error" | undefined;
+        /**
+         * Displays a toast notification.
+         *
+         * @param {string} title - The title of the notification.
+         * @param {string} description - The description of the notification.
+         * @param {string} status - The status of the notification (info, warning, success, error).
+         */
         function displayToast(title: string, description: string, status: ToastStatus) {
             toast({
                 title: title,
@@ -73,7 +108,12 @@ export default function Project() {
             });
         }
 
-        // Function to save repository data to local storage
+        /**
+         * Saves repository data to local storage.
+         *
+         * @param {Repo} repo - The repository data to save.
+         * @param {string} name - The name of the repository.
+         */
         function saveRepoDataToLocalStorage(repo: Repo, name: string) {
             const repoData = {
                 repo,
@@ -82,7 +122,9 @@ export default function Project() {
             localStorage.setItem(name as string, JSON.stringify(repoData));
         }
 
-        // Function to fetch repository data
+        /**
+         * Fetches repository data either from local storage or from the API.
+         */
         function fetchRepoData(): void {
             const storedRepoData = localStorage.getItem(name as string);
             if (storedRepoData) {
@@ -102,20 +144,22 @@ export default function Project() {
         fetchRepoData();
     }, [router.query, toast]);
 
-
     if (error == "404" && !repo) {
-        return (
-            <ErrorCode code={"404"} message={"Le repository n'existe pas"} />
-        )
+        return <ErrorCode code={"404"} message={"Le repository n'existe pas"} />;
     }
 
     if (error == "400" && !repo) {
-        return (
-            <ErrorCode code={"400"} message={"Erreur lors de la récupération des données"} />
-        )
+        return <ErrorCode code={"400"} message={"Erreur lors de la récupération des données"} />;
     }
 
 
+    /**
+     * Possible toast notification status values.
+     */
+    type ToastStatus = "info" | "warning" | "success" | "error" | undefined;
+
+
+    // If the repository data is not available yet, display a skeleton
     if (!repo) {
         return (
             <div className="flex flex-col items-center justify-center px-20 py-10 space-x-5">
@@ -181,6 +225,7 @@ export default function Project() {
     }
 
 
+    // If the repository data is available, display it
     return (
         <div className="flex flex-col items-center justify-center px-5 sm:px-20 py-5 space-y-5">
             <div className="grid grid-flow-row-dense grid-cols-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 grid-rows-1 lgrepo:space-x-5  w-full">
@@ -271,6 +316,9 @@ interface ButtonCopyProps {
     rel?: string;
 }
 
+/**
+ * Represents a button that copies text to the clipboard.
+ */
 const ButtonCopy = ({ colorScheme, children, onClick, className, as, href, target, rel }: ButtonCopyProps) => (
     <Button colorScheme={colorScheme} onClick={onClick} className={`w-full lgrepo:py-9 md:py-7 py-9 ${className}`} as={as} href={href} target={target} rel={rel}>
         {children}
@@ -285,6 +333,9 @@ interface StyledProps {
     className?: string;
 }
 
+/**
+ * Represents a styled text component.
+ */
 const StyledText = ({ children, className, ...props }: StyledProps) => (
     <Text className={`sm:text-xl md:text-2xl ${className}`} {...props}>
         {children}
@@ -296,6 +347,11 @@ interface ReadmeAndCommitsProps {
     repo: Repo;
 }
 
+/**
+ * Represents a component that displays the README and the commits of a repository.
+ * @param {ReadmeAndCommitsProps} props - The props for the ReadmeAndCommits component.
+ * @return {JSX.Element} The rendered ReadmeAndCommits component.
+ */
 const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
     const [boxHeight, setBoxHeight] = useState<number>(0);
     const refFirstBox = useRef<HTMLDivElement>(null);
@@ -307,7 +363,7 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
         if (refFirstBox.current) {
             setBoxHeight(refFirstBox.current.offsetHeight);
         }
-    }, [repo.readme]); // Mise à jour lorsque le contenu du README change
+    }, [repo.readme]); // Change the height of the commits box when the readme changes
 
 
     return (
