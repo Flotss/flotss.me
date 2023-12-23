@@ -1,3 +1,6 @@
+/**
+ * Represents a GitHub repository.
+ */
 export type Repo = {
   id: number;
   name: string;
@@ -28,6 +31,9 @@ export type Repo = {
   pullrequests: PullRequest[];
 };
 
+/**
+ * Represents the owner of a GitHub repository.
+ */
 export type Owner = {
   login: string;
   avatar_url: string;
@@ -35,7 +41,10 @@ export type Owner = {
   html_url: string;
 };
 
-// api.github.com/repos/owner/repo/collaborators requiert une authentification
+/**
+ * Represents a collaborator of a GitHub repository.
+ * Note: Requires authentication for API requests.
+ */
 export type Collaborator = {
   login: string;
   avatar_url: string;
@@ -43,11 +52,17 @@ export type Collaborator = {
   html_url: string;
 };
 
+/**
+ * Represents a programming language used in a GitHub repository.
+ */
 export type Language = {
   name: string;
   percentage: number;
 };
 
+/**
+ * Represents a commit in a GitHub repository.
+ */
 export type Commit = {
   author: {
     name: string;
@@ -57,8 +72,9 @@ export type Commit = {
   url: string;
 };
 
-
-// api.github.com/repos/owner/repo/pulls 
+/**
+ * Represents a pull request in a GitHub repository.
+ */
 export type PullRequest = {
   url: string;
   id: number;
@@ -77,5 +93,3 @@ export type PullRequest = {
   };
   body: string;
 };
-
-
