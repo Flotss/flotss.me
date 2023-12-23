@@ -7,17 +7,23 @@ interface ErrorCodeProps {
     message: string;
 }
 
+/**
+ * Renders an error code component.
+ *
+ * @param {ErrorCodeProps} props - The props for the error code component.
+ * @returns {JSX.Element} The rendered error code component.
+ */
 const ErrorCode = (props: ErrorCodeProps): JSX.Element => {
     const { code, message } = props;
 
+    // Function to determine the color based on the error code
     const getColor = (code: string): string => {
-        if (code.startsWith("4")) return "red";
-        if (code.startsWith("5")) return "orange";
-        if (code.startsWith("3")) return "blue";
-        if (code.startsWith("2")) return "green";
-        return "purple";
+        if (code.startsWith("4")) return "red"; // Client error codes
+        if (code.startsWith("5")) return "orange"; // Server error codes
+        if (code.startsWith("3")) return "blue"; // Redirection codes
+        if (code.startsWith("2")) return "green"; // Success codes
+        return "purple"; // Other codes
     }
-
 
     const color = getColor(code);
 
@@ -32,4 +38,4 @@ const ErrorCode = (props: ErrorCodeProps): JSX.Element => {
     )
 }
 
-export default ErrorCode
+export default ErrorCode;
