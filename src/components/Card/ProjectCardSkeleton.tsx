@@ -1,10 +1,15 @@
-import { Box, Divider, SkeletonText,  } from "@chakra-ui/react";
+import { Box, Divider, SkeletonText } from "@chakra-ui/react";
 
 
 const SkeletonTextLine = ({ width }: { width: string }): JSX.Element => (
   <SkeletonText noOfLines={1} width={width} />
 );
 
+
+/**
+ * Renders a skeleton for a project card.
+ * @returns The JSX element representing the project card skeleton.
+ */
 export default function ProjectCardSkeleton(): JSX.Element {
   return (
     <Box
