@@ -9,6 +9,12 @@ import { BsGithub, BsLinkedin } from "react-icons/bs";
 import { ReactNode } from "react";
 import { StyledBox } from "@/components/StyledBox";
 
+/**
+ * Represents a social media button.
+ * @param children - The content of the button.
+ * @param label - The label for accessibility.
+ * @param href - The URL to navigate to.
+ */
 const SocialButton = ({
   children,
   label,
