@@ -50,7 +50,7 @@ const SocialButton = ({
 
 export default function Footer() {
   return (
-    <Box className="px-4 lg:px-6 h-14 mx-5 sm:mx-20 flex items-center justify-between sticky top-[100vh] bg-box-color rounded-full">
+    <Box className="px-4 mb-2 lg:px-6 h-14 mx-5 sm:mx-20 flex items-center justify-between sticky top-[100vh] bg-box-color rounded-full">
       <nav className="flex gap-10">
         <SocialButton label="GitHub" href="https://github.com/flotss">
           <BsGithub />
