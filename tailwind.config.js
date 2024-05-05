@@ -4,20 +4,28 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#16161a",
-        secondary: "#252525",
-        buttonbg: "#7f5af0",
-        buttonTxt: "#fffffe",
-        headline: "#fffffe",
-        paragraph: "#94a1b2",
-        stroke: "#010101",
-        hightlight: "#7f5af0",
-        tertiary: "#2cb67d",
-
-        bgElem: "#242629",
-        bgItem: "#16161a",
+        "box-color": "#131312",
       },
     },
+    screens: {
+      'sm': '640px',
+      // => @media (min-width: 640px) { ... }
+
+      'md': '768px',
+      // => @media (min-width: 768px) { ... }
+
+      'lg': '1024px',
+      // => @media (min-width: 1024px) { ... }
+
+      'xl': '1280px',
+      // => @media (min-width: 1280px) { ... }
+
+      '2xl': '1536px',
+      // => @media (min-width: 1536px) { ... }
+      'mdrepo' : '1193px',
+      'lgrepo' : '1415px',
+    }
   },
-  plugins: [],
+  plugins: [require("tailwindcss-animate")],
+  variants: {},
 };

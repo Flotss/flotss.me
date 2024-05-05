@@ -1,17 +1,20 @@
-'use client'
 import {
   Box,
-  Container,
   Link,
-  Stack,
   Text,
   useColorModeValue,
   VisuallyHidden,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
-import { BsGithub, BsDiscord, BsLinkedin } from "react-icons/bs";
+import { BsGithub, BsLinkedin } from "react-icons/bs";
 import { ReactNode } from "react";
+import { StyledBox } from "@/components/StyledBox";
 
+/**
+ * Represents a social media button.
+ * @param children - The content of the button.
+ * @param label - The label for accessibility.
+ * @param href - The URL to navigate to.
+ */
 const SocialButton = ({
   children,
   label,
@@ -47,43 +50,18 @@ const SocialButton = ({
 
 export default function Footer() {
   return (
-    <Box
-      className="bg-secondary text-white w-full bottom-0 left-0 right-0"
-    >
-      <Container
-        as={Stack}
-        maxW={"6xl"}
-        py={4}
-        direction={{ base: "column", md: "row" }}
-        spacing={4}
-        justify={{ base: "center", md: "space-between" }}
-        align={{ base: "center", md: "center" }}
-      >
-        <Text>
-          © 2023{" "}
-          <Link as={NextLink} href="#">
-            Flotss
-          </Link>
-          . All rights reserved
-        </Text>
-        <Stack direction={"row"} spacing={6}>
-          <SocialButton label={"Github"} href={"https://github.com/Flotss"}>
-            <BsGithub />
-          </SocialButton>
-          <SocialButton
-            label={"Discord"}
-            href={"https://discordapp.com/users/262703750920011777"}
-          >
-            <BsDiscord />
-          </SocialButton>
-          <SocialButton
-            label={"Linkedin"}
-            href={"https://www.linkedin.com/in/florian-mangin-784604208/"}
-          >
-            <BsLinkedin />
-          </SocialButton>
-        </Stack>
-      </Container>
+    <Box className="px-4 lg:px-6 h-14 mx-5 sm:mx-20 flex items-center justify-between sticky top-[100vh] bg-box-color rounded-full">
+      <nav className="flex gap-10">
+        <SocialButton label="GitHub" href="https://github.com/flotss">
+          <BsGithub />
+        </SocialButton>
+        <SocialButton label="LinkedIn" href="https://www.linkedin.com/in/florian-mangin-784604208/">
+          <BsLinkedin />
+        </SocialButton>
+      </nav>
+      <Text className="text-xs text-[#A0AEC0]">
+        &copy; Flotss&rsquo;s Portfolio. All rights reserved.
+      </Text>
     </Box>
   );
 }
