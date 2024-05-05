@@ -11,9 +11,6 @@ import Link from "next/link";
  * @returns {JSX.Element} The rendered error code component.
  */
 const WorkInProgress = () : JSX.Element => {
-
-
-
     return (
         <>
             <StyledBox className="flex flex-col items-center justify-center px-5 sm:px-20 py-5 space-y-5 mx-5 sm:mx-20 mt-5">
