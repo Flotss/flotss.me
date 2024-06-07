@@ -28,7 +28,7 @@ export type Repo = {
   watchers_count: number;
   languages: Language[];
   collaborators: Collaborator[];
-  pullrequests: PullRequest[];
+  pullRequests: PullRequest[];
 };
 
 /**
