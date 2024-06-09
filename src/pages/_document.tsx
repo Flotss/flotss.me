@@ -1,5 +1,4 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import { Analytics } from '@vercel/analytics/react';
 
 /**
  * The `Document` component is a custom Next.js component that allows you
@@ -16,9 +15,6 @@ export default function Document() {
       <body>
         {/* The <Main> component is where the main content of your application is rendered */}
         <Main />
-
-        {/* The <Analytics> component is used for analytics tracking (e.g., Vercel Analytics) */}
-        <Analytics />
 
         {/* The <NextScript> component includes Next.js scripts required for the application */}
         <NextScript />
