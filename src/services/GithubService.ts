@@ -5,6 +5,7 @@ import {
   PullRequest,
   Repo,
 } from "@/types/types";
+import { RateLimitError, RepoNotFoundError } from "./exception/GithubErrors";
 
 // Define the type of repositories
 type RepositoryName = {
@@ -50,7 +51,7 @@ export class GithubService {
       reposResponse.message &&
       reposResponse.message.includes("API rate limit exceeded")
     ) {
-      throw new Error("API rate limit exceeded");
+      throw new RateLimitError("API rate limit exceeded");
     }
 
     // Use Promise.all to wait for all promises to resolve
@@ -72,23 +73,24 @@ export class GithubService {
    * @returns A promise that resolves to the repository object, or null if not found.
    */
   public async getRepo(repoName: string): Promise<Repo | null> {
-    const repo = await this.getRepoData(repoName);
-
-    if (!repo) {
+    let repo: Repo = {} as Repo;
+    
+    try {
+      repo = await this.getRepoData(repoName);
+    } catch (error) {
       return null;
     }
 
-    // Retrieve commits
-    repo.commits = await this.getAllCommits(repoName);
     repo.collaborators = await this.getCollaborators(repoName);
+    repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
-    repo.languages = await this.getLanguages(repoName);
+    repo.commits = await this.getAllCommits(repoName);
 
     return repo;
   }
 
-  private async getRepoData(repoName: string): Promise<Repo | null> {
+  private async getRepoData(repoName: string): Promise<Repo> {
     const response = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}`,
       { headers }
@@ -97,13 +99,13 @@ export class GithubService {
     const reponseJson: any = await response.json();
 
     if (!reponseJson || reponseJson.message == "Not Found") {
-      return null;
+      throw new RepoNotFoundError("Repository not found");
     }
     if (
       reponseJson.message &&
       reponseJson.message.includes("API rate limit exceeded")
     ) {
-      throw new Error("API rate limit exceeded");
+      throw new RateLimitError("API rate limit exceeded");
     }
 
     return reponseJson as Repo;
