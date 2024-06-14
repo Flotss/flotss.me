@@ -10,7 +10,7 @@ export default function Projects() {
   return (
     <>
       {/* Render the page title */}
-      <Title title="Mes projets" />
+      <Title title="Mes projets" className='mt-10'/>
 
       {/* Render the list of repositories */}
       <Repos />
