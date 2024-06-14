@@ -40,7 +40,7 @@ import gfm from 'remark-gfm';
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project(props: any) {
+export default function Project(props : any) {
   const router = useRouter();
 
   const [repo, setRepo] = useState<Repo>();
@@ -97,8 +97,9 @@ export default function Project(props: any) {
       const commits = await fetch(`/api/get/${repo.name}/commits`);
       const commitsData = await commits.json();
       setRepo({ ...repo, commits: commitsData });
+      repo.commits = commitsData;
 
-      // saveRepoDataToLocalStorage(repo, name as string);
+      saveRepoDataToLocalStorage(repo, name as string);
     }
 
     /**
@@ -173,7 +174,9 @@ export default function Project(props: any) {
     return (
       <>
         <Head>
-          { router.query.name && <title>Loading repository {router.query.name}...</title> || <title>Loading repository...</title> }
+          {(router.query.name && <title>Loading repository {router.query.name}...</title>) || (
+            <title>Loading repository...</title>
+          )}
         </Head>
         <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
           <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">

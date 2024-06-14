@@ -10,7 +10,18 @@ export default function Document() {
   return (
     <Html lang="en">
       {/* The <Head> component is used to specify metadata and link to external resources */}
-      <Head />
+      <Head>
+        {/* The <title> element specifies the title of the document */}
+        <title>Flotss.me</title>
+
+        {/* The <meta> element provides metadata about the HTML document */}
+        <meta name="description" content="Flotss personal website" />
+        <meta name="author" content="Flotss" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        {/* The <link> element defines the relationship between a document and an external resource */}
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
 
       <body>
         {/* The <Main> component is where the main content of your application is rendered */}
