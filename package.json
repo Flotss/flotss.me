@@ -53,5 +53,8 @@
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix"
+  },
+  "optionalDependencies": {
+    "husky": "^4.3.4"
   }
 }
