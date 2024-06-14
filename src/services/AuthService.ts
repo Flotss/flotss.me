@@ -1,9 +1,6 @@
-import { PrismaClient } from "@prisma/client";
-import {
-  UserAlreadyExistsError,
-  UserNotFoundError,
-} from "./exception/AuthErrors";
-import { hashPassword, setUserJWT } from "@/utils/Security";
+import { hashPassword, setUserJWT } from '@/utils/Security';
+import { PrismaClient } from '@prisma/client';
+import { UserAlreadyExistsError, UserNotFoundError } from './exception/AuthErrors';
 
 export async function login(email: string, password: string): Promise<string> {
   const prisma = new PrismaClient();
@@ -16,17 +13,14 @@ export async function login(email: string, password: string): Promise<string> {
 
   // If no user is found, return null
   if (!user) {
-    throw new UserNotFoundError("Invalid credentials provided.");
+    throw new UserNotFoundError('Invalid credentials provided.');
   }
 
   // Otherwise, set the user JWT and return the token
   return setUserJWT(user);
 }
 
-export async function register(
-  email: string,
-  password: string
-): Promise<string> {
+export async function register(email: string, password: string): Promise<string> {
   const prisma = new PrismaClient();
   const user = await prisma.user.findFirst({
     where: {
@@ -36,7 +30,7 @@ export async function register(
 
   // If the user is found
   if (user) {
-    throw new UserAlreadyExistsError("User already exists.");
+    throw new UserAlreadyExistsError('User already exists.');
   }
 
   const userCreate = await prisma.user.create({
@@ -49,7 +43,7 @@ export async function register(
 
   // If the user is not created, return an error
   if (!userCreate) {
-    throw new UserNotFoundError("Error while creating user.");
+    throw new UserNotFoundError('Error while creating user.');
   }
 
   // Otherwise, set the user JWT and return the token

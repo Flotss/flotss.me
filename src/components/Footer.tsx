@@ -1,13 +1,6 @@
-import {
-  Box,
-  Link,
-  Text,
-  useColorModeValue,
-  VisuallyHidden,
-} from "@chakra-ui/react";
-import { BsGithub, BsLinkedin } from "react-icons/bs";
-import { ReactNode } from "react";
-import { StyledBox } from "@/components/StyledBox";
+import { Box, Link, Text, useColorModeValue, VisuallyHidden } from '@chakra-ui/react';
+import { ReactNode } from 'react';
+import { BsGithub, BsLinkedin } from 'react-icons/bs';
 
 /**
  * Represents a social media button.
@@ -26,20 +19,20 @@ const SocialButton = ({
 }) => {
   return (
     <Link
-      bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
-      rounded={"full"}
+      bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
+      rounded={'full'}
       w={8}
       h={8}
-      cursor={"pointer"}
-      as={"a"}
+      cursor={'pointer'}
+      as={'a'}
       href={href}
-      display={"inline-flex"}
-      alignItems={"center"}
-      justifyContent={"center"}
-      transition={"background 0.3s ease"}
+      display={'inline-flex'}
+      alignItems={'center'}
+      justifyContent={'center'}
+      transition={'background 0.3s ease'}
       isExternal
       _hover={{
-        transform: "scale(1.2)",
+        transform: 'scale(1.2)',
       }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
@@ -50,7 +43,7 @@ const SocialButton = ({
 
 export default function Footer() {
   return (
-    <Box className="px-4 mb-2 lg:px-6 h-14 mx-5 sm:mx-20 flex items-center justify-between sticky top-[100vh] bg-box-color rounded-full">
+    <Box className="sticky top-[100vh] mx-5 mb-2 flex h-14 items-center justify-between rounded-full bg-box-color px-4 sm:mx-20 lg:px-6">
       <nav className="flex gap-10">
         <SocialButton label="GitHub" href="https://github.com/flotss">
           <BsGithub />

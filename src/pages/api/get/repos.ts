@@ -4,19 +4,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Repo[] | Repo | { message: string }>
+  res: NextApiResponse<Repo[] | Repo | { message: string }>,
 ) {
-  
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method not allowed' });
     return;
   }
-  
+
   const { name } = req.query;
-  if (name === undefined || typeof name !== 'string') {
-    res.status(400).json({ message: 'Invalid query' });
-    return;
-  }
 
   const githubService = new GithubService();
 
@@ -27,7 +22,7 @@ export default async function handler(
       if (repo) {
         res.status(200).json(repo);
       } else {
-        res.status(404).json({ message: "Repo not found" });
+        res.status(404).json({ message: 'Repo not found' });
       }
       return;
     }
@@ -56,6 +51,6 @@ export default async function handler(
     res.status(200).json(repos);
   } catch (e: any) {
     // Gestion des erreurs
-    res.status(400).json({ message: e.message + " from repos.ts " + e.name });
+    res.status(400).json({ message: e.message + ' from repos.ts ' + e.name });
   }
 }

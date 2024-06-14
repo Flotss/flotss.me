@@ -1,7 +1,5 @@
-import WorkInProgress from "@/components/WorkInProgress";
+import WorkInProgress from '@/components/WorkInProgress';
 
-export default function contact () {
-    return (
-        <WorkInProgress />
-    )
+export default function contact() {
+  return <WorkInProgress />;
 }

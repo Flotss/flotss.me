@@ -1,11 +1,11 @@
-import { Box } from "@chakra-ui/react";
-import { Ref } from "react";
+import { Box } from '@chakra-ui/react';
+import { Ref } from 'react';
 
 interface StyledBoxProps {
-    children: React.ReactNode;
-    className?: string;
-    ref?: Ref<HTMLDivElement>;
-    style?: React.CSSProperties;
+  children: React.ReactNode;
+  className?: string;
+  ref?: Ref<HTMLDivElement>;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -20,9 +20,9 @@ interface StyledBoxProps {
  * @returns {JSX.Element} - The rendered `StyledBox` component.
  */
 export const StyledBox = ({ children, className, ...props }: StyledBoxProps) => {
-    return (
-        <Box className={`rounded-3xl bg-box-color p-8 ${className}`} {...props}>
-            {children}
-        </Box>
-    );
+  return (
+    <Box className={`rounded-3xl bg-box-color p-8 ${className}`} {...props}>
+      {children}
+    </Box>
+  );
 };

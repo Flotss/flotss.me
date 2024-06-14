@@ -1,42 +1,30 @@
 import { StyledBox } from '@/components/StyledBox';
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import withAuth from '@/components/auth/withAuth';
+import Router from 'next/router';
+import { useState } from 'react';
 
-export default function LoginPage() {
-  const router = useRouter();
+function DashBoard() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Get cookie 'UserJWT' and check if it exists
-    const token = localStorage.getItem('UserJWT');
-    console.log('Token:', token);
-    if (token) {
-      router.push('/admin/dashboard');
-    }
-  }, [router]);
-
-  const handleLogin = async () => {
-    try {
-      fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      }).then(async (response) => {
-        if (!response.ok && response.status === 400) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Login failed');
-        } else {
-          router.push('/admin/dashboard');
-        }
-      });
-    } catch (error: any) {
-      setError(error.message);
-    }
+  const handleLogin = () => {
+    console.log(email, password);
+    fetch('/api/post/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    }).then(async (res) => {
+      if (res.ok) {
+        Router.push('/admin/dashboard');
+      } else if (res.status === 400) {
+        const resJson = await res.json();
+        setError(resJson.message);
+      }
+    });
   };
 
   const handleRegister = async () => {
@@ -135,3 +123,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default withAuth(DashBoard);

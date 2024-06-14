@@ -1,11 +1,5 @@
-import {
-  Collaborator,
-  Commit,
-  Language,
-  PullRequest,
-  Repo,
-} from "@/types/types";
-import { RateLimitError, RepoNotFoundError } from "./exception/GithubErrors";
+import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
+import { RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
 // Define the type of repositories
 type RepositoryName = {
@@ -15,23 +9,23 @@ type RepositoryName = {
 // Define the list of repositories
 // TODO : Make a backoffice to manage this list
 const repositories: RepositoryName[] = [
-  { name: "UpdateGenius" },
-  { name: "CrazyCharlyDay" },
-  { name: "ObjectAidJava" },
-  { name: "NETVOD" },
-  { name: "Zeldiablo" },
-  { name: "TimeLineGame" },
-  { name: "flotss.me" },
+  { name: 'UpdateGenius' },
+  { name: 'CrazyCharlyDay' },
+  { name: 'ObjectAidJava' },
+  { name: 'NETVOD' },
+  { name: 'Zeldiablo' },
+  { name: 'TimeLineGame' },
+  { name: 'flotss.me' },
 ];
 
 const headers: any = {
-  "Content-Type": "application/json",
-   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-  "X-GitHub-Api-Version": "2022-11-28",
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+  'X-GitHub-Api-Version': '2022-11-28',
 };
 
 export class GithubService {
-  private owner: string = "Flotss";
+  private owner: string = 'Flotss';
 
   /**
    * Asynchronous function to retrieve repositories.
@@ -40,18 +34,12 @@ export class GithubService {
   public async getRepos(): Promise<Repo[]> {
     let repos: Repo[] = [];
 
-    const response = await fetch(
-      `https://api.github.com/users/${this.owner}/repos`,
-      { headers }
-    );
+    const response = await fetch(`https://api.github.com/users/${this.owner}/repos`, { headers });
 
     const reposResponse: any = await response.json();
 
-    if (
-      reposResponse.message &&
-      reposResponse.message.includes("API rate limit exceeded")
-    ) {
-      throw new RateLimitError("API rate limit exceeded");
+    if (reposResponse.message && reposResponse.message.includes('API rate limit exceeded')) {
+      throw new RateLimitError('API rate limit exceeded');
     }
 
     // Use Promise.all to wait for all promises to resolve
@@ -60,7 +48,7 @@ export class GithubService {
         if (repositories.some((repo) => repo.name === rep.name)) {
           repos.push(rep as Repo);
         }
-      })
+      }),
     );
 
     return repos;
@@ -74,7 +62,7 @@ export class GithubService {
    */
   public async getRepo(repoName: string): Promise<Repo | null> {
     let repo: Repo = {} as Repo;
-    
+
     try {
       repo = await this.getRepoData(repoName);
     } catch (error) {
@@ -85,27 +73,22 @@ export class GithubService {
     repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
-    repo.commits = await this.getAllCommits(repoName);
 
     return repo;
   }
 
   private async getRepoData(repoName: string): Promise<Repo> {
-    const response = await fetch(
-      `https://api.github.com/repos/${this.owner}/${repoName}`,
-      { headers }
-    );
+    const response = await fetch(`https://api.github.com/repos/${this.owner}/${repoName}`, {
+      headers,
+    });
 
     const reponseJson: any = await response.json();
 
-    if (!reponseJson || reponseJson.message == "Not Found") {
-      throw new RepoNotFoundError("Repository not found");
+    if (!reponseJson || reponseJson.message == 'Not Found') {
+      throw new RepoNotFoundError('Repository not found');
     }
-    if (
-      reponseJson.message &&
-      reponseJson.message.includes("API rate limit exceeded")
-    ) {
-      throw new RateLimitError("API rate limit exceeded");
+    if (reponseJson.message && reponseJson.message.includes('API rate limit exceeded')) {
+      throw new RateLimitError('API rate limit exceeded');
     }
 
     return reponseJson as Repo;
@@ -115,7 +98,7 @@ export class GithubService {
     // Retrieve collaborators
     const collaboratorsResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/collaborators`,
-      { headers }
+      { headers },
     );
 
     if (collaboratorsResponse.ok) {
@@ -130,7 +113,7 @@ export class GithubService {
     // Retrieve languages
     const languagesResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/languages`,
-      { headers }
+      { headers },
     );
     if (languagesResponse.ok) {
       const languagesJson: unknown = await languagesResponse.json();
@@ -138,7 +121,7 @@ export class GithubService {
 
       const total = Object.values(languages).reduce(
         (acc: number, value: unknown) => acc + (value as number),
-        0
+        0,
       );
 
       languages = Object.keys(languages).map((key) => {
@@ -168,7 +151,7 @@ export class GithubService {
     // Retrieve pull requests
     const pullrequestsResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/pulls`,
-      { headers }
+      { headers },
     );
 
     if (pullrequestsResponse.ok) {
@@ -193,6 +176,11 @@ export class GithubService {
     while (true) {
       const url = `https://api.github.com/repos/${this.owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
       const response = await fetch(url, { headers });
+
+      if (response.status === 404) {
+        throw new RepoNotFoundError('Repository not found');
+      }
+
       const data: unknown = await response.json();
       const commitsResponse: any[] = Array.isArray(data) ? data : [];
 
@@ -222,12 +210,12 @@ export class GithubService {
     // Retrieve README.md file
     const readmeResponse = await fetch(
       `https://raw.githubusercontent.com/${this.owner}/${repoName}/main/README.md`,
-      { headers }
+      { headers },
     );
     if (readmeResponse.ok) {
       return await readmeResponse.text();
     } else {
-      return "";
+      return '';
     }
   }
 }
