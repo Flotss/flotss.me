@@ -55,6 +55,6 @@
     "*.js": "eslint --cache --fix"
   },
   "optionalDependencies": {
-    "husky": "^4.3.4"
+    "husky": "^9.0.1"
   }
 }
