@@ -40,7 +40,7 @@ import gfm from 'remark-gfm';
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project(props : any) {
+export default function Project(props: any) {
   const router = useRouter();
 
   const [repo, setRepo] = useState<Repo>();

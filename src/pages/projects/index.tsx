@@ -6,11 +6,11 @@ import Title from '@/components/Title';
  *
  * @returns {JSX.Element} - The rendered `Projects` component.
  */
-export default function Projects() {
+export default function Projects(props: any) {
   return (
     <>
       {/* Render the page title */}
-      <Title title="Mes projets" className='mt-10'/>
+      <Title title="Mes projets" className="mt-10" />
 
       {/* Render the list of repositories */}
       <Repos />

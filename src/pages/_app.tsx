@@ -4,6 +4,7 @@ import '@/styles/scrollbar.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import dotenv from 'dotenv';
 import type { AppProps } from 'next/app';
+// eslint-disable-next-line @next/next/no-document-import-in-page
 
 /**
  * The `App` component is the entry point for your Next.js application.
@@ -11,7 +12,13 @@ import type { AppProps } from 'next/app';
  * @param {AppProps} props - The properties passed to the `App` component.
  * @returns {JSX.Element} - The rendered `App` component.
  */
-export default function App({ Component, pageProps }: { Component: React.ComponentType, pageProps: any }) {
+export default function App({
+  Component,
+  pageProps,
+}: {
+  Component: React.ComponentType;
+  pageProps: any;
+}) {
   // Load environment variables from a .env file if available
   dotenv.config();
 
