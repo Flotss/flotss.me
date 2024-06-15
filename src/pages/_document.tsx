@@ -1,3 +1,4 @@
+import CustomHead from '@/components/CustomHead';
 import Document, { Head, Html, Main, NextScript } from 'next/document';
 
 /**
@@ -10,7 +11,7 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <CustomHead />
         <body>
           {/* The <Main> component is where the main content of your application is rendered */}
           <Main />
