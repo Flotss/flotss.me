@@ -11,6 +11,7 @@ export default class MyDocument extends Document {
   render() {
     return (
       <Html>
+        <Head />
         <CustomHead />
         <body>
           {/* The <Main> component is where the main content of your application is rendered */}
