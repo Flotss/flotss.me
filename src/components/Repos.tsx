@@ -27,6 +27,7 @@ import { StyledBox } from './StyledBox';
 type ReposProps = {
   filterVisible?: boolean;
   limit?: number;
+  onReposCount?: (count: number) => void;
 };
 
 /**
@@ -54,6 +55,8 @@ export default function Repos(props: ReposProps): JSX.Element {
 
   const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
+
+  const onReposCount = props.onReposCount;
 
   const getMapCountOfLang = (reposParam: Repo[]) => {
     let languageCountMap = new Map<string, number>();
@@ -195,6 +198,7 @@ export default function Repos(props: ReposProps): JSX.Element {
     }
 
     setFilteredRepos(filteredRepos);
+    onReposCount && onReposCount(filteredRepos.length);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repos, isArchived, isPrivate, selectedLanguage, search]);
 

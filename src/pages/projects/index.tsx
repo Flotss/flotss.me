@@ -1,20 +1,24 @@
 import Repos from '@/components/Repos';
 import Title from '@/components/Title';
-import { GithubService } from '@/services/GithubService';
+import { useState } from 'react';
 
 /**
  * The `Projects` component is responsible for displaying a list of repositories.
  *
  * @returns {JSX.Element} - The rendered `Projects` component.
  */
-export default function Projects(props: any) {
+export default function Projects() {
+  const [reposCount, setReposCount] = useState<number | null>(null);
+
+  const handleReposCount = (count: number) => {
+    setReposCount(count);
+  };
+
   return (
     <>
-      {/* Render the page title */}
-      <Title title="My projects" className="mt-10" />
+      <Title title={`My projects${reposCount !== 0 ? ` (${reposCount})` : ''}`} className="mt-10" />
 
-      {/* Render the list of repositories */}
-      <Repos filterVisible={true} />
+      <Repos filterVisible={true} onReposCount={handleReposCount} />
     </>
   );
 }
