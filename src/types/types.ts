@@ -1,3 +1,8 @@
+export type RepoLocalStorage = {
+  repos: Repo[];
+  lastRequestDate: number;
+};
+
 /**
  * Represents a GitHub repository.
  */
@@ -26,6 +31,7 @@ export type Repo = {
   subscribers_count: number;
   forks_count: number;
   watchers_count: number;
+  private: boolean;
   languages: Language[];
   collaborators: Collaborator[];
   pullRequests: PullRequest[];

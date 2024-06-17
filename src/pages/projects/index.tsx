@@ -13,7 +13,7 @@ export default function Projects(props: any) {
       <Title title="Mes projets" className="mt-10" />
 
       {/* Render the list of repositories */}
-      <Repos />
+      <Repos filterVisible={true} />
     </>
   );
 }

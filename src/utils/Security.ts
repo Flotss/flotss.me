@@ -1,10 +1,5 @@
 import { User } from '@prisma/client';
-import { createHash } from 'crypto';
 import * as jose from 'jose';
-
-export async function hashPassword(password: string): Promise<string> {
-  return createHash('sha256').update(password).digest('hex');
-}
 
 export async function setUserJWT(user: User) {
   const token = new jose.SignJWT({

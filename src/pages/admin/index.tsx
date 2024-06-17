@@ -43,6 +43,20 @@ export default function LoginPage(props: any) {
   const handleRegister = async () => {
     try {
       alert('Registration successful');
+      fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      }).then(async (response) => {
+        if (!response.ok && response.status === 400) {
+          const errorData = await response.json();
+          setError(errorData.message || 'Registration failed');
+        } else {
+          router.push('/admin/dashboard');
+        }
+      });
     } catch (error: any) {
       alert(error.message);
       setError(error.message);

@@ -5,6 +5,7 @@ module.exports = {
     extend: {
       colors: {
         'box-color': '#131312',
+        filterSearch: '#202020',
       },
     },
     screens: {

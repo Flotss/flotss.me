@@ -12,6 +12,13 @@ export class UserAlreadyExistsError extends AuthError {
   }
 }
 
+export class EmailAlreadyExistsError extends AuthError {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'EmailAlreadyExistsError';
+  }
+}
+
 export class UserNotFoundError extends AuthError {
   constructor(message?: string) {
     super(message);

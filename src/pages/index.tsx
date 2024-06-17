@@ -48,7 +48,7 @@ export default function Home() {
           className="mt-10 text-2xl mdrepo:text-4xl lgrepo:text-6xl"
         ></Title>
         {/* Display a list of projects or repositories using the `Repos` component */}
-        <Repos />
+        <Repos limit={5} />
       </StyledBox>
     </>
   );
