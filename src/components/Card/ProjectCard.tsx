@@ -20,14 +20,23 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
   const isPrivate = props.repo.private;
 
   return (
-    <Link href={`projects/${name}`}>
+    <Link
+      href={`projects/${name}`}
+      // disable the link if the repository is private
+      onClick={(e) => {
+        if (isPrivate) {
+          e.preventDefault();
+        }
+        return;
+      }}
+    >
       <Box
-        className="glow bg-box-color-light shadow-shadow-color transform overflow-ellipsis rounded-xl border border-black shadow-md transition duration-500 ease-in-out hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl md:max-w-2xl"
+        className={`glow bg-box-color-light transform overflow-ellipsis rounded-xl border border-black transition duration-500 ease-in-out md:max-w-2xl ${isPrivate ? '' : 'shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'}`}
         p={8}
         width="26rem"
         height="10rem"
         overflow="hidden"
-        // if private repo, add a lock icon
+        cursor={isPrivate ? 'not-allowed' : 'pointer'}
       >
         <Box className="flex flex-col">
           <Box className="flex justify-between">
