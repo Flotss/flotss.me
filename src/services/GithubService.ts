@@ -1,12 +1,7 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
-import { saveRepoDescription } from '@/utils/RepoUtils';
+import { createIfNotExists } from '@/utils/RepoUtils';
 import { PrismaClient } from '@prisma/client';
 import { RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
-
-// Define the type of repositories
-type RepositoryName = {
-  name: string;
-};
 
 const headers: any = {
   'Content-Type': 'application/json',
@@ -16,7 +11,6 @@ const headers: any = {
 
 export class GithubService {
   private owner: string = 'Flotss';
-  private prisma = new PrismaClient();
 
   /**
    * Asynchronous function to retrieve repositories.
@@ -48,10 +42,30 @@ export class GithubService {
       }),
     );
 
+    createIfNotExists(repos);
+    repos = await GithubService.setDescriptions(repos);
+
     return repos;
   }
 
-  public async getPinnedRepos(): Promise<string[]> {
+  private static async setDescriptions(repos: Repo[]): Promise<Repo[]> {
+    const prisma = new PrismaClient();
+
+    // GET ALL DESCRIPTIONS
+    const descriptions = await prisma.repoDescription.findMany();
+
+    // Set descriptions
+    repos.forEach(async (repo) => {
+      const description = descriptions.find((d) => d.repoId === repo.id);
+      if (description) {
+        repo.description = description.description ?? repo.description;
+      }
+    });
+
+    return repos;
+  }
+
+  private async getPinnedRepos(): Promise<string[]> {
     // Fetch pinned repositories GraphQL query
     const query = {
       query: `{

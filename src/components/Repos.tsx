@@ -108,7 +108,7 @@ export default function Repos(props: ReposProps): JSX.Element {
       const repositoryArray = sortRepos(data);
 
       const reposData = {
-        repos: data,
+        repos: repositoryArray,
         lastRequestDate: new Date().getTime(),
       };
 

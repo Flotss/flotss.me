@@ -40,3 +40,24 @@ export const saveRepoDescription = (repos: Repo[]): void => {
     });
   });
 };
+
+export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
+  const prisma = new PrismaClient();
+
+  // Create a new repo record if not exists
+  repos.forEach(async (repo) => {
+    try {
+      const existingRepo = await prisma.repoDescription.findUnique({ where: { repoId: repo.id } });
+      if (!existingRepo) {
+        await prisma.repoDescription.create({
+          data: { repoId: repo.id, description: repo.description, name: repo.name, url: repo.url },
+        });
+      }
+    } catch (e: any) {
+      // Change the type annotation of 'e' to 'any'
+      if (e.code !== 'P2002') {
+        throw e;
+      }
+    }
+  });
+};
