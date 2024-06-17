@@ -20,6 +20,11 @@ export default async function handler(
     if (name !== undefined) {
       const repo = await githubService.getRepo(name as string);
       if (repo) {
+        if (repo.private) {
+          res.status(403).json({ message: 'Repository is private' });
+          return;
+        }
+
         res.status(200).json(repo);
       } else {
         res.status(404).json({ message: 'Repo not found' });

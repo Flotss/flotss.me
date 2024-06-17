@@ -41,7 +41,7 @@ export default function Project() {
   const router = useRouter();
 
   const [repo, setRepo] = useState<Repo>();
-  const [error, setError] = useState<string | undefined>(undefined); // 404 or 400
+  const [error, setError] = useState<{ error: string; code: string } | undefined>(undefined); // 404 or 400
   const toast = useToast();
 
   /**
@@ -73,17 +73,11 @@ export default function Project() {
       const response = await fetch(`/api/get/repos?name=${name}`);
 
       if (!response.ok) {
-        if (response.status == 400) {
-          const message = await response.json().then((data) => data.message);
-          displayToast('Erreur', message, 'error');
-          setError('400');
-        }
-
-        if (response.status == 404) {
-          const message = await response.json().then((data) => data.message);
-          displayToast('Erreur', message, 'error');
-          setError('404');
-        }
+        const reponse = await response.json();
+        const message = reponse.message;
+        const code = response.status.toString();
+        displayToast('Erreur', message, 'error');
+        setError({ error: message, code });
         return;
       }
 
@@ -153,12 +147,8 @@ export default function Project() {
     fetchRepoData();
   }, [router.query, toast]);
 
-  if (error == '404' && !repo) {
-    return <ErrorCode code={'404'} message={"Le repository n'existe pas"} />;
-  }
-
-  if (error == '400' && !repo) {
-    return <ErrorCode code={'400'} message={'Erreur lors de la récupération des données'} />;
+  if (error && !repo) {
+    return <ErrorCode code={error.code} message={error.error} />;
   }
 
   /**
