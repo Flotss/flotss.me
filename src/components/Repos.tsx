@@ -72,7 +72,12 @@ export default function Repos(props: ReposProps): JSX.Element {
   };
 
   const getLanguageValues = (reposParam: Repo[]) => {
-    return new Set<string>(reposParam.map((repo) => repo.language).sort());
+    return new Set<string>(
+      reposParam
+        .map((repo) => repo.language)
+        .filter((language) => language !== null)
+        .sort(),
+    );
   };
 
   useEffect(() => {
