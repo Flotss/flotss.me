@@ -31,7 +31,7 @@ export default function ProjectCard(props: ProjectCardProps): JSX.Element {
       }}
     >
       <Box
-        className={`glow bg-box-color-light transform overflow-ellipsis rounded-xl border border-black transition duration-500 ease-in-out md:max-w-2xl ${isPrivate ? '' : 'shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'}`}
+        className={`glow bg-box-color-light transform overflow-ellipsis rounded-xl border border-black transition duration-500 ease-in-out md:max-w-2xl ${isPrivate ? '' : 'shadow-shadow-color shadow-sm hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'}`}
         p={8}
         width="26rem"
         height="10rem"
