@@ -36,17 +36,6 @@ export default async function handler(
       return;
     }
 
-    // Trier les dépôts, en mettant ceux qui sont archivés à la fin
-    repos.sort((a, b) => {
-      if (a.archived && !b.archived) {
-        return 1;
-      } else if (a.archived === b.archived) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
-
     // Renvoi de la liste des dépôts
     res.status(200).json(repos);
   } catch (e: any) {

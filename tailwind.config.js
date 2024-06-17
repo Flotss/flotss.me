@@ -5,7 +5,9 @@ module.exports = {
     extend: {
       colors: {
         'box-color': '#131312',
-        filterSearch: '#202020',
+        'box-color-light': '#191919',
+        'filter-search': '#202020',
+        'shadow-color': '#BDFFE3',
       },
     },
     screens: {

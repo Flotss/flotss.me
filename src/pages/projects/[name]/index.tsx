@@ -16,14 +16,11 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTrigger,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
   Text,
+  Tooltip,
   useToast,
 } from '@chakra-ui/react';
 import Head from 'next/head';
@@ -40,7 +37,7 @@ import gfm from 'remark-gfm';
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project(props: any) {
+export default function Project() {
   const router = useRouter();
 
   const [repo, setRepo] = useState<Repo>();
@@ -282,7 +279,7 @@ export default function Project(props: any) {
                 {/* https://img.shields.io/badge/any_text-you_like-blue */}
                 <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
                   <Image
-                    src={`https://img.shields.io/badge/Stars-${repo.stars}-green`}
+                    src={`https://img.shields.io/badge/Stars-${repo.stargazers_count}-green`}
                     alt="Stars"
                   />
                 </MenuItem>
@@ -328,31 +325,53 @@ export default function Project(props: any) {
             </StyledText>
 
             <StyledText className="pb-2 pt-5">Collaborateurs :</StyledText>
-            <Flex width={'100%'} gap={5} className="justify-around">
+            <Flex width={'100%'} gap={5} className="justify-around" flexWrap={'wrap'}>
               {repo.collaborators.map((collaborator, index) => (
-                <Popover key={index} placement="top" trigger="hover">
-                  <PopoverTrigger>
-                    <Link href={collaborator.html_url} isExternal>
-                      <Box className="flex flex-col items-center justify-center space-y-2">
-                        <Avatar
-                          name={collaborator.login}
-                          src={collaborator.avatar_url}
-                          size={repo.collaborators.length <= 4 ? 'md' : 'xs'}
-                        />
-                        {collaborator.login == 'Flotss' && (
-                          <Badge ml="1" colorScheme="green">
-                            Me
-                          </Badge>
-                        )}
-                      </Box>
+                <>
+                  {/* <Popover key={index} placement="top" trigger="hover">
+                    <PopoverTrigger>
+                      <Link href={collaborator.html_url} isExternal>
+                        <Box className="flex flex-col items-center justify-center space-y-2">
+                          <Avatar
+                            name={collaborator.login}
+                            src={collaborator.avatar_url}
+                            size={repo.collaborators.length <= 4 ? 'md' : 'xs'}
+                          />
+                          {collaborator.login == 'Flotss' && (
+                            <Badge ml="1" colorScheme="green">
+                              Me
+                            </Badge>
+                          )}
+                        </Box>
+                      </Link>
+                    </PopoverTrigger>
+                    <PopoverContent width={`${collaborator.login.length / 1.5}rem`}>
+                      <PopoverHeader className="flex items-center justify-center bg-box-color">
+                        {collaborator.login}
+                      </PopoverHeader>
+                    </PopoverContent>
+                  </Popover> */}
+                  <Tooltip
+                    hasArrow
+                    label={collaborator.login}
+                    bg="gray.300"
+                    placement="top"
+                    color="black"
+                  >
+                    <Link
+                      className="flex flex-col items-center space-y-2"
+                      href={collaborator.html_url}
+                      isExternal
+                    >
+                      <Avatar name={collaborator.login} src={collaborator.avatar_url} size={'md'} />
+                      {collaborator.login == 'Flotss' && (
+                        <Badge ml="1" colorScheme="green">
+                          Me
+                        </Badge>
+                      )}
                     </Link>
-                  </PopoverTrigger>
-                  <PopoverContent width={`${collaborator.login.length / 1.5}rem`}>
-                    <PopoverHeader className="flex items-center justify-center bg-box-color">
-                      {collaborator.login}
-                    </PopoverHeader>
-                  </PopoverContent>
-                </Popover>
+                  </Tooltip>
+                </>
               ))}
             </Flex>
           </StyledBox>

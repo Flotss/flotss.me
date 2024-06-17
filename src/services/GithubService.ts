@@ -1,22 +1,12 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
+import { saveRepoDescription } from '@/utils/RepoUtils';
+import { PrismaClient } from '@prisma/client';
 import { RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
 // Define the type of repositories
 type RepositoryName = {
   name: string;
 };
-
-// Define the list of repositories
-// TODO : Make a backoffice to manage this list
-const repositories: RepositoryName[] = [
-  { name: 'UpdateGenius' },
-  { name: 'CrazyCharlyDay' },
-  { name: 'ObjectAidJava' },
-  { name: 'NETVOD' },
-  { name: 'Zeldiablo' },
-  { name: 'TimeLineGame' },
-  { name: 'flotss.me' },
-];
 
 const headers: any = {
   'Content-Type': 'application/json',
@@ -26,6 +16,7 @@ const headers: any = {
 
 export class GithubService {
   private owner: string = 'Flotss';
+  private prisma = new PrismaClient();
 
   /**
    * Asynchronous function to retrieve repositories.
@@ -34,7 +25,10 @@ export class GithubService {
   public async getRepos(): Promise<Repo[]> {
     let repos: Repo[] = [];
 
-    const response = await fetch(`https://api.github.com/users/${this.owner}/repos`, { headers });
+    const response = await fetch(
+      `https://api.github.com/search/repositories?q=user:${this.owner}`,
+      { headers },
+    );
 
     const reposResponse: any = await response.json();
 
@@ -43,15 +37,61 @@ export class GithubService {
     }
 
     // Use Promise.all to wait for all promises to resolve
+    const pinnedRepos = await this.getPinnedRepos();
     await Promise.all(
-      reposResponse.map(async (rep: any) => {
-        if (repositories.some((repo) => repo.name === rep.name)) {
-          repos.push(rep as Repo);
+      reposResponse.items.map(async (rep: any) => {
+        if (!rep.forked) {
+          repos.push({ ...rep, pinned: pinnedRepos.includes(rep.name) } as Repo);
+        } else if (rep.forked && pinnedRepos.includes(rep.name)) {
+          repos.push({ ...rep, pinned: true } as Repo);
         }
       }),
     );
 
     return repos;
+  }
+
+  public async getPinnedRepos(): Promise<string[]> {
+    // Fetch pinned repositories GraphQL query
+    const query = {
+      query: `{
+        user(login: "${this.owner}") {
+          pinnedItems(first: 6, types: REPOSITORY) {
+            nodes {
+              ... on Repository {
+                name
+              }
+            }
+          }
+        }
+      }`,
+    };
+
+    try {
+      const response = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        },
+        body: JSON.stringify(query),
+      });
+
+      if (response.status === 401) {
+        throw new Error('Bad credentials. Please check your GitHub token.');
+      }
+
+      const data = await response.json();
+
+      if (data.errors) {
+        console.error(data.errors);
+        throw new Error('Error fetching data from GitHub GraphQL API.');
+      }
+
+      return data.data.user.pinnedItems.nodes.map((repo: any) => repo.name);
+    } catch (error) {}
+
+    return [];
   }
 
   /**
@@ -69,7 +109,12 @@ export class GithubService {
       return null;
     }
 
-    repo.collaborators = await this.getCollaborators(repoName);
+    repo.collaborators = await (
+      await this.getCollaborators(repoName)
+    ).sort(
+      // IF owner is first, return -1, else return 1
+      (a, b) => (a.login === this.owner ? -1 : b.login === this.owner ? 1 : 0),
+    );
     repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
@@ -193,7 +238,7 @@ export class GithubService {
           name: commit.commit.author.name,
           date: commit.commit.author.date,
         },
-        message: commit.commit.message,
+        message: commit.commit.message.slice(0, 80),
         url: commit.html_url,
       }));
 

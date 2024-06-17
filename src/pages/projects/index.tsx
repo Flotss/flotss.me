@@ -1,5 +1,6 @@
 import Repos from '@/components/Repos';
 import Title from '@/components/Title';
+import { GithubService } from '@/services/GithubService';
 
 /**
  * The `Projects` component is responsible for displaying a list of repositories.
@@ -10,7 +11,7 @@ export default function Projects(props: any) {
   return (
     <>
       {/* Render the page title */}
-      <Title title="Mes projets" className="mt-10" />
+      <Title title="My projects" className="mt-10" />
 
       {/* Render the list of repositories */}
       <Repos filterVisible={true} />

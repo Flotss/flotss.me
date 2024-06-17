@@ -14,7 +14,7 @@ export type Repo = {
   html_url: string;
   created_at: string;
   updated_at: string;
-  stars: number;
+  stargazers_count: number;
   archived: boolean;
   language: string;
   homepage: string;
@@ -32,6 +32,7 @@ export type Repo = {
   forks_count: number;
   watchers_count: number;
   private: boolean;
+  pinned: boolean;
   languages: Language[];
   collaborators: Collaborator[];
   pullRequests: PullRequest[];
