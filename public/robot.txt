@@ -1,5 +1,3 @@
 User-agent: *
-Disallow: /admin/
-Disallow: /*.jpg$
-Disallow: /*.jpeg$
-Disallow: /*.png$
+Disallow: /
+Allow: /$
