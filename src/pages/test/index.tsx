@@ -7,7 +7,7 @@ export default function Home() {
   const repo: Repo = {
     name: 'test',
     description: 'test',
-    stars: 0,
+    stargazers_count: 0,
     archived: true,
     id: 0,
     url: '',
@@ -37,6 +37,8 @@ export default function Home() {
     languages: [],
     collaborators: [],
     pullRequests: [],
+    pinned: true,
+    private: false,
   };
 
   return (

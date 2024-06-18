@@ -3,11 +3,12 @@ import { PrismaClient } from '@prisma/client';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
-  { pinned: true, private: false, archived: false }, // Épinglé et public
-  { pinned: false, private: false, archived: false }, // Public (non épinglé)
-  { pinned: true, archived: true }, // Archivé et épinglé
-  { pinned: false, archived: true }, // Archivé (non épinglé)
-  { private: true }, // Privé
+  { pinned: true, private: false, archived: false }, // Pinned and public
+  { pinned: false, private: false, archived: false }, // Public (not pinned)
+  { pinned: true, archived: true }, // Archived and pinned
+  { pinned: false, archived: true }, // Archived (not pinned)
+  { private: true, archived: false }, // Private
+  { private: true, archived: true }, // Archived and private
 ];
 
 export const sortRepos = (repos: Repo[]): Repo[] => {
@@ -17,13 +18,13 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
       const bMatches = Object.keys(priority).every((key) => (b as any)[key] === priority[key]);
 
       if (aMatches && !bMatches) {
-        return -1; // a vient avant b
+        return -1; // a comes before b
       } else if (!aMatches && bMatches) {
-        return 1; // b vient avant a
+        return 1; // b comes before a
       }
     }
 
-    // Si tout le reste est égal, tri alphabétique
+    // If everything else is equal, sort alphabetically
     return a.name.localeCompare(b.name);
   });
 };
