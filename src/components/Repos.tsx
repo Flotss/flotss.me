@@ -243,6 +243,7 @@ export default function Repos(props: ReposProps): JSX.Element {
               <AccordionPanel pb={4}>
                 <Filters
                   countFilter={countFilter}
+                  search={search}
                   setSearch={setSearch}
                   isArchived={isArchived}
                   setIsArchived={setIsArchived}
@@ -262,6 +263,7 @@ export default function Repos(props: ReposProps): JSX.Element {
         {props.filterVisible && !isMobile && (
           <Filters
             countFilter={countFilter}
+            search={search}
             setSearch={setSearch}
             isArchived={isArchived}
             setIsArchived={setIsArchived}
@@ -306,6 +308,7 @@ export default function Repos(props: ReposProps): JSX.Element {
 
 type FilterProps = {
   countFilter: number;
+  search: string;
   setSearch: (value: string) => void;
   isArchived: boolean;
   setIsArchived: (value: boolean) => void;
@@ -322,6 +325,7 @@ type FilterProps = {
 const Filters = (props: FilterProps) => {
   const {
     countFilter,
+    search,
     setSearch,
     isArchived,
     setIsArchived,
@@ -339,7 +343,6 @@ const Filters = (props: FilterProps) => {
       <div className="mr-6 flex w-full flex-row items-center justify-between">
         <span>Filters {countFilter > 0 && <span>({countFilter})</span>}</span>
         <Button
-          // outline
           size="sm"
           colorScheme="red"
           variant="outline"
@@ -353,6 +356,7 @@ const Filters = (props: FilterProps) => {
         className="my-4 rounded-md ring-orange-500"
         placeholder="Search for a project"
         size="sm"
+        value={search}
         onChange={(e) => setSearch(e.target.value)}
       ></Input>
       <Accordion allowMultiple={true}>
