@@ -1,37 +1,16 @@
-import {
-  Collaborator,
-  Commit,
-  Language,
-  PullRequest,
-  Repo,
-} from "@/types/types";
-import { RateLimitError, RepoNotFoundError } from "./exception/GithubErrors";
-
-// Define the type of repositories
-type RepositoryName = {
-  name: string;
-};
-
-// Define the list of repositories
-// TODO : Make a backoffice to manage this list
-const repositories: RepositoryName[] = [
-  { name: "UpdateGenius" },
-  { name: "CrazyCharlyDay" },
-  { name: "ObjectAidJava" },
-  { name: "NETVOD" },
-  { name: "Zeldiablo" },
-  { name: "TimeLineGame" },
-  { name: "flotss.me" },
-];
+import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
+import { createIfNotExists } from '@/utils/RepoUtils';
+import { PrismaClient } from '@prisma/client';
+import { RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
 const headers: any = {
-  "Content-Type": "application/json",
-   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-  "X-GitHub-Api-Version": "2022-11-28",
+  'Content-Type': 'application/json',
+  Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+  'X-GitHub-Api-Version': '2022-11-28',
 };
 
 export class GithubService {
-  private owner: string = "Flotss";
+  private owner: string = 'Flotss';
 
   /**
    * Asynchronous function to retrieve repositories.
@@ -41,29 +20,110 @@ export class GithubService {
     let repos: Repo[] = [];
 
     const response = await fetch(
-      `https://api.github.com/users/${this.owner}/repos`,
-      { headers }
+      `https://api.github.com/search/repositories?q=user:${this.owner}`,
+      { headers },
     );
 
     const reposResponse: any = await response.json();
 
-    if (
-      reposResponse.message &&
-      reposResponse.message.includes("API rate limit exceeded")
-    ) {
-      throw new RateLimitError("API rate limit exceeded");
+    if (reposResponse.message && reposResponse.message.includes('API rate limit exceeded')) {
+      throw new RateLimitError('API rate limit exceeded');
     }
 
     // Use Promise.all to wait for all promises to resolve
+    const pinnedRepos = await this.getPinnedRepos();
     await Promise.all(
-      reposResponse.map(async (rep: any) => {
-        if (repositories.some((repo) => repo.name === rep.name)) {
-          repos.push(rep as Repo);
+      reposResponse.items.map(async (rep: any) => {
+        if (!rep.forked) {
+          repos.push({ ...rep, pinned: pinnedRepos.includes(rep.name) } as Repo);
+        } else if (rep.forked && pinnedRepos.includes(rep.name)) {
+          repos.push({ ...rep, pinned: true } as Repo);
         }
-      })
+      }),
     );
 
+    createIfNotExists(repos);
+    repos = await GithubService.setDescriptions(repos);
+
     return repos;
+  }
+
+  private static async setDescriptions(repos: Repo[]): Promise<Repo[]> {
+    const prisma = new PrismaClient();
+
+    // GET ALL DESCRIPTIONS
+    const descriptions = await prisma.repoDescription.findMany();
+
+    // Set descriptions
+    repos.forEach(async (repo) => {
+      const description = descriptions.find((d) => d.repoId === repo.id);
+      if (description) {
+        repo.description = description.description ?? repo.description;
+      }
+    });
+
+    return repos;
+  }
+
+  private async setDescription(repo: Repo): Promise<Repo> {
+    const prisma = new PrismaClient();
+
+    // GET ALL DESCRIPTIONS
+    const description = await prisma.repoDescription.findFirst({
+      where: {
+        repoId: repo.id,
+      },
+    });
+
+    // Set descriptions
+    if (description) {
+      repo.description = description.description ?? repo.description;
+    }
+
+    return repo;
+  }
+
+  private async getPinnedRepos(): Promise<string[]> {
+    // Fetch pinned repositories GraphQL query
+    const query = {
+      query: `{
+        user(login: "${this.owner}") {
+          pinnedItems(first: 6, types: REPOSITORY) {
+            nodes {
+              ... on Repository {
+                name
+              }
+            }
+          }
+        }
+      }`,
+    };
+
+    try {
+      const response = await fetch('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        },
+        body: JSON.stringify(query),
+      });
+
+      if (response.status === 401) {
+        throw new Error('Bad credentials. Please check your GitHub token.');
+      }
+
+      const data = await response.json();
+
+      if (data.errors) {
+        console.error(data.errors);
+        throw new Error('Error fetching data from GitHub GraphQL API.');
+      }
+
+      return data.data.user.pinnedItems.nodes.map((repo: any) => repo.name);
+    } catch (error) {}
+
+    return [];
   }
 
   /**
@@ -74,38 +134,40 @@ export class GithubService {
    */
   public async getRepo(repoName: string): Promise<Repo | null> {
     let repo: Repo = {} as Repo;
-    
+
     try {
       repo = await this.getRepoData(repoName);
     } catch (error) {
       return null;
     }
 
-    repo.collaborators = await this.getCollaborators(repoName);
+    repo.collaborators = await (
+      await this.getCollaborators(repoName)
+    ).sort(
+      // IF owner is first, return -1, else return 1
+      (a, b) => (a.login === this.owner ? -1 : b.login === this.owner ? 1 : 0),
+    );
     repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
-    repo.commits = await this.getAllCommits(repoName);
+
+    repo = await this.setDescription(repo);
 
     return repo;
   }
 
   private async getRepoData(repoName: string): Promise<Repo> {
-    const response = await fetch(
-      `https://api.github.com/repos/${this.owner}/${repoName}`,
-      { headers }
-    );
+    const response = await fetch(`https://api.github.com/repos/${this.owner}/${repoName}`, {
+      headers,
+    });
 
     const reponseJson: any = await response.json();
 
-    if (!reponseJson || reponseJson.message == "Not Found") {
-      throw new RepoNotFoundError("Repository not found");
+    if (!reponseJson || reponseJson.message == 'Not Found') {
+      throw new RepoNotFoundError('Repository not found');
     }
-    if (
-      reponseJson.message &&
-      reponseJson.message.includes("API rate limit exceeded")
-    ) {
-      throw new RateLimitError("API rate limit exceeded");
+    if (reponseJson.message && reponseJson.message.includes('API rate limit exceeded')) {
+      throw new RateLimitError('API rate limit exceeded');
     }
 
     return reponseJson as Repo;
@@ -115,7 +177,7 @@ export class GithubService {
     // Retrieve collaborators
     const collaboratorsResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/collaborators`,
-      { headers }
+      { headers },
     );
 
     if (collaboratorsResponse.ok) {
@@ -130,7 +192,7 @@ export class GithubService {
     // Retrieve languages
     const languagesResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/languages`,
-      { headers }
+      { headers },
     );
     if (languagesResponse.ok) {
       const languagesJson: unknown = await languagesResponse.json();
@@ -138,7 +200,7 @@ export class GithubService {
 
       const total = Object.values(languages).reduce(
         (acc: number, value: unknown) => acc + (value as number),
-        0
+        0,
       );
 
       languages = Object.keys(languages).map((key) => {
@@ -168,7 +230,7 @@ export class GithubService {
     // Retrieve pull requests
     const pullrequestsResponse = await fetch(
       `https://api.github.com/repos/${this.owner}/${repoName}/pulls`,
-      { headers }
+      { headers },
     );
 
     if (pullrequestsResponse.ok) {
@@ -193,6 +255,11 @@ export class GithubService {
     while (true) {
       const url = `https://api.github.com/repos/${this.owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
       const response = await fetch(url, { headers });
+
+      if (response.status === 404) {
+        throw new RepoNotFoundError('Repository not found');
+      }
+
       const data: unknown = await response.json();
       const commitsResponse: any[] = Array.isArray(data) ? data : [];
 
@@ -205,7 +272,7 @@ export class GithubService {
           name: commit.commit.author.name,
           date: commit.commit.author.date,
         },
-        message: commit.commit.message,
+        message: commit.commit.message.slice(0, 80),
         url: commit.html_url,
       }));
 
@@ -222,12 +289,12 @@ export class GithubService {
     // Retrieve README.md file
     const readmeResponse = await fetch(
       `https://raw.githubusercontent.com/${this.owner}/${repoName}/main/README.md`,
-      { headers }
+      { headers },
     );
     if (readmeResponse.ok) {
       return await readmeResponse.text();
     } else {
-      return "";
+      return '';
     }
   }
 }

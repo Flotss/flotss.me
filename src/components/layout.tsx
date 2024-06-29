@@ -1,6 +1,9 @@
+/* eslint-disable @next/next/no-document-import-in-page */
+/* eslint-disable @next/next/no-title-in-document-head */
 import React from 'react';
-import Header from './Header';
 import Footer from './Footer';
+import Header from './Header';
+import { Head } from 'next/document';
 
 /**
  * The Layout component provides a consistent structure for web pages within the application.
@@ -10,7 +13,7 @@ import Footer from './Footer';
  * @param {React.ReactNode} props.children - The content to be rendered within the main content area.
  * @returns {React.ReactNode} - The rendered Layout component.
  */
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }): React.ReactNode {
   return (
     <>
       <Header />

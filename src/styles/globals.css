@@ -27,25 +27,29 @@ a {
 }
 
 .glows {
-	pointer-events: none;
-	position: absolute;
-	inset: 0;
-	filter: blur(calc(var(--blur) * 1px));
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  filter: blur(calc(var(--blur) * 1px));
 }
 
 .glows::after,
 .glows::before {
   --alpha: 0;
-  content: "";
+  content: '';
   background: var(--gradient);
   background-attachment: fixed;
   position: absolute;
-	inset: -5px;
+  inset: -5px;
   border: 10px solid transparent;
   border-radius: var(--border-radius);
-  mask:
-  	linear-gradient(#0000, #0000),
-  	conic-gradient(from calc((var(--start) - (var(--spread) * 0.5)) * 1deg), #000 0deg, #fff, #0000 calc(var(--spread) * 1deg));
+  mask: linear-gradient(#0000, #0000),
+    conic-gradient(
+      from calc((var(--start) - (var(--spread) * 0.5)) * 1deg),
+      #000 0deg,
+      #fff,
+      #0000 calc(var(--spread) * 1deg)
+    );
   mask-composite: intersect;
   mask-clip: padding-box, border-box;
   opacity: var(--active);
@@ -53,22 +57,22 @@ a {
 }
 
 .glow::before {
-	position: absolute;
-	inset: 0;
-	border: var(--border-width) solid transparent;
-	content: "";
-	border-radius: var(--border-radius);
-	pointer-events: none;
-	background: var(--border);
+  position: absolute;
+  inset: 0;
+  border: var(--border-width) solid transparent;
+  content: '';
+  border-radius: var(--border-radius);
+  pointer-events: none;
+  background: var(--border);
   background-attachment: fixed;
   border-radius: var(--border-radius);
-  mask:
-  	linear-gradient(#0000, #0000),
-  	conic-gradient(
-  		from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 1.5)) * 1deg),
-  		hsl(0 0% 100% / 0.15) 0deg,
-  		white,
-  		hsl(0 0% 100% / 0.15) calc(var(--spread) * 2.5deg));
+  mask: linear-gradient(#0000, #0000),
+    conic-gradient(
+      from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 1.5)) * 1deg),
+      hsl(0 0% 100% / 0.15) 0deg,
+      white,
+      hsl(0 0% 100% / 0.15) calc(var(--spread) * 2.5deg)
+    );
   mask-clip: padding-box, border-box;
   mask-composite: intersect;
   opacity: var(--active);
@@ -76,8 +80,8 @@ a {
 }
 
 .glow::after {
-	--bg-size: 100%;
-  content: "";
+  --bg-size: 100%;
+  content: '';
   pointer-events: none;
   position: absolute;
   background: var(--gradient);
@@ -88,9 +92,13 @@ a {
   --alpha: 0;
   inset: 0;
   border: var(--border-width) solid transparent;
-  mask:
-  	linear-gradient(#0000, #0000),
-  	conic-gradient(from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 0.5)) * 1deg), #0000 0deg, #fff, #0000 calc(var(--spread) * 0.5deg));
+  mask: linear-gradient(#0000, #0000),
+    conic-gradient(
+      from calc(((var(--start) + (var(--spread) * 0.25)) - (var(--spread) * 0.5)) * 1deg),
+      #0000 0deg,
+      #fff,
+      #0000 calc(var(--spread) * 0.5deg)
+    );
   filter: brightness(1.5);
   mask-clip: padding-box, border-box;
   mask-composite: intersect;

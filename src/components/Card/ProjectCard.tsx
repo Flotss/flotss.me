@@ -1,7 +1,8 @@
-import { Badge, Box, Divider, Text } from "@chakra-ui/react";
-import Link from "next/link";
-import { StarIcon } from '@chakra-ui/icons'
-import { Repo } from "@/types/types";
+import { Repo } from '@/types/types';
+import { LockIcon, StarIcon } from '@chakra-ui/icons';
+import { Badge, Box, Divider, Text } from '@chakra-ui/react';
+import Link from 'next/link';
+import { VscPinnedDirty } from 'react-icons/vsc';
 
 interface ProjectCardProps {
   repo: Repo;
@@ -15,44 +16,64 @@ interface ProjectCardProps {
  * @returns {JSX.Element} The rendered ProjectCard component.
  */
 export default function ProjectCard(props: ProjectCardProps): JSX.Element {
-  const { repo } = props;
-  const { name, description, stars, archived } = repo;
+  const { name, description, stargazers_count, archived, pinned } = props.repo;
+  const isPrivate = props.repo.private;
 
   return (
-    <Link href={`projects/${name}`}>
+    <Link
+      href={`projects/${name}`}
+      // disable the link if the repository is private
+      onClick={(e) => {
+        if (isPrivate) {
+          e.preventDefault();
+        }
+        return;
+      }}
+    >
       <Box
-        className="glow bg-box-color rounded-xl md:max-w-2xl transition duration-500 ease-in-out transform hover:rounded-3xl hover:-translate-y-1 hover:scale-105 overflow-ellipsis"
+        className={`glow bg-box-color-light transform overflow-ellipsis rounded-xl border border-black transition duration-500 ease-in-out md:max-w-2xl ${isPrivate ? '' : 'shadow-shadow-color shadow-sm hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'}`}
         p={8}
         width="26rem"
         height="10rem"
+        overflow="hidden"
+        cursor={isPrivate ? 'not-allowed' : 'pointer'}
       >
         <Box className="flex flex-col">
           <Box className="flex justify-between">
             <Text
-              className="uppercase tracking-wide text-xl text-gray-300 font-semibold mt-0 mb-1 items-center"
+              className="mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide text-gray-300"
               fontSize="xl"
               fontWeight="semibold"
+              title={name}
             >
+              {isPrivate && (
+                <LockIcon className="mr-1 h-6 w-6 -translate-y-1 pr-1 text-[#E2E8F0]" />
+              )}
               {name}
-              {archived && <Badge ml={1} fontSize='0.8em' marginBottom={1} colorScheme='whiteAlpha'>Archived</Badge>}
+              {archived && (
+                <Badge ml={1} fontSize="0.8em" marginBottom={1} colorScheme="whiteAlpha">
+                  Archived
+                </Badge>
+              )}
             </Text>
-            {stars > 0 && 
-              <Box className="flex justify-between  items-center space-x-1">
-                <Text
-                  className="tracking-wide text-gray-300"
-                  fontSize="xl"
-                  fontWeight="semibold"
-                >
-                  {stars}
-                </Text>
-                <StarIcon />
-              </Box>
-            }
+            <div className="flex items-center">
+              {stargazers_count > 2 && (
+                <Box className="flex items-center justify-between space-x-1">
+                  <Text className="tracking-wide text-gray-300" fontSize="xl" fontWeight="semibold">
+                    {stargazers_count}
+                  </Text>
+                  <StarIcon />
+                </Box>
+              )}
+              {pinned && (
+                <VscPinnedDirty className="ml-2 h-6 w-6 text-[#E2E8F0]" title="Pinned repository" />
+              )}
+            </div>
           </Box>
           <Divider />
           {description && (
             <Text
-              className="block mt-1 text-sm leading-tight font-medium text-gray-300 mb-2"
+              className="mt-1 block text-sm font-medium leading-tight text-gray-300"
               fontSize="sm"
               fontWeight="medium"
             >

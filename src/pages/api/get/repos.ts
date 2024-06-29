@@ -4,19 +4,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Repo[] | Repo | { message: string }>
+  res: NextApiResponse<Repo[] | Repo | { message: string }>,
 ) {
-  
   if (req.method !== 'GET') {
     res.status(405).json({ message: 'Method not allowed' });
     return;
   }
-  
+
   const { name } = req.query;
-  if (name === undefined || typeof name !== 'string') {
-    res.status(400).json({ message: 'Invalid query' });
-    return;
-  }
 
   const githubService = new GithubService();
 
@@ -25,9 +20,14 @@ export default async function handler(
     if (name !== undefined) {
       const repo = await githubService.getRepo(name as string);
       if (repo) {
+        if (repo.private) {
+          res.status(403).json({ message: 'Repository is private' });
+          return;
+        }
+
         res.status(200).json(repo);
       } else {
-        res.status(404).json({ message: "Repo not found" });
+        res.status(404).json({ message: 'Repo not found' });
       }
       return;
     }
@@ -41,21 +41,10 @@ export default async function handler(
       return;
     }
 
-    // Trier les dépôts, en mettant ceux qui sont archivés à la fin
-    repos.sort((a, b) => {
-      if (a.archived && !b.archived) {
-        return 1;
-      } else if (a.archived === b.archived) {
-        return 0;
-      } else {
-        return -1;
-      }
-    });
-
     // Renvoi de la liste des dépôts
     res.status(200).json(repos);
   } catch (e: any) {
     // Gestion des erreurs
-    res.status(400).json({ message: e.message + " from repos.ts " + e.name });
+    res.status(400).json({ message: e.message + ' from repos.ts ' + e.name });
   }
 }

@@ -1,9 +1,9 @@
-import { Box, Text } from "@chakra-ui/react"
+import { Box, Text } from '@chakra-ui/react';
 
 interface TitleProps {
-    title: string
-    className?: string
-    color?: string
+  title: string;
+  className?: string;
+  color?: string;
 }
 
 /**
@@ -17,12 +17,14 @@ interface TitleProps {
  * @returns {JSX.Element} - The rendered `Title` component.
  */
 export default function Title({ title, className, color }: TitleProps) {
-    return (
-        <Box className="flex items-center justify-center">
-            <Text className={`text-3xl mdrepo:text-5xl lgrepo:text-7xl font-bold tracking-tighter sm:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-500 pb-5 pr-1 ${className}`}
-                color={color}>
-                {title}
-            </Text>
-        </Box>
-    )
+  return (
+    <Box className="flex items-center justify-center">
+      <Text
+        className={`bg-gradient-to-r from-white to-gray-500 bg-clip-text pb-5 pr-1 text-3xl font-bold tracking-tighter text-transparent sm:text-5xl mdrepo:text-5xl lgrepo:text-7xl ${className}`}
+        color={color}
+      >
+        {title}
+      </Text>
+    </Box>
+  );
 }
