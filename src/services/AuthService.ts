@@ -54,7 +54,6 @@ export async function register(email: string, password: string): Promise<string>
     });
   });
 
-  console.log(userCreate);
 
   // If the user is not created, return an error
   if (!userCreate) {

@@ -13,7 +13,6 @@ export default function LoginPage(props: any) {
   useEffect(() => {
     // Get cookie 'UserJWT' and check if it exists
     const token = localStorage.getItem('UserJWT');
-    console.log('Token:', token);
     if (token) {
       router.push('/admin/dashboard');
     }

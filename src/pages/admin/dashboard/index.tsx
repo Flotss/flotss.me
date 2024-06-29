@@ -11,7 +11,6 @@ function DashBoard() {
   const [error, setError] = useState('');
 
   const handleLogin = () => {
-    console.log(email, password);
     fetch('/api/post/login', {
       method: 'POST',
       headers: {
