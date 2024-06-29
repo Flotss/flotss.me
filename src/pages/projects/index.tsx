@@ -16,7 +16,7 @@ export default function Projects() {
 
   return (
     <>
-      <Title title={`My projects${reposCount !== 0 ? ` (${reposCount})` : ''}`} className="mt-10" />
+      <Title title={`My projects${reposCount !== 0 && reposCount ? ` (${reposCount})` : ''}`} className="mt-10" />
 
       <Repos filterVisible={true} onReposCount={handleReposCount} />
     </>

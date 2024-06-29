@@ -13,7 +13,7 @@ import { Head } from 'next/document';
  * @param {React.ReactNode} props.children - The content to be rendered within the main content area.
  * @returns {React.ReactNode} - The rendered Layout component.
  */
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }): React.ReactNode {
   return (
     <>
       <Header />

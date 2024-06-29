@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react';
 import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
 import { StyledBox } from './StyledBox';
+import Title from './Title';
 
 type ReposProps = {
   filterVisible?: boolean;
@@ -211,7 +212,7 @@ export default function Repos(props: ReposProps): JSX.Element {
 
   if (loading) {
     // Display skeleton loading cards while data is being fetched
-    const skeletons = Array.from({ length: 6 }).map((_, index) => (
+    const skeletons = Array.from({ length: props.limit ?? 6 }).map((_, index) => (
       <ProjectCardSkeleton key={index} />
     ));
     return (
@@ -227,13 +228,14 @@ export default function Repos(props: ReposProps): JSX.Element {
       <section className="grid-col-1 mx-5 grid gap-3 py-8 sm:mx-20 lg:grid-cols-5" id="projects">
         {props.filterVisible && isMobile && (
           <Accordion allowToggle={true}>
-            <AccordionItem
-              onClick={() => {
-                setIsOpenFilterMobile(!isOpenFilterMobile);
-              }}
-            >
+            <AccordionItem>
               <h2>
-                <AccordionButton className="flex justify-end">
+                <AccordionButton
+                  className="flex justify-end"
+                  onClick={() => {
+                    setIsOpenFilterMobile(!isOpenFilterMobile);
+                  }}
+                >
                   <Box flex="1" textAlign="left" hidden={!isOpenFilterMobile}>
                     Filters
                   </Box>
@@ -287,7 +289,12 @@ export default function Repos(props: ReposProps): JSX.Element {
               <ProjectCard key={repo.id} repo={repo} />
             </ScaleFade>
           ))}
-          {filteredRepo.length === 0 && <div>oups</div>}
+          {filteredRepo.length === 0 && (
+            <Title
+              title="No repositories found"
+              className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
+            />
+          )}
         </div>
       </section>
       {props.limit && filteredRepo.length > props.limit && (
@@ -336,6 +343,7 @@ const Filters = (props: FilterProps) => {
     languages,
     languageCountMap,
     clearFilters,
+    isMobile,
   } = props;
 
   return (

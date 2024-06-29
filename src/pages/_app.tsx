@@ -25,7 +25,7 @@ export default function App({
   return (
     <ChakraProvider>
       {/* Define the overall layout of the application */}
-      <div className="flex min-h-screen flex-col bg-[#000000] text-[#F7FAFC]">
+      <div className="flex min-h-screen flex-col bg-[#000000] text-[#f7fafcd0]">
         {/* Render the layout, which includes header and footer */}
         <Layout>
           {/* Render the main content of the application */}

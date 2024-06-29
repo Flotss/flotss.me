@@ -65,6 +65,24 @@ export class GithubService {
     return repos;
   }
 
+  private async setDescription(repo: Repo): Promise<Repo> {
+    const prisma = new PrismaClient();
+
+    // GET ALL DESCRIPTIONS
+    const description = await prisma.repoDescription.findFirst({
+      where: {
+        repoId: repo.id,
+      },
+    });
+
+    // Set descriptions
+    if (description) {
+      repo.description = description.description ?? repo.description;
+    }
+
+    return repo;
+  }
+
   private async getPinnedRepos(): Promise<string[]> {
     // Fetch pinned repositories GraphQL query
     const query = {
@@ -132,6 +150,8 @@ export class GithubService {
     repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
+
+    repo = await this.setDescription(repo);
 
     return repo;
   }
