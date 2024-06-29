@@ -12,15 +12,15 @@ const LinkHeader = ({ textColor, ...props } : { textColor: string }) => (
 
 export default function Header() {
   const path = usePathname();
+  const pathTab = path?.split('/');
 
   const isSelected = (href: string) => {
-    return path == href;
-  };
+    if (path == '/') {
+      return true
+    } 
 
-  console.log({
-    path,
-    isSelected: isSelected('/'),
-  });
+    return pathTab?.includes(href);
+  };
 
   return (
     <Box
@@ -40,7 +40,7 @@ export default function Header() {
         </Link>
         <Link
           className="text-sm font-medium hover:text-[#A0AEC0]"
-          textColor={isSelected('/projects') ? '#BDFFE3' : '#f7fafc62'}
+          textColor={isSelected('projects') ? '#BDFFE3' : '#f7fafc62'}
           href="/projects"
         >
           My projects
@@ -48,14 +48,14 @@ export default function Header() {
         <Link
           className="text-sm font-medium hover:text-[#A0AEC0]"
           href="/about-me"
-          textColor={isSelected('/about-me') ? '#BDFFE3' : '#f7fafc62'}
+          textColor={isSelected('about-me') ? '#BDFFE3' : '#f7fafc62'}
         >
           About me
         </Link>
         <Link
           className="text-sm font-medium hover:text-[#A0AEC0]"
           href="/contact"
-          textColor={isSelected('/contact') ? '#BDFFE3' : '#f7fafc62'}
+          textColor={isSelected('contact') ? '#BDFFE3' : '#f7fafc62'}
         >
           Contact
         </Link>

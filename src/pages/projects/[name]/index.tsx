@@ -28,7 +28,9 @@ import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
+import remarkGfm from 'remark-gfm';
 import gfm from 'remark-gfm';
 
 /**
@@ -492,9 +494,12 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
       >
         <Title title={'Readme'} className="text-5xl" />
         <Divider />
-        <ReactMarkdown remarkPlugins={[gfm]} rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings]}>
-          {repo.readme}
-        </ReactMarkdown>
+        <ReactMarkdown className={'markdown'}
+        remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+      >
+        {repo.readme}
+      </ReactMarkdown>
       </Box>
       <StyledBox
         className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"

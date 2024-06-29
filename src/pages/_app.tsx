@@ -1,6 +1,7 @@
 import Layout from '@/components/layout';
 import '@/styles/globals.css';
 import '@/styles/scrollbar.css';
+import '@/styles/markdown.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import dotenv from 'dotenv';
 import type { AppProps } from 'next/app';
