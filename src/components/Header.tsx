@@ -15,10 +15,6 @@ export default function Header() {
   const pathTab = path?.split('/');
 
   const isSelected = (href: string) => {
-    if (path == '/') {
-      return true
-    } 
-
     return pathTab?.includes(href);
   };
 
@@ -33,7 +29,7 @@ export default function Header() {
       <nav className="ml-auto flex gap-4 sm:gap-6">
         <Link
           className="text-sm font-medium hover:text-[#A0AEC0]"
-          textColor={isSelected('/') ? '#BDFFE3' : '#f7fafc62'}
+          textColor={path == '/' ? '#BDFFE3' : '#f7fafc62'}
           href="/"
         >
           Home
