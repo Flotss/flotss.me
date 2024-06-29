@@ -37,18 +37,21 @@
 }
 
 .markdown pre {
-  background-color: #282c34;
-  color: #61dafb;
-  padding: 1em;
-  border-radius: 10px;
+  background-color: #161b22;
+  padding: 16px;
   overflow: auto;
+  margin: 1em 0;
+  font-size: 13.6px;
 }
 
-.markdown code {
-  border-radius: 6px;
-  font-size : 0.85em;
-  padding: 2.720px 5.440px;
-  background-color: #343942;
+.markdown p code,
+.markdown li code
+{
+    font-size: 13.6px;
+    background-color: #343942;
+    padding: 2.720px 5.440px;
+    border-radius: 6px;
+    font-family: inherit;
 }
 
 .markdown ul {
@@ -76,6 +79,22 @@
 .markdown a {
     color: #0366d6;
     text-decoration: none;
+}
+
+.markdown a:hover {
+    text-decoration: underline;
+}
+
+.markdown p img{
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 1em;
+}
+
+.markdown div div:has(img) {
+    flex-wrap: wrap
 }
 
 .markdown table {
