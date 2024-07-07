@@ -4,8 +4,7 @@ import '@/styles/scrollbar.css';
 import '@/styles/markdown.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import dotenv from 'dotenv';
-import type { AppProps } from 'next/app';
-// eslint-disable-next-line @next/next/no-document-import-in-page
+import React from 'react';
 
 /**
  * The `App` component is the entry point for your Next.js application.

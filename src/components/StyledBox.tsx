@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react';
-import { Ref } from 'react';
+import React, { Ref } from 'react';
 
 interface StyledBoxProps {
   children: React.ReactNode;

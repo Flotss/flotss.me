@@ -3,7 +3,6 @@
 import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
-import { Head } from 'next/document';
 
 /**
  * The Layout component provides a consistent structure for web pages within the application.

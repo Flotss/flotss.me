@@ -2,14 +2,6 @@ import { Box, Link } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
 import { FaCode } from 'react-icons/fa';
 
-
-const LinkHeader = ({ textColor, ...props } : { textColor: string }) => (
-  <Link
-    {...props}
-    textColor={textColor}
-    className="text-sm font-medium hover:text-[#A0AEC0]" />
-)
-
 export default function Header() {
   const path = usePathname();
   const pathTab = path?.split('/');
