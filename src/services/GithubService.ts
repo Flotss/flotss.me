@@ -9,9 +9,9 @@ const headers: any = {
   'X-GitHub-Api-Version': '2022-11-28',
 };
 
-export class GithubService {
-  private owner: string = 'Flotss';
+export const owner: string = 'Flotss';
 
+export class GithubService {
   /**
    * Asynchronous function to retrieve repositories.
    * @returns A promise that resolves to an array of repositories.
@@ -19,10 +19,9 @@ export class GithubService {
   public async getRepos(): Promise<Repo[]> {
     let repos: Repo[] = [];
 
-    const response = await fetch(
-      `https://api.github.com/search/repositories?q=user:${this.owner}`,
-      { headers },
-    );
+    const response = await fetch(`https://api.github.com/search/repositories?q=user:${owner}`, {
+      headers,
+    });
 
     const reposResponse: any = await response.json();
 
@@ -87,7 +86,7 @@ export class GithubService {
     // Fetch pinned repositories GraphQL query
     const query = {
       query: `{
-        user(login: "${this.owner}") {
+        user(login: "${owner}") {
           pinnedItems(first: 6, types: REPOSITORY) {
             nodes {
               ... on Repository {
@@ -121,7 +120,9 @@ export class GithubService {
       }
 
       return data.data.user.pinnedItems.nodes.map((repo: any) => repo.name);
-    } catch (error) {}
+    } catch (error) {
+      /* empty */
+    }
 
     return [];
   }
@@ -145,7 +146,7 @@ export class GithubService {
       await this.getCollaborators(repoName)
     ).sort(
       // IF owner is first, return -1, else return 1
-      (a, b) => (a.login === this.owner ? -1 : b.login === this.owner ? 1 : 0),
+      (a, b) => (a.login === owner ? -1 : b.login === owner ? 1 : 0),
     );
     repo.languages = await this.getLanguages(repoName);
     repo.pullRequests = await this.getPullRequests(repoName);
@@ -157,7 +158,7 @@ export class GithubService {
   }
 
   private async getRepoData(repoName: string): Promise<Repo> {
-    const response = await fetch(`https://api.github.com/repos/${this.owner}/${repoName}`, {
+    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
       headers,
     });
 
@@ -176,7 +177,7 @@ export class GithubService {
   public async getCollaborators(repoName: string): Promise<Collaborator[]> {
     // Retrieve collaborators
     const collaboratorsResponse = await fetch(
-      `https://api.github.com/repos/${this.owner}/${repoName}/collaborators`,
+      `https://api.github.com/repos/${owner}/${repoName}/collaborators`,
       { headers },
     );
 
@@ -191,7 +192,7 @@ export class GithubService {
   public async getLanguages(repoName: string): Promise<Language[]> {
     // Retrieve languages
     const languagesResponse = await fetch(
-      `https://api.github.com/repos/${this.owner}/${repoName}/languages`,
+      `https://api.github.com/repos/${owner}/${repoName}/languages`,
       { headers },
     );
     if (languagesResponse.ok) {
@@ -229,7 +230,7 @@ export class GithubService {
   public async getPullRequests(repoName: string): Promise<PullRequest[]> {
     // Retrieve pull requests
     const pullrequestsResponse = await fetch(
-      `https://api.github.com/repos/${this.owner}/${repoName}/pulls`,
+      `https://api.github.com/repos/${owner}/${repoName}/pulls`,
       { headers },
     );
 
@@ -252,8 +253,9 @@ export class GithubService {
     let page = 1;
     let commits: Commit[] = [];
 
-    while (true) {
-      const url = `https://api.github.com/repos/${this.owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
+    let pageEnd = false;
+    while (pageEnd) {
+      const url = `https://api.github.com/repos/${owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
       const response = await fetch(url, { headers });
 
       if (response.status === 404) {
@@ -264,7 +266,8 @@ export class GithubService {
       const commitsResponse: any[] = Array.isArray(data) ? data : [];
 
       if (commitsResponse.length === 0) {
-        break;
+        pageEnd = true;
+        continue;
       }
 
       const commitPromises = commitsResponse.map((commit: any) => ({
@@ -288,7 +291,7 @@ export class GithubService {
   public async getReadme(repoName: string): Promise<string> {
     // Retrieve README.md file
     const readmeResponse = await fetch(
-      `https://raw.githubusercontent.com/${this.owner}/${repoName}/main/README.md`,
+      `https://raw.githubusercontent.com/${owner}/${repoName}/main/README.md`,
       { headers },
     );
     if (readmeResponse.ok) {
@@ -296,5 +299,11 @@ export class GithubService {
     } else {
       return '';
     }
+  }
+
+  public async getUser(name: string): Promise<any> {
+    const response = await fetch(`https://api.github.com/users/${name}`, { headers });
+    const user = await response.json();
+    return user;
   }
 }
