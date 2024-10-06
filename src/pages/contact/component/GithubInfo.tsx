@@ -1,7 +1,7 @@
 // GithubInfo.tsx
 'use client';
-import { Box, Flex, Link, Tag, TagLabel, Text } from '@chakra-ui/react';
 import { Repo } from '@/types/types';
+import { Box, Flex, Link, Tag, TagLabel, Text } from '@chakra-ui/react';
 import Image from 'next/image';
 
 type GithubInfoProps = {
@@ -20,6 +20,7 @@ const GithubInfo = ({ user, repos, getStargazerCount, getWatchersCount }: Github
         width={92}
         height={0}
         className="rounded-sm bg-white p-1"
+        fetchPriority="high"
       />
     </Box>
 

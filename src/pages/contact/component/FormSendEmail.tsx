@@ -68,7 +68,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
   return (
     <>
       <FormControl isInvalid={emailError} isRequired>
-        <SlideFade offsetY="20px" in={email.length > 0}>
+        <SlideFade offsetY="20px" in={email?.length > 0}>
           <FormLabel htmlFor="email" className="text-white">
             Email
           </FormLabel>
@@ -87,7 +87,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
         <FormErrorMessage>{emailHelperMessage}</FormErrorMessage>
       </FormControl>
       <FormControl isInvalid={subjectError} isRequired>
-        <SlideFade offsetY="20px" in={subject.length > 0}>
+        <SlideFade offsetY="20px" in={subject?.length > 0}>
           <FormLabel htmlFor="Subject" className="text-white">
             Subject
           </FormLabel>
@@ -108,7 +108,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
       </FormControl>
 
       <FormControl isInvalid={messageError} isRequired>
-        <SlideFade offsetY="20px" in={message.length > 0}>
+        <SlideFade offsetY="20px" in={message?.length > 0}>
           <FormLabel htmlFor="message" className="text-white">
             Message
           </FormLabel>
