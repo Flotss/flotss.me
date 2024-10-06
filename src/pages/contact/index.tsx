@@ -12,7 +12,7 @@ import ContactHeader from './component/ContactHeader';
 import FormSendEmail from './component/FormSendEmail';
 import GithubInfo from './component/GithubInfo';
 
-export default function Contact(props) {
+export default function Contact(props: any) {
   const toast = useToast();
 
   // Get Inforamtion of the user github
