@@ -33,6 +33,7 @@ const GithubInfo = ({ user, repos, getStargazerCount, getWatchersCount }: Github
             width={52}
             height={52}
             className="mb-2 mt-3 rounded-full border-2"
+            fetchPriority="high"
           />
           <Link href={user.html_url} className="font-semibold hover:underline">
             {user.login}

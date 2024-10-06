@@ -6,7 +6,6 @@ import { Repo } from '@/types/types';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
 import { Box, Heading, Text, useMediaQuery, useToast } from '@chakra-ui/react';
 import Link from 'next/link';
-import Script from 'next/script';
 import { useEffect, useState } from 'react';
 import ContactHeader from './component/ContactHeader';
 import FormSendEmail from './component/FormSendEmail';
@@ -237,17 +236,6 @@ export default function Contact(props: any) {
               About Me
             </Heading>
             <Box className="flex flex-row flex-wrap justify-around gap-2">
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: `<div 
-                              class="badge-base LI-profile-badge"
-                              data-locale="en_US"
-                              data-theme="dark"
-                              data-size="${isMobile ? 'sm' : 'large'}" 
-                              data-type="HORIZONTAL" data-vanity="florian-mangin"
-                              data-version="v1"></div>`,
-                }}
-              ></div>
               {/* Github CARD */}
               <GithubInfo
                 user={user}
@@ -259,12 +247,6 @@ export default function Contact(props: any) {
           </StyledBox>
         </Box>
       </div>
-      <Script
-        src="https://platform.linkedin.com/badges/js/profile.js"
-        async
-        defer
-        type="text/javascript"
-      ></Script>
     </>
   );
 }
