@@ -37,7 +37,7 @@ type ReposProps = {
  *
  * @returns {JSX.Element} - The rendered Repos component.
  */
-export default function Repos(props: ReposProps): JSX.Element {
+export default function Repos(props: ReposProps) {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
 

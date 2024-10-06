@@ -2,16 +2,8 @@ import Repos from '@/components/Repos';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
-import { Box, Grid, Image, useMediaQuery } from '@chakra-ui/react';
-
-/**
- * `moveToProjects` is a function that scrolls the page to the "Projects" section.
- * It is typically triggered by a button or link.
- */
-const moveToProjects = () => {
-  const element = document.getElementById('projects');
-  element?.scrollIntoView({ behavior: 'smooth' });
-};
+import { Grid, Image, useMediaQuery } from '@chakra-ui/react';
+import React from 'react';
 
 /**
  * The `Home` component represents the homepage of your website.
@@ -50,7 +42,7 @@ export default function Home() {
         {/* Display a list of projects or repositories using the `Repos` component */}
         <Repos limit={isMobile ? 3 : 6} />
       </StyledBox>
-      
+
       {/* About me  */}
       {/* QUi je suis */}
       {/* Quel jobs */}
