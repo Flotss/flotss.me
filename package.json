@@ -13,6 +13,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@builder.io/partytown": "^0.10.2",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.1",
