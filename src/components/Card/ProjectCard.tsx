@@ -41,7 +41,7 @@ export default function ProjectCard(props: ProjectCardProps) {
         <Box className="flex flex-col">
           <Box className="flex justify-between">
             <Text
-              className="mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide text-gray-300"
+              className={`mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide ${isPrivate ? 'text-gray-400' : 'text-gray-300'}`}
               fontSize="xl"
               fontWeight="semibold"
               title={name}
@@ -66,14 +66,17 @@ export default function ProjectCard(props: ProjectCardProps) {
                 </Box>
               )}
               {pinned && (
-                <VscPinnedDirty className="ml-2 h-6 w-6 text-[#E2E8F0]" title="Pinned repository" />
+                <VscPinnedDirty
+                  className={`ml-2 h-6 w-6 text-[#E2E8F0]`}
+                  title="Pinned repository"
+                />
               )}
             </div>
           </Box>
           <Divider />
           {description && (
             <Text
-              className="mt-1 block text-sm font-medium leading-tight text-gray-300"
+              className={`mt-1 block text-sm font-medium leading-tight ${isPrivate ? 'text-gray-500' : 'text-gray-300'}`}
               fontSize="sm"
               fontWeight="medium"
             >
