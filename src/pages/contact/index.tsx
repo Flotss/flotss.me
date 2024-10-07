@@ -10,9 +10,12 @@ import { useEffect, useState } from 'react';
 import ContactHeader from './component/ContactHeader';
 import FormSendEmail from './component/FormSendEmail';
 import GithubInfo from './component/GithubInfo';
+import { loadGithubInformation } from '@/utils/RepoUtils';
 
 export default function Contact(props: any) {
   const toast = useToast();
+
+  const [isLoading, setLoading] = useState<boolean>(true);
 
   // Get Inforamtion of the user github
   const [user, setUser] = useState<any>(null);
@@ -26,25 +29,14 @@ export default function Contact(props: any) {
   const [isMobile] = useMediaQuery(`(max-width:${breakpoints.lg})`);
 
   useEffect(() => {
-    // LocalStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      fetch(`/api/get/user?name=${owner}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
-        });
-    }
-
-    const cachedRepos = localStorage.getItem('repos');
-    if (cachedRepos) {
-      const parsedRepos = JSON.parse(cachedRepos).repos as Repo[];
-      setRepos(parsedRepos);
-    }
-  }, []);
+    loadGithubInformation({
+      owner: owner,
+      setUser: setUser,
+      setRepos: setRepos,
+      toast: toast,
+      setLoading: setLoading,
+    });
+  }, [toast]);
 
   const getStargazerCount = () => {
     return repos.reduce((a, b) => a + b.stargazers_count, 0);

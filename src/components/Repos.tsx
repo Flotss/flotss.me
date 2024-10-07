@@ -1,5 +1,5 @@
 import { Repo } from '@/types/types';
-import { sortRepos } from '@/utils/RepoUtils';
+import { loadGithubInformation } from '@/utils/RepoUtils';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
 import {
   Accordion,
@@ -85,71 +85,18 @@ export default function Repos(props: ReposProps) {
   };
 
   useEffect(() => {
-    /**
-     * Fetches GitHub repositories from the API.
-     * Handles different response statuses, such as rate limiting and not found.
-     */
-    const fetchRepos = async () => {
-      const response = await fetch('api/get/repos');
-      const data = (await response.json()) as Repo[];
-
-      if (response.status === 400) {
-        toast({
-          title: 'Networking Error',
-          description: 'Rate limit of GitHub has been reached',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
-
-      if (response.status === 404) {
-        toast({
-          title: 'Repositories not found',
-          description: '',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        });
-        return;
-      }
-      const repositoryArray = sortRepos(data);
-
-      const reposData = {
-        repos: repositoryArray,
-        lastRequestDate: new Date().getTime(),
-      };
-
-      setRepos(repositoryArray);
-      setLanguages(getLanguageValues(repositoryArray));
-      setLanguageCountMap(getMapCountOfLang(repositoryArray));
-      setLoading(false);
-      localStorage.setItem('repos', JSON.stringify(reposData)); // Save data in localStorage
+    const fetchData = async () => {
+      await loadGithubInformation({
+        setRepos: setRepos,
+        toast,
+        setLoading: setLoading,
+      });
+      setLanguages(getLanguageValues(repos));
+      setLanguageCountMap(getMapCountOfLang(repos));
     };
-
-    // Check if cached data is available and not expired
-    const cachedRepos = localStorage.getItem('repos');
-    if (cachedRepos) {
-      const { lastRequestDate } = JSON.parse(cachedRepos);
-
-      if (new Date().getTime() - lastRequestDate > 3600000) {
-        fetchRepos();
-        return;
-      } else {
-        let reposs = JSON.parse(cachedRepos).repos as Repo[];
-        reposs = sortRepos(reposs);
-        setRepos(reposs);
-        setLoading(false);
-        setLanguages(getLanguageValues(reposs));
-        setLanguageCountMap(getMapCountOfLang(reposs));
-      }
-    } else {
-      fetchRepos();
-    }
-
+    fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toast]);
+  }, []); // Empty dependency array ensures this runs only once
 
   useEffect(() => {
     const updateNumberOfFilters = () => {

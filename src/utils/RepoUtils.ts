@@ -1,5 +1,8 @@
+import { owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
+import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
+import { Dispatch } from 'react';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -61,4 +64,98 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
       }
     }
   });
+};
+
+interface loadGithubInformationProps {
+  setLoading: Dispatch<boolean>;
+  toast: ReturnType<typeof useToast>;
+  setUser?: Dispatch<any>;
+  setRepos?: Dispatch<any>;
+  owner?: string;
+  callback?: () => void;
+}
+
+export const loadGithubInformation = async ({
+  setUser,
+  setRepos,
+  owner: userOwner,
+  toast,
+  setLoading,
+  callback,
+}: loadGithubInformationProps): Promise<void> => {
+  setLoading(true);
+  if (setRepos) {
+    const fetchRepos = async () => {
+      const response = await fetch('api/get/repos');
+      const data = (await response.json()) as Repo[];
+
+      if (response.status === 400) {
+        toast({
+          title: 'Networking Error',
+          description: 'Rate limit of GitHub has been reached',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      if (response.status === 404) {
+        toast({
+          title: 'Repositories not found',
+          description: '',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+      const repositoryArray = sortRepos(data);
+
+      const reposData = {
+        repos: repositoryArray,
+        lastRequestDate: new Date().getTime(),
+      };
+
+      setRepos(repositoryArray);
+      localStorage.setItem('repos', JSON.stringify(reposData)); // Save data in localStorage
+      setLoading(false);
+    };
+
+    // Check if cached data is available and not expired
+    const cachedRepos = localStorage.getItem('repos');
+    if (cachedRepos) {
+      const { lastRequestDate } = JSON.parse(cachedRepos);
+
+      if (new Date().getTime() - lastRequestDate > 3600000) {
+        await fetchRepos();
+        return;
+      } else {
+        let reposs = JSON.parse(cachedRepos).repos as Repo[];
+        reposs = sortRepos(reposs);
+        setRepos(reposs);
+        setLoading(false);
+      }
+    } else {
+      await fetchRepos();
+    }
+  }
+
+  if (setUser) {
+    // LocalStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+      setLoading(false);
+    } else {
+      fetch(`/api/get/user?name=${userOwner ?? owner}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
+          setLoading(false);
+        });
+    }
+  }
+  callback && callback();
 };
