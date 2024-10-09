@@ -12,7 +12,6 @@ import React from 'react';
  */
 export default function Home() {
   const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
-
   return (
     <>
       {/* Grid layout for the homepage content */}
@@ -123,6 +122,7 @@ type CustomStyledBoxProps = {
 };
 
 import { motion } from 'framer-motion';
+import { getTechStackImages } from '@/constants/techstack';
 
 const CustomStyledBox = (props: CustomStyledBoxProps) => {
   return (

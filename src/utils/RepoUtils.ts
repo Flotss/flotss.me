@@ -1,10 +1,10 @@
 import { owner } from '@/services/GithubService';
+import { Technologie } from '@/types/tech.types';
 import { Repo, ReposLocalStorage } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
 import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
-import { get } from 'http';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -152,4 +152,20 @@ export const loadGithubInformation = async ({
     }
   }
   callback && callback();
+};
+
+const getAllTechnologies = (repos: Repo[]): Technologie[] => {
+  const technologies: Technologie[] = [];
+  repos.forEach((repo) => {
+    repo.languages.forEach((language) => {
+      const existingTech = technologies.find((tech) => tech.name === language.name);
+      if (existingTech) {
+        existingTech.number++;
+        technologies[technologies.indexOf(existingTech)] = existingTech;
+      } else {
+        technologies.push({ name: language.name, number: 1, icon: language.icon });
+      }
+    });
+  });
+  return technologies;
 };

@@ -1,8 +1,5 @@
 export interface Technologie {
   name: string;
-}
-
-export interface technologieGroup {
-  name: Technologie;
+  icon: string;
   number: number;
 }
