@@ -178,7 +178,7 @@ export default function Repos(props: ReposProps) {
                     setIsOpenFilterMobile(!isOpenFilterMobile);
                   }}
                 >
-                  <Box flex="1" textAlign="left" hidden={!isOpenFilterMobile}>
+                  <Box flex="1" textAlign="left" hidden={isOpenFilterMobile}>
                     Filters
                   </Box>
                   <AccordionIcon float={'right'} />
