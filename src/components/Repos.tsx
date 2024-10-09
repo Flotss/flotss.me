@@ -28,7 +28,7 @@ import Title from './Title';
 type ReposProps = {
   filterVisible?: boolean;
   limit?: number;
-  onReposCount?: (count: number) => void;
+  setReposCount?: (count: number) => void;
   repos?: Repo[];
 };
 
@@ -58,7 +58,7 @@ export default function Repos(props: ReposProps) {
   const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
 
-  const onReposCount = props.onReposCount;
+  const onReposCount = props.setReposCount;
 
   const getMapCountOfLang = (reposParam: Repo[]) => {
     let languageCountMap = new Map<string, number>();
@@ -159,12 +159,15 @@ export default function Repos(props: ReposProps) {
   };
 
   const skeletons = Array.from({ length: props.limit ?? 6 }).map((_, index) => (
-    <ProjectCardSkeleton key={index} />
+    <ProjectCardSkeleton key={index} isMobile={isMobile} />
   ));
 
   return (
     <>
-      <section className="grid-col-1 mx-5 grid gap-3 py-8 sm:mx-20 lg:grid-cols-5" id="projects">
+      <section
+        className={`grid-col-1 ${isMobile ? 'mx-1' : 'mx-5'} grid gap-3 py-8 sm:mx-20 lg:grid-cols-5`}
+        id="projects"
+      >
         {props.filterVisible && isMobile && (
           <Accordion allowToggle={true}>
             <AccordionItem>
@@ -219,7 +222,7 @@ export default function Repos(props: ReposProps) {
           />
         )}
         <div
-          className={`col-span-1 flex w-full flex-wrap items-stretch justify-center gap-x-5 gap-y-5 lg:flex-row ${
+          className={`margin-auto col-span-1 flex w-full flex-wrap items-stretch justify-center gap-x-5 gap-y-5 lg:flex-row ${
             props.filterVisible ? 'lg:col-span-4' : 'lg:col-span-5'
           }`}
         >
@@ -227,7 +230,7 @@ export default function Repos(props: ReposProps) {
             ? skeletons
             : filteredRepo.slice(0, props.limit).map((repo) => (
                 <ScaleFade key={repo.id} initialScale={0.9} in={true}>
-                  <ProjectCard key={repo.id} repo={repo} />
+                  <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} />
                 </ScaleFade>
               ))}
           {!loading && filteredRepo.length === 0 && (

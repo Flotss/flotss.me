@@ -6,6 +6,7 @@ import { VscPinnedDirty } from 'react-icons/vsc';
 
 interface ProjectCardProps {
   repo: Repo;
+  isMobile?: boolean;
 }
 
 /**
@@ -18,6 +19,7 @@ interface ProjectCardProps {
 export default function ProjectCard(props: ProjectCardProps) {
   const { name, description, stargazers_count, archived, pinned } = props.repo;
   const isPrivate = props.repo.private;
+  const isMobile = props.isMobile;
 
   return (
     <Link
@@ -37,8 +39,8 @@ export default function ProjectCard(props: ProjectCardProps) {
             : 'shadow-sm shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'
         }`}
         p={8}
-        width="26rem"
-        height="10rem"
+        width={isMobile ? '20rem' : '26rem'}
+        height={isMobile ? '100%' : '10rem'}
         overflow="hidden"
         cursor={isPrivate ? 'not-allowed' : 'pointer'}
       >

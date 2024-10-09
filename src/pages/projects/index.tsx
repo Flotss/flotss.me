@@ -10,10 +10,6 @@ import { useState } from 'react';
 export default function Projects() {
   const [reposCount, setReposCount] = useState<number | null>(null);
 
-  const handleReposCount = (count: number) => {
-    setReposCount(count);
-  };
-
   return (
     <>
       <Title
@@ -21,7 +17,7 @@ export default function Projects() {
         className="mt-10"
       />
 
-      <Repos filterVisible={true} onReposCount={handleReposCount} />
+      <Repos filterVisible={true} setReposCount={setReposCount} />
     </>
   );
 }

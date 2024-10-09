@@ -37,7 +37,7 @@ export default function Home() {
       </Grid>
 
       {/* "My Projects" section */}
-      <StyledBox className="mx-5 my-5 overflow-hidden sm:mx-20">
+      <StyledBox className="mx-5 my-5 overflow-hidden px-0 sm:mx-20">
         <Title title="Projects" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl"></Title>
         {/* Display a list of projects or repositories using the `Repos` component */}
         <Repos limit={isMobile ? 3 : 6} />
