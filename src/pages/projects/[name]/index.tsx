@@ -476,7 +476,10 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
             <Box key={index} width={'100%'} height={'100%'}>
               <Link href={commit.url} isExternal className="no-underline">
                 <Box className="space-y-2 rounded-3xl bg-[#202020] px-4 py-2 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:rounded-3xl">
-                  <h1 className="text-xl">{commit.message}</h1>
+                  <h1 className="text-xl" title={commit.message}>
+                    {commit.message.slice(0, 80)}
+                    {commit.message.slice(0, 80).length == 80 ? `...` : ''}
+                  </h1>
                   <div className="flex items-start justify-start space-x-2">
                     <h1 className="text-lg">
                       Date: {new Date(commit.author.date).toLocaleDateString()}

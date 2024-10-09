@@ -276,7 +276,7 @@ export class GithubService {
           name: commit.commit.author.name,
           date: commit.commit.author.date,
         },
-        message: commit.commit.message.slice(0, 80),
+        message: commit.commit.message,
         url: commit.html_url,
       }));
 
