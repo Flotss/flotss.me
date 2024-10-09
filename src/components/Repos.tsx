@@ -158,19 +158,10 @@ export default function Repos(props: ReposProps) {
     setSearch('');
   };
 
-  if (loading) {
-    // Display skeleton loading cards while data is being fetched
-    const skeletons = Array.from({ length: props.limit ?? 6 }).map((_, index) => (
-      <ProjectCardSkeleton key={index} />
-    ));
-    return (
-      <section className="mx-14 flex flex-wrap justify-center gap-x-12 gap-y-6 py-8 sm:mx-10 lg:mx-36 lg:flex-row">
-        {skeletons}
-      </section>
-    );
-  }
+  const skeletons = Array.from({ length: props.limit ?? 6 }).map((_, index) => (
+    <ProjectCardSkeleton key={index} />
+  ));
 
-  // Render the repository cards when data is available
   return (
     <>
       <section className="grid-col-1 mx-5 grid gap-3 py-8 sm:mx-20 lg:grid-cols-5" id="projects">
@@ -232,12 +223,14 @@ export default function Repos(props: ReposProps) {
             props.filterVisible ? 'lg:col-span-4' : 'lg:col-span-5'
           }`}
         >
-          {filteredRepo.slice(0, props.limit).map((repo) => (
-            <ScaleFade key={repo.id} initialScale={0.9} in={true}>
-              <ProjectCard key={repo.id} repo={repo} />
-            </ScaleFade>
-          ))}
-          {filteredRepo.length === 0 && (
+          {loading
+            ? skeletons
+            : filteredRepo.slice(0, props.limit).map((repo) => (
+                <ScaleFade key={repo.id} initialScale={0.9} in={true}>
+                  <ProjectCard key={repo.id} repo={repo} />
+                </ScaleFade>
+              ))}
+          {!loading && filteredRepo.length === 0 && (
             <Title
               title="No repositories found"
               className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
