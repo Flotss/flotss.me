@@ -254,7 +254,7 @@ export class GithubService {
     let commits: Commit[] = [];
 
     let pageEnd = false;
-    while (pageEnd) {
+    while (!pageEnd) {
       const url = `https://api.github.com/repos/${owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
       const response = await fetch(url, { headers });
 
@@ -263,6 +263,7 @@ export class GithubService {
       }
 
       const data: unknown = await response.json();
+
       const commitsResponse: any[] = Array.isArray(data) ? data : [];
 
       if (commitsResponse.length === 0) {

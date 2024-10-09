@@ -1,8 +1,10 @@
 import { owner } from '@/services/GithubService';
-import { Repo } from '@/types/types';
+import { Repo, ReposLocalStorage } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
+import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
+import { get } from 'http';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -112,28 +114,21 @@ export const loadGithubInformation = async ({
       }
       const repositoryArray = sortRepos(data);
 
-      const reposData = {
-        repos: repositoryArray,
-        lastRequestDate: new Date().getTime(),
-      };
-
       setRepos(repositoryArray);
-      localStorage.setItem('repos', JSON.stringify(reposData)); // Save data in localStorage
+      saveDataToLocalStorage('repos', 'repos', repositoryArray);
       setLoading(false);
     };
 
     // Check if cached data is available and not expired
-    const cachedRepos = localStorage.getItem('repos');
+    const cachedRepos = getLocalStorage<ReposLocalStorage>('repos');
     if (cachedRepos) {
-      const { lastRequestDate } = JSON.parse(cachedRepos);
+      const { lastRequestDate, repos } = cachedRepos;
 
       if (new Date().getTime() - lastRequestDate > 3600000) {
         await fetchRepos();
         return;
       } else {
-        let reposs = JSON.parse(cachedRepos).repos as Repo[];
-        reposs = sortRepos(reposs);
-        setRepos(reposs);
+        setRepos(sortRepos(repos));
         setLoading(false);
       }
     } else {
@@ -142,17 +137,16 @@ export const loadGithubInformation = async ({
   }
 
   if (setUser) {
-    // LocalStorage
-    const storedUser = localStorage.getItem('user');
+    const storedUser = getLocalStorage<any>('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
       setLoading(false);
     } else {
       fetch(`/api/get/user?name=${userOwner ?? owner}`)
         .then((response) => response.json())
         .then((data) => {
           setUser(data);
-          localStorage.setItem('user', JSON.stringify(data));
+          saveDataToLocalStorage('user', 'user', data);
           setLoading(false);
         });
     }

@@ -1,5 +1,10 @@
-export type RepoLocalStorage = {
+export type ReposLocalStorage = {
   repos: Repo[];
+  lastRequestDate: number;
+};
+
+export type RepoLocalStorage = {
+  repo: Repo;
   lastRequestDate: number;
 };
 

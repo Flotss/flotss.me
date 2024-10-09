@@ -1,7 +1,8 @@
 import ErrorCode from '@/components/ErrorCode';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
-import { Repo } from '@/types/types';
+import { Repo, RepoLocalStorage } from '@/types/types';
+import { clearLocalStorage, getLocalStorage, saveDataToLocalStorage } from '@/utils/LocalStorage';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
@@ -31,7 +32,6 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
-import gfm from 'remark-gfm';
 
 /**
  * The `Project` component displays information about a GitHub repository.
@@ -39,7 +39,7 @@ import gfm from 'remark-gfm';
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project() {
+export default function Project(props: any) {
   const router = useRouter();
 
   const [repo, setRepo] = useState<Repo>();
@@ -56,7 +56,7 @@ export default function Project() {
 
     navigator.clipboard.writeText(text);
     toast({
-      title: 'Copié dans le presse-papier',
+      title: 'Copied to clipboard',
       description: text,
       status: 'success',
       duration: 4000,
@@ -65,8 +65,7 @@ export default function Project() {
   };
 
   useEffect(() => {
-    const { name } = router.query;
-
+    const { name } = router.query as { name: string };
     if (!name) {
       return;
     }
@@ -92,7 +91,7 @@ export default function Project() {
       setRepo({ ...repo, commits: commitsData });
       repo.commits = commitsData;
 
-      saveRepoDataToLocalStorage(repo, name as string);
+      saveDataToLocalStorage(name, 'repo', repo);
     }
 
     /**
@@ -113,36 +112,21 @@ export default function Project() {
     }
 
     /**
-     * Saves repository data to local storage.
-     *
-     * @param {Repo} repo - The repository data to save.
-     * @param {string} name - The name of the repository.
-     */
-    function saveRepoDataToLocalStorage(repo: Repo, name: string) {
-      const repoData = {
-        repo,
-        lastRequestDate: new Date().getTime(),
-      };
-      localStorage.setItem(name as string, JSON.stringify(repoData));
-    }
-
-    /**
      * Fetches repository data either from local storage or from the API.
      */
-    function fetchRepoData(): void {
-      const storedRepoData = localStorage.getItem(name as string);
+    async function fetchRepoData(): Promise<void> {
+      const storedRepoData = getLocalStorage<RepoLocalStorage>(name as string);
       if (storedRepoData == null) {
-        fetchRepoDataFromApi();
+        await fetchRepoDataFromApi();
         return;
       }
 
-      const parsedData = JSON.parse(storedRepoData);
       // if the date of the last request is more than 1 hour
-      if (new Date().getTime() - parsedData.lastRequestDate < 3600000) {
-        setRepo(parsedData.repo);
+      if (new Date().getTime() - storedRepoData.lastRequestDate < 3600000) {
+        setRepo(storedRepoData.repo);
       } else {
-        localStorage.removeItem(name as string);
-        fetchRepoDataFromApi();
+        clearLocalStorage(name as string);
+        await fetchRepoDataFromApi();
       }
     }
 
@@ -320,29 +304,6 @@ export default function Project() {
             <Flex width={'100%'} gap={5} className="justify-around" flexWrap={'wrap'}>
               {repo.collaborators.map((collaborator, index) => (
                 <>
-                  {/* <Popover key={index} placement="top" trigger="hover">
-                    <PopoverTrigger>
-                      <Link href={collaborator.html_url} isExternal>
-                        <Box className="flex flex-col items-center justify-center space-y-2">
-                          <Avatar
-                            name={collaborator.login}
-                            src={collaborator.avatar_url}
-                            size={repo.collaborators.length <= 4 ? 'md' : 'xs'}
-                          />
-                          {collaborator.login == 'Flotss' && (
-                            <Badge ml="1" colorScheme="green">
-                              Me
-                            </Badge>
-                          )}
-                        </Box>
-                      </Link>
-                    </PopoverTrigger>
-                    <PopoverContent width={`${collaborator.login.length / 1.5}rem`}>
-                      <PopoverHeader className="flex items-center justify-center bg-box-color">
-                        {collaborator.login}
-                      </PopoverHeader>
-                    </PopoverContent>
-                  </Popover> */}
                   <Tooltip
                     hasArrow
                     label={collaborator.login}
@@ -402,11 +363,9 @@ export default function Project() {
         {repo.commits ? (
           <ReadmeAndCommits repo={repo} />
         ) : (
-          ((
-            <Head>
-              <title>Loading commits...</title>
-            </Head>
-          ) as React.ReactNode)
+          <Head>
+            <title>Loading commits...</title>
+          </Head>
         )}
       </div>
     </>
@@ -436,7 +395,7 @@ const ButtonCopy = ({
   href,
   target,
   rel,
-}: ButtonCopyProps): JSX.Element => (
+}: ButtonCopyProps) => (
   <Button
     colorScheme={colorScheme}
     onClick={onClick}
@@ -473,7 +432,7 @@ interface ReadmeAndCommitsProps {
  * @param {ReadmeAndCommitsProps} props - The props for the ReadmeAndCommits component.
  * @return {JSX.Element} The rendered ReadmeAndCommits component.
  */
-const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
+const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
   const [boxHeight, setBoxHeight] = useState<number>(0);
   const refFirstBox = useRef<HTMLDivElement>(null);
 
@@ -494,12 +453,13 @@ const ReadmeAndCommits: React.FC<ReadmeAndCommitsProps> = ({ repo }) => {
       >
         <Title title={'Readme'} className="text-5xl" />
         <Divider />
-        <ReactMarkdown className={'markdown'}
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
-      >
-        {repo.readme}
-      </ReactMarkdown>
+        <ReactMarkdown
+          className={'markdown'}
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+        >
+          {repo.readme}
+        </ReactMarkdown>
       </Box>
       <StyledBox
         className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"

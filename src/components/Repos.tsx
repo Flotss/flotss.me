@@ -29,6 +29,7 @@ type ReposProps = {
   filterVisible?: boolean;
   limit?: number;
   onReposCount?: (count: number) => void;
+  repos?: Repo[];
 };
 
 /**
@@ -38,7 +39,7 @@ type ReposProps = {
  * @returns {JSX.Element} - The rendered Repos component.
  */
 export default function Repos(props: ReposProps) {
-  const [repos, setRepos] = useState<Repo[]>([]);
+  const [repos, setRepos] = useState<Repo[]>(props.repos ?? []);
   const [loading, setLoading] = useState(true);
 
   const [languages, setLanguages] = useState<Set<string>>(new Set());

@@ -3,6 +3,7 @@ import { StyledBox } from '@/components/StyledBox';
 import { EmailInputs } from '@/services/EmailService';
 import { owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
+import { loadGithubInformation } from '@/utils/RepoUtils';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
 import { Box, Heading, Text, useMediaQuery, useToast } from '@chakra-ui/react';
 import Link from 'next/link';
@@ -10,7 +11,6 @@ import { useEffect, useState } from 'react';
 import ContactHeader from './component/ContactHeader';
 import FormSendEmail from './component/FormSendEmail';
 import GithubInfo from './component/GithubInfo';
-import { loadGithubInformation } from '@/utils/RepoUtils';
 
 export default function Contact(props: any) {
   const toast = useToast();
@@ -229,12 +229,16 @@ export default function Contact(props: any) {
             </Heading>
             <Box className="flex flex-row flex-wrap justify-around gap-2">
               {/* Github CARD */}
-              <GithubInfo
-                user={user}
-                repos={repos}
-                getStargazerCount={getStargazerCount}
-                getWatchersCount={getWatchersCount}
-              />
+              {isLoading ? (
+                <Text className="text-white">Loading...</Text>
+              ) : (
+                <GithubInfo
+                  user={user}
+                  repos={repos}
+                  getStargazerCount={getStargazerCount}
+                  getWatchersCount={getWatchersCount}
+                />
+              )}
             </Box>
           </StyledBox>
         </Box>
