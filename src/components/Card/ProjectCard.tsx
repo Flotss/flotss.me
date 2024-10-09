@@ -31,7 +31,11 @@ export default function ProjectCard(props: ProjectCardProps) {
       }}
     >
       <Box
-        className={`glow transform overflow-ellipsis rounded-xl border border-black bg-box-color-light transition duration-500 ease-in-out md:max-w-2xl ${isPrivate ? '' : 'shadow-sm shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'}`}
+        className={`glow transform overflow-ellipsis rounded-xl border border-black bg-box-color-light transition-all duration-500 ease-in-out md:max-w-2xl ${
+          isPrivate
+            ? ''
+            : 'shadow-sm shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'
+        }`}
         p={8}
         width="26rem"
         height="10rem"
