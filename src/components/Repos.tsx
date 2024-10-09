@@ -1,5 +1,8 @@
+import { useFetchRepos } from '@/hooks/useFetchRepos';
+import useFiltersRepos from '@/hooks/useFiltersRepos';
+import { useLanguageFilters } from '@/hooks/useLanguageFilters';
 import { Repo } from '@/types/types';
-import { loadGithubInformation } from '@/utils/RepoUtils';
+import { getMapCountOfLang } from '@/utils/RepoUtils';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
 import {
   Accordion,
@@ -16,7 +19,6 @@ import {
   ScaleFade,
   Stack,
   useMediaQuery,
-  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -39,117 +41,37 @@ type ReposProps = {
  * @returns {JSX.Element} - The rendered Repos component.
  */
 export default function Repos(props: ReposProps) {
-  const [repos, setRepos] = useState<Repo[]>(props.repos ?? []);
-  const [loading, setLoading] = useState(true);
+  const setReposCount = props.setReposCount;
 
-  const [languages, setLanguages] = useState<Set<string>>(new Set());
-  const [languageCountMap, setLanguageCountMap] = useState<Map<string, number>>(new Map());
+  const { repos, loading } = useFetchRepos([]);
 
-  const [filteredRepo, setFilteredRepos] = useState<Repo[]>([]);
-  const [countFilter, setCountFilter] = useState(0);
+  const { languages, languageCountMap, setLanguageCountMap, setLanguages } =
+    useLanguageFilters(repos);
+
   const [search, setSearch] = useState('');
   const [isArchived, setIsArchived] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
 
-  const toast = useToast();
-  const router = useRouter();
+  const options = {
+    isArchived,
+    isPrivate,
+    selectedLanguage,
+    search,
+  };
+  const { filteredRepos, repoCount, countFilter } = useFiltersRepos(repos, options);
 
+  const router = useRouter();
   const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
 
-  const onReposCount = props.setReposCount;
-
-  const getMapCountOfLang = (reposParam: Repo[]) => {
-    let languageCountMap = new Map<string, number>();
-
-    reposParam.forEach((repo) => {
-      if (repo.language) {
-        if (languageCountMap.has(repo.language)) {
-          languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
-        } else {
-          languageCountMap.set(repo.language, 1);
-        }
-      }
-    });
-
-    return languageCountMap;
-  };
-
-  const getLanguageValues = (reposParam: Repo[]) => {
-    return new Set<string>(
-      reposParam
-        .map((repo) => repo.language)
-        .filter((language) => language !== null)
-        .sort(),
-    );
-  };
+  useEffect(() => {
+    setReposCount && setReposCount(repoCount);
+  }, [repoCount, setReposCount]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await loadGithubInformation({
-        setRepos: setRepos,
-        toast,
-        setLoading: setLoading,
-      });
-      setLanguages(getLanguageValues(repos));
-      setLanguageCountMap(getMapCountOfLang(repos));
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs only once
-
-  useEffect(() => {
-    const updateNumberOfFilters = () => {
-      let count = 0;
-      if (isArchived) count++;
-      if (isPrivate) count++;
-      if (selectedLanguage !== 'All') count++;
-      if (search.length) count++;
-      setCountFilter(count);
-    };
-
-    let filteredRepos = repos;
-
-    if (search.length) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        let name = repo.name.toLowerCase();
-        let desc = repo.description?.toLowerCase();
-        let filterSearch = search.toLowerCase();
-        return name.includes(filterSearch) || desc?.includes(filterSearch);
-      });
-    }
     setLanguageCountMap(getMapCountOfLang(filteredRepos));
-    updateNumberOfFilters();
-
-    if (selectedLanguage !== 'All') {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.language === selectedLanguage;
-      });
-    }
-
-    // if language selected verify the count
-    // if 0 toggle to All
-    if (!languageCountMap.has(selectedLanguage)) {
-      setSelectedLanguage('All');
-    }
-
-    if (isArchived) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.archived === isArchived;
-      });
-    }
-
-    if (isPrivate) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.private == isPrivate;
-      });
-    }
-
-    setFilteredRepos(filteredRepos);
-    onReposCount && onReposCount(filteredRepos.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [repos, isArchived, isPrivate, selectedLanguage, search]);
+  }, [search, isArchived, isPrivate, filteredRepos]);
 
   const clearFilters = () => {
     setIsArchived(false);
@@ -228,12 +150,12 @@ export default function Repos(props: ReposProps) {
         >
           {loading
             ? skeletons
-            : filteredRepo.slice(0, props.limit).map((repo) => (
+            : filteredRepos.slice(0, props.limit).map((repo) => (
                 <ScaleFade key={repo.id} initialScale={0.9} in={true}>
                   <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} />
                 </ScaleFade>
               ))}
-          {!loading && filteredRepo.length === 0 && (
+          {!loading && filteredRepos.length === 0 && (
             <Title
               title="No repositories found"
               className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
@@ -241,7 +163,7 @@ export default function Repos(props: ReposProps) {
           )}
         </div>
       </section>
-      {props.limit && filteredRepo.length > props.limit && (
+      {props.limit && filteredRepos.length > props.limit && (
         <Box className="mb-5 flex justify-center">
           <button
             className="w-6/12 rounded-md bg-black px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-[#212120]"
@@ -362,7 +284,6 @@ const Filters = (props: FilterProps) => {
               colorScheme="transparent"
               onChange={(e) => {
                 if (!languageCountMap.has(e) && e !== 'All') return;
-
                 setSelectedLanguage(e);
               }}
             >

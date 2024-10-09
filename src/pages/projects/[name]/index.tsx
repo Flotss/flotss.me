@@ -1,6 +1,7 @@
 import ErrorCode from '@/components/ErrorCode';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
+import { useFetchRepo } from '@/hooks/useFetchRepo';
 import { Repo, RepoLocalStorage } from '@/types/types';
 import { clearLocalStorage, getLocalStorage, saveDataToLocalStorage } from '@/utils/LocalStorage';
 import { ChevronDownIcon } from '@chakra-ui/icons';
@@ -42,8 +43,7 @@ import remarkGfm from 'remark-gfm';
 export default function Project(props: any) {
   const router = useRouter();
 
-  const [repo, setRepo] = useState<Repo>();
-  const [error, setError] = useState<{ error: string; code: string } | undefined>(undefined); // 404 or 400
+  const { repo, error, loading } = useFetchRepo(null, router.query.name as string);
   const toast = useToast();
 
   /**
@@ -63,75 +63,6 @@ export default function Project(props: any) {
       isClosable: true,
     });
   };
-
-  useEffect(() => {
-    const { name } = router.query as { name: string };
-    if (!name) {
-      return;
-    }
-
-    async function fetchRepoDataFromApi() {
-      const response = await fetch(`/api/get/repos?name=${name}`);
-
-      if (!response.ok) {
-        const reponse = await response.json();
-        const message = reponse.message;
-        const code = response.status.toString();
-        displayToast('Erreur', message, 'error');
-        setError({ error: message, code });
-        return;
-      }
-
-      const data = await response.json();
-      const repo: Repo = data;
-      setRepo(repo);
-
-      const commits = await fetch(`/api/get/${repo.name}/commits`);
-      const commitsData = await commits.json();
-      setRepo({ ...repo, commits: commitsData });
-      repo.commits = commitsData;
-
-      saveDataToLocalStorage(name, 'repo', repo);
-    }
-
-    /**
-     * Displays a toast notification.
-     *
-     * @param {string} title - The title of the notification.
-     * @param {string} description - The description of the notification.
-     * @param {string} status - The status of the notification (info, warning, success, error).
-     */
-    function displayToast(title: string, description: string, status: ToastStatus) {
-      toast({
-        title: title,
-        description: description,
-        status: status,
-        duration: 9000,
-        isClosable: true,
-      });
-    }
-
-    /**
-     * Fetches repository data either from local storage or from the API.
-     */
-    async function fetchRepoData(): Promise<void> {
-      const storedRepoData = getLocalStorage<RepoLocalStorage>(name as string);
-      if (storedRepoData == null) {
-        await fetchRepoDataFromApi();
-        return;
-      }
-
-      // if the date of the last request is more than 1 hour
-      if (new Date().getTime() - storedRepoData.lastRequestDate < 3600000) {
-        setRepo(storedRepoData.repo);
-      } else {
-        clearLocalStorage(name as string);
-        await fetchRepoDataFromApi();
-      }
-    }
-
-    fetchRepoData();
-  }, [router.query, toast]);
 
   if (error && !repo) {
     return <ErrorCode code={error.code} message={error.error} />;

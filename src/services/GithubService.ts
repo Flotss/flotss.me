@@ -60,7 +60,7 @@ export class GithubService {
         repo.description = description.description ?? repo.description;
       }
     });
-
+    prisma.$disconnect();
     return repos;
   }
 
@@ -78,7 +78,7 @@ export class GithubService {
     if (description) {
       repo.description = description.description ?? repo.description;
     }
-
+    prisma.$disconnect();
     return repo;
   }
 

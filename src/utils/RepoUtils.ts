@@ -4,7 +4,6 @@ import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
 import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
-import { get } from 'http';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -45,6 +44,7 @@ export const saveRepoDescription = (repos: Repo[]): void => {
       where: { repoId: repo.id },
     });
   });
+  prisma.$disconnect();
 };
 
 export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
@@ -64,6 +64,8 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
       if (e.code !== 'P2002') {
         throw e;
       }
+    } finally {
+      prisma.$disconnect();
     }
   });
 };
@@ -152,4 +154,27 @@ export const loadGithubInformation = async ({
     }
   }
   callback && callback();
+};
+
+export const getMapCountOfLang = (reposParam: Repo[]) => {
+  let languageCountMap = new Map<string, number>();
+  reposParam.forEach((repo) => {
+    if (repo.language) {
+      if (languageCountMap.has(repo.language)) {
+        languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
+      } else {
+        languageCountMap.set(repo.language, 1);
+      }
+    }
+  });
+  return languageCountMap;
+};
+
+export const getLanguageValues = (reposParam: Repo[]) => {
+  return new Set<string>(
+    reposParam
+      .map((repo) => repo.language)
+      .filter((language) => language !== null)
+      .sort(),
+  );
 };
