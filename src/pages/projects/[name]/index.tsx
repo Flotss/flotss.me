@@ -481,7 +481,7 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
                     <h1 className="text-lg">
                       Date: {new Date(commit.author.date).toLocaleDateString()}
                     </h1>
-                    <h1 className="text-lg">Auteur: {commit.author.name}</h1>
+                    <h1 className="text-lg">Author: {commit.author.name}</h1>
                   </div>
                 </Box>
               </Link>
