@@ -32,7 +32,7 @@ export type Repo = {
   readme: string;
   owner: Owner;
   open_issues_count: number;
-  license: string;
+  license: string | License;
   subscribers_count: number;
   forks_count: number;
   watchers_count: number;
@@ -104,4 +104,12 @@ export type PullRequest = {
     html_url: string;
   };
   body: string;
+};
+
+export type License = {
+  key: string;
+  name: string;
+  spdx_id: string;
+  url: string;
+  node_id: string;
 };

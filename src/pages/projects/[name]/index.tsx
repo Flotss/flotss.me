@@ -1,7 +1,8 @@
 import ErrorCode from '@/components/ErrorCode';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
-import { Repo, RepoLocalStorage } from '@/types/types';
+import { License, Repo, RepoLocalStorage } from '@/types/types';
+import { RepoMock, USE_MOCK_DATA } from '@/utils/GithubMock.constants';
 import { clearLocalStorage, getLocalStorage, saveDataToLocalStorage } from '@/utils/LocalStorage';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
@@ -115,6 +116,11 @@ export default function Project(props: any) {
      * Fetches repository data either from local storage or from the API.
      */
     async function fetchRepoData(): Promise<void> {
+      // If the application is using mock data, use the mock data instead of fetching from the API
+      if (USE_MOCK_DATA) {
+        setRepo(RepoMock);
+        return;
+      }
       const storedRepoData = getLocalStorage<RepoLocalStorage>(name as string);
       if (storedRepoData == null) {
         await fetchRepoDataFromApi();
@@ -252,7 +258,6 @@ export default function Project(props: any) {
                 Plus d&apos;information
               </MenuButton>
               <MenuList style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }} border={'none'}>
-                {/* https://img.shields.io/badge/any_text-you_like-blue */}
                 <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
                   <Image
                     src={`https://img.shields.io/badge/Stars-${repo.stargazers_count}-green`}
@@ -271,12 +276,14 @@ export default function Project(props: any) {
                     alt="Open Issues"
                   />
                 </MenuItem>
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/License-${repo.license}-black`}
-                    alt="License"
-                  />
-                </MenuItem>
+                {repo.license != 'null' && (
+                  <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
+                    <Image
+                      src={`https://img.shields.io/badge/License-${(repo.license as License).name}-black`}
+                      alt="License"
+                    />
+                  </MenuItem>
+                )}
                 <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
                   <Image
                     src={`https://img.shields.io/badge/Watchers-${repo.watchers_count}-yellow`}

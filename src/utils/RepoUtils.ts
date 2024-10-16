@@ -3,8 +3,8 @@ import { Repo, ReposLocalStorage } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
+import { ReposMock, USE_MOCK_DATA, UserMock } from './GithubMock.constants';
 import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
-import { get } from 'http';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -119,6 +119,13 @@ export const loadGithubInformation = async ({
       setLoading(false);
     };
 
+    // If the application is using mock data, use the mock data instead of fetching from the API
+    if (USE_MOCK_DATA) {
+      setRepos(sortRepos(ReposMock as Repo[]));
+      setLoading(false);
+      return;
+    }
+
     // Check if cached data is available and not expired
     const cachedRepos = getLocalStorage<ReposLocalStorage>('repos');
     if (cachedRepos) {
@@ -137,6 +144,13 @@ export const loadGithubInformation = async ({
   }
 
   if (setUser) {
+    // If the application is using mock data, use the mock data instead of fetching from the API
+    if (USE_MOCK_DATA) {
+      setUser(UserMock);
+      setLoading(false);
+      return;
+    }
+
     const storedUser = getLocalStorage<any>('user');
     if (storedUser) {
       setUser(storedUser);
@@ -144,9 +158,9 @@ export const loadGithubInformation = async ({
     } else {
       fetch(`/api/get/user?name=${userOwner ?? owner}`)
         .then((response) => response.json())
-        .then((data) => {
-          setUser(data);
-          saveDataToLocalStorage('user', 'user', data);
+        .then((user) => {
+          setUser(user);
+          saveDataToLocalStorage('user', 'user', user);
           setLoading(false);
         });
     }

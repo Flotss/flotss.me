@@ -92,12 +92,15 @@ export default function Repos(props: ReposProps) {
         toast,
         setLoading: setLoading,
       });
-      setLanguages(getLanguageValues(repos));
-      setLanguageCountMap(getMapCountOfLang(repos));
     };
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array ensures this runs only once
+
+  useEffect(() => {
+    setLanguages(getLanguageValues(repos));
+    setLanguageCountMap(getMapCountOfLang(repos));
+  }, [repos]);
 
   useEffect(() => {
     const updateNumberOfFilters = () => {
@@ -119,6 +122,19 @@ export default function Repos(props: ReposProps) {
         return name.includes(filterSearch) || desc?.includes(filterSearch);
       });
     }
+
+    if (isArchived) {
+      filteredRepos = filteredRepos.filter((repo) => {
+        return repo.archived === isArchived;
+      });
+    }
+
+    if (isPrivate) {
+      filteredRepos = filteredRepos.filter((repo) => {
+        return repo.private == isPrivate;
+      });
+    }
+
     setLanguageCountMap(getMapCountOfLang(filteredRepos));
     updateNumberOfFilters();
 
@@ -132,18 +148,6 @@ export default function Repos(props: ReposProps) {
     // if 0 toggle to All
     if (!languageCountMap.has(selectedLanguage)) {
       setSelectedLanguage('All');
-    }
-
-    if (isArchived) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.archived === isArchived;
-      });
-    }
-
-    if (isPrivate) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.private == isPrivate;
-      });
     }
 
     setFilteredRepos(filteredRepos);

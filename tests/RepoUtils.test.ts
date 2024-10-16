@@ -1,5 +1,6 @@
 import { Repo } from '@/types/types';
 import { sortRepos } from '@/utils/RepoUtils';
+import { describe, it, expect } from '@jest/globals';
 
 describe('sortRepos', () => {
   it('should sort repos based on pinned, archived, and private status', () => {
