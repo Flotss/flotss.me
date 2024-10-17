@@ -38,6 +38,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: true,
     private: false,
     pinned: false,
+    fork: true,
   },
   {
     id: 5,
@@ -140,7 +141,7 @@ export const RepoMock: Repo = {
   ssh_url: '@github.com:flotss/flotss.me.git',
   clone_url: 'https://github.com/flotss/flotss.me.git',
   svn_url: '',
-  forked: false,
+  fork: false,
   commits: commitMock as Commit[],
   readme: readmeMock,
   owner: {

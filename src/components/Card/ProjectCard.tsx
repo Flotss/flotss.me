@@ -20,6 +20,7 @@ export default function ProjectCard(props: ProjectCardProps) {
   const { name, description, stargazers_count, archived, pinned } = props.repo;
   const isPrivate = props.repo.private;
   const isMobile = props.isMobile;
+  const isFork = props.repo.fork;
 
   return (
     <Link
@@ -52,6 +53,9 @@ export default function ProjectCard(props: ProjectCardProps) {
               fontWeight="semibold"
               title={name}
             >
+              {isFork && (
+                <Box className="absolute top-2 text-sm font-semibold text-gray-400">FORKED</Box>
+              )}
               {isPrivate && (
                 <LockIcon className="mr-1 h-6 w-6 -translate-y-1 pr-1 text-[#E2E8F0]" />
               )}
@@ -83,8 +87,6 @@ export default function ProjectCard(props: ProjectCardProps) {
           {description && (
             <Text
               className={`mt-1 block text-sm font-medium leading-tight ${isPrivate ? 'text-gray-500' : 'text-gray-300'}`}
-              fontSize="sm"
-              fontWeight="medium"
             >
               {description}
             </Text>

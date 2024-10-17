@@ -1,5 +1,7 @@
+import { useFetchRepos } from '@/hooks/useFetchRepos';
+import useFiltersRepos, { Property } from '@/hooks/useFiltersRepos';
+import { useLanguageFilters } from '@/hooks/useLanguageFilters';
 import { Repo } from '@/types/types';
-import { loadGithubInformation } from '@/utils/RepoUtils';
 import { breakpoints } from '@/utils/tailwindBreakpoints';
 import {
   Accordion,
@@ -16,7 +18,6 @@ import {
   ScaleFade,
   Stack,
   useMediaQuery,
-  useToast,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -39,125 +40,41 @@ type ReposProps = {
  * @returns {JSX.Element} - The rendered Repos component.
  */
 export default function Repos(props: ReposProps) {
-  const [repos, setRepos] = useState<Repo[]>(props.repos ?? []);
-  const [loading, setLoading] = useState(true);
+  const { repos, loading } = useFetchRepos(props.repos ?? []);
 
-  const [languages, setLanguages] = useState<Set<string>>(new Set());
-  const [languageCountMap, setLanguageCountMap] = useState<Map<string, number>>(new Map());
-
-  const [filteredRepo, setFilteredRepos] = useState<Repo[]>([]);
-  const [countFilter, setCountFilter] = useState(0);
   const [search, setSearch] = useState('');
   const [isArchived, setIsArchived] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
+  const [isFork, setIsFork] = useState(false);
+  const properties: Property<boolean>[] = [
+    { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
+    { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
+    { value: isFork, setValue: setIsFork, propertyName: 'fork' },
+  ];
 
-  const toast = useToast();
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
+  const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
+  const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
+
+  const setReposCount = props.setReposCount;
+
+  const { languages, languageCountMap, setLanguageCountMap } = useLanguageFilters(repos);
+  const options = {
+    properties,
+    selectedLanguage,
+    search,
+    setLanguageCountMap,
+  };
+  const { filteredRepos, countFilter, repoCount } = useFiltersRepos(repos, options);
+
+  useEffect(() => {
+    setReposCount && setReposCount(repoCount);
+  }, [setReposCount, repoCount]);
+
   const router = useRouter();
 
-  const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
-  const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
-
-  const onReposCount = props.setReposCount;
-
-  const getMapCountOfLang = (reposParam: Repo[]) => {
-    let languageCountMap = new Map<string, number>();
-
-    reposParam.forEach((repo) => {
-      if (repo.language) {
-        if (languageCountMap.has(repo.language)) {
-          languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
-        } else {
-          languageCountMap.set(repo.language, 1);
-        }
-      }
-    });
-
-    return languageCountMap;
-  };
-
-  const getLanguageValues = (reposParam: Repo[]) => {
-    return new Set<string>(
-      reposParam
-        .map((repo) => repo.language)
-        .filter((language) => language !== null)
-        .sort(),
-    );
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await loadGithubInformation({
-        setRepos: setRepos,
-        toast,
-        setLoading: setLoading,
-      });
-    };
-    fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs only once
-
-  useEffect(() => {
-    setLanguages(getLanguageValues(repos));
-    setLanguageCountMap(getMapCountOfLang(repos));
-  }, [repos]);
-
-  useEffect(() => {
-    const updateNumberOfFilters = () => {
-      let count = 0;
-      if (isArchived) count++;
-      if (isPrivate) count++;
-      if (selectedLanguage !== 'All') count++;
-      if (search.length) count++;
-      setCountFilter(count);
-    };
-
-    let filteredRepos = repos;
-
-    if (search.length) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        let name = repo.name.toLowerCase();
-        let desc = repo.description?.toLowerCase();
-        let filterSearch = search.toLowerCase();
-        return name.includes(filterSearch) || desc?.includes(filterSearch);
-      });
-    }
-
-    if (isArchived) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.archived === isArchived;
-      });
-    }
-
-    if (isPrivate) {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.private == isPrivate;
-      });
-    }
-
-    setLanguageCountMap(getMapCountOfLang(filteredRepos));
-    updateNumberOfFilters();
-
-    if (selectedLanguage !== 'All') {
-      filteredRepos = filteredRepos.filter((repo) => {
-        return repo.language === selectedLanguage;
-      });
-    }
-
-    // if language selected verify the count
-    // if 0 toggle to All
-    if (!languageCountMap.has(selectedLanguage)) {
-      setSelectedLanguage('All');
-    }
-
-    setFilteredRepos(filteredRepos);
-    onReposCount && onReposCount(filteredRepos.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [repos, isArchived, isPrivate, selectedLanguage, search]);
-
   const clearFilters = () => {
-    setIsArchived(false);
-    setIsPrivate(false);
+    properties.forEach((prop) => prop.setValue(false));
     setSelectedLanguage('All');
     setSearch('');
   };
@@ -197,6 +114,8 @@ export default function Repos(props: ReposProps) {
                   setIsArchived={setIsArchived}
                   isPrivate={isPrivate}
                   setIsPrivate={setIsPrivate}
+                  isFork={isFork}
+                  setIsFork={setIsFork}
                   selectedLanguage={selectedLanguage}
                   setSelectedLanguage={setSelectedLanguage}
                   languages={languages}
@@ -217,6 +136,8 @@ export default function Repos(props: ReposProps) {
             setIsArchived={setIsArchived}
             isPrivate={isPrivate}
             setIsPrivate={setIsPrivate}
+            isFork={isFork}
+            setIsFork={setIsFork}
             selectedLanguage={selectedLanguage}
             setSelectedLanguage={setSelectedLanguage}
             languages={languages}
@@ -232,12 +153,12 @@ export default function Repos(props: ReposProps) {
         >
           {loading
             ? skeletons
-            : filteredRepo.slice(0, props.limit).map((repo) => (
+            : filteredRepos.slice(0, props.limit).map((repo) => (
                 <ScaleFade key={repo.id} initialScale={0.9} in={true}>
                   <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} />
                 </ScaleFade>
               ))}
-          {!loading && filteredRepo.length === 0 && (
+          {!loading && filteredRepos.length === 0 && (
             <Title
               title="No repositories found"
               className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
@@ -245,12 +166,12 @@ export default function Repos(props: ReposProps) {
           )}
         </div>
       </section>
-      {props.limit && filteredRepo.length > props.limit && (
+      {props.limit && filteredRepos.length > props.limit && (
         <Box className="mb-5 flex justify-center">
           <button
             className="w-6/12 rounded-md bg-black px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-[#212120]"
             onClick={() => {
-              router.push('/projects');
+              router.replace('/projects');
             }}
           >
             <b>Show More</b>
@@ -269,6 +190,8 @@ type FilterProps = {
   setIsArchived: (value: boolean) => void;
   isPrivate: boolean;
   setIsPrivate: (value: boolean) => void;
+  isFork: boolean;
+  setIsFork: (value: boolean) => void;
   selectedLanguage: string;
   setSelectedLanguage: (value: string) => void;
   languages: Set<string>;
@@ -286,6 +209,8 @@ const Filters = (props: FilterProps) => {
     setIsArchived,
     isPrivate,
     setIsPrivate,
+    isFork,
+    setIsFork,
     selectedLanguage,
     setSelectedLanguage,
     languages,
@@ -346,6 +271,16 @@ const Filters = (props: FilterProps) => {
                 }}
               >
                 Private
+              </Checkbox>
+              <Checkbox
+                value="Fork"
+                isChecked={isFork}
+                colorScheme="transparent"
+                onChange={(e) => {
+                  setIsFork(e.target.checked);
+                }}
+              >
+                Fork
               </Checkbox>
             </Stack>
           </AccordionPanel>

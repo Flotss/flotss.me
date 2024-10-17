@@ -37,9 +37,9 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
 export const saveRepoDescription = (repos: Repo[]): void => {
   const prisma = new PrismaClient();
 
-  // Create a new repo description record if existe save the new description
+  // Create a new repo description record if exist save the new description
   repos.forEach(async (repo) => {
-    await prisma.repoDescription.upsert({
+    await prisma.repoDB.upsert({
       update: { description: repo.description, name: repo.name, url: repo.url },
       create: { repoId: repo.id, description: repo.description, name: repo.name, url: repo.url },
       where: { repoId: repo.id },
@@ -53,9 +53,9 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
   // Create a new repo record if not exists
   repos.forEach(async (repo) => {
     try {
-      const existingRepo = await prisma.repoDescription.findUnique({ where: { repoId: repo.id } });
+      const existingRepo = await prisma.repoDB.findUnique({ where: { repoId: repo.id } });
       if (!existingRepo) {
-        await prisma.repoDescription.create({
+        await prisma.repoDB.create({
           data: { repoId: repo.id, description: repo.description, name: repo.name, url: repo.url },
         });
       }
@@ -66,6 +66,31 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
       }
     }
   });
+};
+
+export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {
+  let languageCountMap = new Map<string, number>();
+
+  reposParam.forEach((repo) => {
+    if (repo.language) {
+      if (languageCountMap.has(repo.language)) {
+        languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
+      } else {
+        languageCountMap.set(repo.language, 1);
+      }
+    }
+  });
+
+  return languageCountMap;
+};
+
+export const getLanguageValues = (reposParam: Repo[]) => {
+  return new Set<string>(
+    reposParam
+      .map((repo) => repo.language)
+      .filter((language) => language !== null)
+      .sort(),
+  );
 };
 
 interface loadGithubInformationProps {
@@ -89,12 +114,13 @@ export const loadGithubInformation = async ({
   if (setRepos) {
     const fetchRepos = async () => {
       const response = await fetch('api/get/repos');
-      const data = (await response.json()) as Repo[];
+      console.log(response);
+      const data = await response.json();
 
       if (response.status === 400) {
         toast({
-          title: 'Networking Error',
-          description: 'Rate limit of GitHub has been reached',
+          title: 'Error',
+          description: data.message,
           status: 'error',
           duration: 5000,
           isClosable: true,

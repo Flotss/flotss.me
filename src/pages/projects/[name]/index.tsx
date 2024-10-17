@@ -1,9 +1,8 @@
 import ErrorCode from '@/components/ErrorCode';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
-import { License, Repo, RepoLocalStorage } from '@/types/types';
-import { RepoMock, USE_MOCK_DATA } from '@/utils/GithubMock.constants';
-import { clearLocalStorage, getLocalStorage, saveDataToLocalStorage } from '@/utils/LocalStorage';
+import { useFetchRepo } from '@/hooks/useFetchRepo';
+import { License, Repo } from '@/types/types';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
@@ -42,9 +41,8 @@ import remarkGfm from 'remark-gfm';
  */
 export default function Project(props: any) {
   const router = useRouter();
-
-  const [repo, setRepo] = useState<Repo>();
-  const [error, setError] = useState<{ error: string; code: string } | undefined>(undefined); // 404 or 400
+  const { name } = router.query as { name: string };
+  const { repo, loading, error } = useFetchRepo({ name });
   const toast = useToast();
 
   /**
@@ -65,88 +63,9 @@ export default function Project(props: any) {
     });
   };
 
-  useEffect(() => {
-    const { name } = router.query as { name: string };
-    if (!name) {
-      return;
-    }
-
-    async function fetchRepoDataFromApi() {
-      const response = await fetch(`/api/get/repos?name=${name}`);
-
-      if (!response.ok) {
-        const reponse = await response.json();
-        const message = reponse.message;
-        const code = response.status.toString();
-        displayToast('Erreur', message, 'error');
-        setError({ error: message, code });
-        return;
-      }
-
-      const data = await response.json();
-      const repo: Repo = data;
-      setRepo(repo);
-
-      const commits = await fetch(`/api/get/${repo.name}/commits`);
-      const commitsData = await commits.json();
-      setRepo({ ...repo, commits: commitsData });
-      repo.commits = commitsData;
-
-      saveDataToLocalStorage(name, 'repo', repo);
-    }
-
-    /**
-     * Displays a toast notification.
-     *
-     * @param {string} title - The title of the notification.
-     * @param {string} description - The description of the notification.
-     * @param {string} status - The status of the notification (info, warning, success, error).
-     */
-    function displayToast(title: string, description: string, status: ToastStatus) {
-      toast({
-        title: title,
-        description: description,
-        status: status,
-        duration: 9000,
-        isClosable: true,
-      });
-    }
-
-    /**
-     * Fetches repository data either from local storage or from the API.
-     */
-    async function fetchRepoData(): Promise<void> {
-      // If the application is using mock data, use the mock data instead of fetching from the API
-      if (USE_MOCK_DATA) {
-        setRepo(RepoMock);
-        return;
-      }
-      const storedRepoData = getLocalStorage<RepoLocalStorage>(name as string);
-      if (storedRepoData == null) {
-        await fetchRepoDataFromApi();
-        return;
-      }
-
-      // if the date of the last request is more than 1 hour
-      if (new Date().getTime() - storedRepoData.lastRequestDate < 3600000) {
-        setRepo(storedRepoData.repo);
-      } else {
-        clearLocalStorage(name as string);
-        await fetchRepoDataFromApi();
-      }
-    }
-
-    fetchRepoData();
-  }, [router.query, toast]);
-
   if (error && !repo) {
     return <ErrorCode code={error.code} message={error.error} />;
   }
-
-  /**
-   * Possible toast notification status values.
-   */
-  type ToastStatus = 'info' | 'warning' | 'success' | 'error' | undefined;
 
   // If the repository data is not available yet, display a skeleton
   if (!repo) {
@@ -276,7 +195,7 @@ export default function Project(props: any) {
                     alt="Open Issues"
                   />
                 </MenuItem>
-                {repo.license != 'null' && (
+                {repo.license && repo.license != 'null' && (
                   <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
                     <Image
                       src={`https://img.shields.io/badge/License-${(repo.license as License).name}-black`}
@@ -301,13 +220,13 @@ export default function Project(props: any) {
           </StyledBox>
           <StyledBox className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
             <StyledText className="lgrepo:text-xl">
-              Créé le: {new Date(repo.created_at).toLocaleDateString()}
+              Created : {new Date(repo.created_at).toLocaleDateString()}
             </StyledText>
             <StyledText className="lgrepo:text-xl">
-              Mis à jour le: {new Date(repo.updated_at).toLocaleDateString()}
+              Updated : {new Date(repo.updated_at).toLocaleDateString()}
             </StyledText>
 
-            <StyledText className="pb-2 pt-5">Collaborateurs :</StyledText>
+            <StyledText className="pb-2 pt-5">Collaborators :</StyledText>
             <Flex width={'100%'} gap={5} className="justify-around" flexWrap={'wrap'}>
               {repo.collaborators.map((collaborator, index) => (
                 <>

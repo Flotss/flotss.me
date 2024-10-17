@@ -1,14 +1,12 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
 import { createIfNotExists } from '@/utils/RepoUtils';
 import { PrismaClient } from '@prisma/client';
-import { RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
+import assert from 'assert';
+import { GithubError, RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
 const headers: any = {
-  'Content-Type': 'application/json',
   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
-  'X-GitHub-Api-Version': '2022-11-28',
 };
-
 export const owner: string = 'Flotss';
 
 export class GithubService {
@@ -19,30 +17,65 @@ export class GithubService {
   public async getRepos(): Promise<Repo[]> {
     let repos: Repo[] = [];
 
-    const response = await fetch(`https://api.github.com/search/repositories?q=user:${owner}`, {
-      headers,
-    });
+    // Fetch repositories
+    let page = 1;
+    let reposResponse: any = {
+      items: [],
+    };
+    let total_count = 0;
+    let response;
 
-    const reposResponse: any = await response.json();
+    do {
+      response = await fetch(
+        `https://api.github.com/search/repositories?q=user:${owner}+fork:true&page=${page}`,
+        {
+          headers,
+        },
+      );
 
-    if (reposResponse.message && reposResponse.message.includes('API rate limit exceeded')) {
-      throw new RateLimitError('API rate limit exceeded');
-    }
+      const data = await response.json();
+
+      if (data.message && data.message.includes('API rate limit exceeded')) {
+        throw new RateLimitError('API rate limit exceeded');
+      }
+
+      if (data.message) {
+        throw new GithubError(data.message);
+      }
+
+      if (total_count == 0) {
+        total_count = data.total_count;
+      }
+
+      reposResponse.items = reposResponse.items.concat(data.items);
+      page++;
+    } while (response.ok && reposResponse.items.length < total_count);
+
+    assert(
+      total_count === reposResponse.items.length,
+      `Before Pinned : The number of repositories fetched does not match the total count {${total_count} | ${reposResponse.items.length}} ${reposResponse.toString()}`,
+    );
 
     // Use Promise.all to wait for all promises to resolve
     const pinnedRepos = await this.getPinnedRepos();
     await Promise.all(
       reposResponse.items.map(async (rep: any) => {
-        if (!rep.forked) {
-          repos.push({ ...rep, pinned: pinnedRepos.includes(rep.name) } as Repo);
-        } else if (rep.forked && pinnedRepos.includes(rep.name)) {
-          repos.push({ ...rep, pinned: true } as Repo);
-        }
+        repos.push({ ...rep, pinned: pinnedRepos.includes(rep.name) } as Repo);
       }),
+    );
+
+    assert(
+      total_count === repos.length,
+      'After Pinned : The number of repositories fetched does not match the total count',
     );
 
     createIfNotExists(repos);
     repos = await GithubService.setDescriptions(repos);
+
+    assert(
+      total_count === repos.length,
+      'The number of repositories fetched does not match the total count',
+    );
 
     return repos;
   }
@@ -51,7 +84,7 @@ export class GithubService {
     const prisma = new PrismaClient();
 
     // GET ALL DESCRIPTIONS
-    const descriptions = await prisma.repoDescription.findMany();
+    const descriptions = await prisma.repoDB.findMany();
 
     // Set descriptions
     repos.forEach(async (repo) => {
@@ -68,7 +101,7 @@ export class GithubService {
     const prisma = new PrismaClient();
 
     // GET ALL DESCRIPTIONS
-    const description = await prisma.repoDescription.findFirst({
+    const description = await prisma.repoDB.findFirst({
       where: {
         repoId: repo.id,
       },

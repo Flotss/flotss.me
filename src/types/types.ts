@@ -27,7 +27,7 @@ export type Repo = {
   ssh_url: string;
   clone_url: string;
   svn_url: string;
-  forked: boolean;
+  fork: boolean;
   commits: Commit[];
   readme: string;
   owner: Owner;

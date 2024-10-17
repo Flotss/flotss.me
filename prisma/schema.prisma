@@ -31,11 +31,12 @@ model Role {
   users     User[]   @relation
 }
 
-model RepoDescription {
+model RepoDB {
   repoId    Int      @id
   name      String   @default("No name")
   description String?
   url       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+	@@map("Repository")
 }
