@@ -55,7 +55,7 @@ export class GithubService {
 
     assert(
       total_count === reposResponse.items.length,
-      `Before Pinned : The number of repositories fetched does not match the total count {${total_count} | ${reposResponse.items.length}} ${reposResponse.toString()}`,
+      `The number of repositories fetched does not match the total count {${total_count} | ${reposResponse.items.length}} ${reposResponse.toString()}`,
     );
 
     // Use Promise.all to wait for all promises to resolve
@@ -66,48 +66,41 @@ export class GithubService {
       }),
     );
 
-    assert(
-      total_count === repos.length,
-      'After Pinned : The number of repositories fetched does not match the total count',
-    );
-
     createIfNotExists(repos);
-    repos = await this.setDescriptions(repos);
-
-    assert(
-      total_count === repos.length,
-      'The number of repositories fetched does not match the total count',
-    );
+    repos = await this.enrichReposDb(repos);
 
     return repos;
   }
 
-  private async setDescriptions(repos: Repo[]): Promise<Repo[]> {
-    // GET ALL DESCRIPTIONS
-    const descriptions = await this.prisma.repoDB.findMany();
+  private async enrichReposDb(repos: Repo[]): Promise<Repo[]> {
+    // GET ALL REPOS IN DB
+    const reposDB = await this.prisma.repoDB.findMany();
+
+    // Filter repos by visibility
+    repos = repos.filter((repo) => reposDB.find((r) => r.repoId === repo.id)?.visible ?? true);
 
     // Set descriptions
     repos.forEach(async (repo) => {
-      const description = descriptions.find((d) => d.repoId === repo.id);
+      const description = reposDB.find((d) => d.repoId === repo.id)?.description;
       if (description) {
-        repo.description = description.description ?? repo.description;
+        repo.description = description ?? repo.description;
       }
     });
 
     return repos;
   }
 
-  private async setDescription(repo: Repo): Promise<Repo> {
-    // GET ALL DESCRIPTIONS
-    const description = await this.prisma.repoDB.findFirst({
+  private async enrichRepoDb(repo: Repo): Promise<Repo> {
+    // GET REPO IN DB
+    const repoDb = await this.prisma.repoDB.findFirst({
       where: {
         repoId: repo.id,
       },
     });
 
     // Set descriptions
-    if (description) {
-      repo.description = description.description ?? repo.description;
+    if (repoDb) {
+      repo.description = repoDb.description ?? repo.description;
     }
 
     return repo;
@@ -183,7 +176,7 @@ export class GithubService {
     repo.pullRequests = await this.getPullRequests(repoName);
     repo.readme = await this.getReadme(repoName);
 
-    repo = await this.setDescription(repo);
+    repo = await this.enrichRepoDb(repo);
 
     return repo;
   }
