@@ -127,7 +127,6 @@ export default function Contact(props: any) {
     })
       .then(async (response) => {
         setIsSending(false);
-        console.log(response);
         if (response.ok) {
           toast({
             title: 'Email sent.',
@@ -147,7 +146,6 @@ export default function Contact(props: any) {
         } else {
           const responseData = await response.json();
           const responseString = responseData.message || 'Unknown error occurred';
-          console.log(responseData);
           toast({
             title: 'Error.',
             description: `${responseString}`,

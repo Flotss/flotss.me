@@ -10,6 +10,8 @@ const headers: any = {
 export const owner: string = 'Flotss';
 
 export class GithubService {
+  private prisma: PrismaClient = new PrismaClient();
+
   /**
    * Asynchronous function to retrieve repositories.
    * @returns A promise that resolves to an array of repositories.
@@ -70,7 +72,7 @@ export class GithubService {
     );
 
     createIfNotExists(repos);
-    repos = await GithubService.setDescriptions(repos);
+    repos = await this.setDescriptions(repos);
 
     assert(
       total_count === repos.length,
@@ -80,11 +82,9 @@ export class GithubService {
     return repos;
   }
 
-  private static async setDescriptions(repos: Repo[]): Promise<Repo[]> {
-    const prisma = new PrismaClient();
-
+  private async setDescriptions(repos: Repo[]): Promise<Repo[]> {
     // GET ALL DESCRIPTIONS
-    const descriptions = await prisma.repoDB.findMany();
+    const descriptions = await this.prisma.repoDB.findMany();
 
     // Set descriptions
     repos.forEach(async (repo) => {
@@ -98,10 +98,8 @@ export class GithubService {
   }
 
   private async setDescription(repo: Repo): Promise<Repo> {
-    const prisma = new PrismaClient();
-
     // GET ALL DESCRIPTIONS
-    const description = await prisma.repoDB.findFirst({
+    const description = await this.prisma.repoDB.findFirst({
       where: {
         repoId: repo.id,
       },

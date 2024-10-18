@@ -21,6 +21,7 @@ import {
   SkeletonCircle,
   SkeletonText,
   Text,
+  ToastId,
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
@@ -45,6 +46,7 @@ export default function Project(props: any) {
   const { repo, loading, error } = useFetchRepo({ name });
   const toast = useToast();
 
+  let lastToastId: ToastId;
   /**
    * Copies text to the clipboard and displays a toast notification.
    *
@@ -54,7 +56,12 @@ export default function Project(props: any) {
     if (!text) return;
 
     navigator.clipboard.writeText(text);
-    toast({
+
+    if (lastToastId) {
+      toast.close(lastToastId);
+    }
+
+    lastToastId = toast({
       title: 'Copied to clipboard',
       description: text,
       status: 'success',

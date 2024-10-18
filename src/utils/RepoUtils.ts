@@ -45,6 +45,7 @@ export const saveRepoDescription = (repos: Repo[]): void => {
       where: { repoId: repo.id },
     });
   });
+  prisma.$disconnect();
 };
 
 export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
@@ -66,6 +67,7 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
       }
     }
   });
+  prisma.$disconnect();
 };
 
 export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {
@@ -114,7 +116,6 @@ export const loadGithubInformation = async ({
   if (setRepos) {
     const fetchRepos = async () => {
       const response = await fetch('api/get/repos');
-      console.log(response);
       const data = await response.json();
 
       if (response.status === 400) {

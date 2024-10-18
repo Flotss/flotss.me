@@ -23,6 +23,8 @@ const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
   const [countFilter, setCountFilter] = useState(0);
   const [repoCount, setRepoCount] = useState(0);
 
+  const propertiesChange = options.properties.map((property) => property.value).join('');
+
   useEffect(() => {
     const updateNumberOfFilters = () => {
       let count = 0;
@@ -60,7 +62,7 @@ const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
     setFilteredRepos(filtered);
     updateNumberOfFilters();
     setRepoCount(filtered.length);
-  }, [repos, options]);
+  }, [repos, options.selectedLanguage, options.search, propertiesChange]);
 
   return { filteredRepos, countFilter, repoCount };
 };

@@ -2,6 +2,7 @@ import { Repo } from '@/types/types';
 import { LockIcon, StarIcon } from '@chakra-ui/icons';
 import { Badge, Box, Divider, Text } from '@chakra-ui/react';
 import Link from 'next/link';
+import { memo, useCallback, useMemo } from 'react';
 import { VscPinnedDirty } from 'react-icons/vsc';
 
 interface ProjectCardProps {
@@ -16,23 +17,25 @@ interface ProjectCardProps {
  * @param {Repo} props.repo - The repository object containing project details.
  * @returns {JSX.Element} The rendered ProjectCard component.
  */
-export default function ProjectCard(props: ProjectCardProps) {
+function ProjectCardComponent(props: ProjectCardProps) {
   const { name, description, stargazers_count, archived, pinned } = props.repo;
   const isPrivate = props.repo.private;
   const isMobile = props.isMobile;
   const isFork = props.repo.fork;
 
+  const linkHref = useMemo(() => `projects/${name}`, [name]);
+
+  const handleClick = useCallback(
+    (e: { preventDefault: () => void }) => {
+      if (isPrivate) {
+        e.preventDefault();
+      }
+    },
+    [isPrivate],
+  );
+
   return (
-    <Link
-      href={`projects/${name}`}
-      // disable the link if the repository is private
-      onClick={(e) => {
-        if (isPrivate) {
-          e.preventDefault();
-        }
-        return;
-      }}
-    >
+    <Link href={linkHref} onClick={handleClick}>
       <Box
         className={`glow transform overflow-ellipsis rounded-xl border border-black bg-box-color-light transition-all duration-500 ease-in-out md:max-w-2xl ${
           isPrivate
@@ -47,7 +50,7 @@ export default function ProjectCard(props: ProjectCardProps) {
       >
         <Box className="flex flex-col">
           <Box className="flex justify-between">
-            <Text
+            <Box
               className={`mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide ${isPrivate ? 'text-gray-400' : 'text-gray-300'}`}
               fontSize="xl"
               fontWeight="semibold"
@@ -65,7 +68,7 @@ export default function ProjectCard(props: ProjectCardProps) {
                   Archived
                 </Badge>
               )}
-            </Text>
+            </Box>
             <div className="flex items-center">
               {stargazers_count > 2 && (
                 <Box className="flex items-center justify-between space-x-1">
@@ -96,3 +99,5 @@ export default function ProjectCard(props: ProjectCardProps) {
     </Link>
   );
 }
+
+export default memo(ProjectCardComponent);

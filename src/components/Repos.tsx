@@ -20,7 +20,7 @@ import {
   useMediaQuery,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
 import { StyledBox } from './StyledBox';
@@ -39,7 +39,8 @@ type ReposProps = {
  *
  * @returns {JSX.Element} - The rendered Repos component.
  */
-export default function Repos(props: ReposProps) {
+const Repos = React.memo((props: ReposProps) => {
+  Repos.displayName = 'Repos';
   const { repos, loading } = useFetchRepos(props.repos ?? []);
 
   const [search, setSearch] = useState('');
@@ -146,7 +147,7 @@ export default function Repos(props: ReposProps) {
             isMobile={isMobile}
           />
         )}
-        <div
+        <Box
           className={`margin-auto col-span-1 flex w-full flex-wrap items-stretch justify-center gap-x-5 gap-y-5 lg:flex-row ${
             props.filterVisible ? 'lg:col-span-4' : 'lg:col-span-5'
           }`}
@@ -164,14 +165,14 @@ export default function Repos(props: ReposProps) {
               className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
             />
           )}
-        </div>
+        </Box>
       </section>
       {props.limit && filteredRepos.length > props.limit && (
         <Box className="mb-5 flex justify-center">
           <button
             className="w-6/12 rounded-md bg-black px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-[#212120]"
             onClick={() => {
-              router.replace('/projects');
+              router.push('/projects');
             }}
           >
             <b>Show More</b>
@@ -180,7 +181,9 @@ export default function Repos(props: ReposProps) {
       )}
     </>
   );
-}
+});
+
+export default Repos;
 
 type FilterProps = {
   countFilter: number;

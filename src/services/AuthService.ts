@@ -14,6 +14,7 @@ export async function login(email: string, password: string): Promise<string> {
       email,
     },
   });
+  prisma.$disconnect();
 
   // If no user is found or the password is incorrect, throw an error
   if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -54,7 +55,7 @@ export async function register(email: string, password: string): Promise<string>
     });
   });
 
-
+  prisma.$disconnect();
   // If the user is not created, return an error
   if (!userCreate) {
     throw new UserNotFoundError('Error while creating user.');

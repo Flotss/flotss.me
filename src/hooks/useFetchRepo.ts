@@ -2,7 +2,7 @@ import { Repo, RepoLocalStorage } from '@/types/types';
 import { RepoMock, USE_MOCK_DATA } from '@/utils/GithubMock.constants';
 import { clearLocalStorage, getLocalStorage, saveDataToLocalStorage } from '@/utils/LocalStorage';
 import { useToast } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface useFetchRepoProps {
   initialRepos?: Repo | null;
@@ -14,13 +14,19 @@ export function useFetchRepo({ initialRepos = null, name }: useFetchRepoProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ error: string; code: string } | null>(null);
   const toast = useToast();
+  const prevNameRef = useRef<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
-
     if (!name) {
       return;
     }
+
+    if (prevNameRef.current === name) {
+      return;
+    }
+
+    setLoading(true);
+    prevNameRef.current = name;
 
     async function fetchRepoDataFromApi() {
       const response = await fetch(`/api/get/repos?name=${name}`);
