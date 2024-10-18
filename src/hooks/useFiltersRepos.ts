@@ -1,7 +1,7 @@
 import { Repo } from '@/types/types';
 import { getMapCountOfLang } from '@/utils/RepoUtils';
 import assert from 'assert';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 export interface Property<T> {
   value: T;
