@@ -39,6 +39,10 @@
   font-size: 13.6px;
 }
 
+.markdown p {
+  margin: 0.5rem 0;
+}
+
 .markdown p code,
 .markdown li code
 {

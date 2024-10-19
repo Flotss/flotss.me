@@ -398,7 +398,7 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
         className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"
         style={{ height: `${boxHeight}px` }}
       >
-        <Title title={'Commits'} className="text-5xl" />
+        <Title title={`Commits (${commits.length})`} className="text-5xl" />
         <Divider />
         <Box
           className="scrollbar flex flex-col space-y-2 p-2"
@@ -406,21 +406,31 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
           height={`${boxHeight - 180}px`}
         >
           {commits.map((commit, index) => (
-            <Box key={index} width={'100%'} height={'100%'}>
-              <Link href={commit.url} isExternal className="no-underline">
-                <Box className="space-y-2 rounded-3xl bg-[#202020] px-4 py-2 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:rounded-3xl">
-                  <h1 className="text-xl" title={commit.message}>
-                    {commit.message.slice(0, 80)}
-                    {commit.message.slice(0, 80).length == 80 ? `...` : ''}
-                  </h1>
-                  <div className="flex items-start justify-start space-x-2">
+            <Box key={index} width={'100%'} height={'100%'} className="group">
+              <Box className="space-y-2 rounded-3xl bg-[#202020] px-4 py-2 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:rounded-3xl">
+                <h1 className="text-xl" title={commit.message}>
+                  {commit.message.slice(0, 80)}
+                  {commit.message.slice(0, 80).length == 80 ? `...` : ''}
+                </h1>
+
+                <Box className="between flex items-center justify-between space-x-2">
+                  <Box className="flex items-start justify-start space-x-2">
                     <h1 className="text-lg">
                       Date: {new Date(commit.author.date).toLocaleDateString()}
                     </h1>
                     <h1 className="text-lg">Author: {commit.author.name}</h1>
-                  </div>
+                  </Box>
+                  <Link href={commit.url} isExternal textDecoration={'none'}>
+                    <Button
+                      colorScheme="blue"
+                      size={'xs'}
+                      className="opacity-0 transition-opacity delay-150 ease-in-out group-hover:opacity-100"
+                    >
+                      See on GitHub
+                    </Button>
+                  </Link>
                 </Box>
-              </Link>
+              </Box>
             </Box>
           ))}
         </Box>

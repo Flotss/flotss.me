@@ -75,14 +75,17 @@ export class GithubService {
   private async enrichReposDb(repos: Repo[]): Promise<Repo[]> {
     // GET ALL REPOS IN DB
     const reposDB = await this.prisma.repoDB.findMany();
+    const mapRepoDb = new Map(reposDB.map((r) => [r.repoId, r]));
 
-    // Filter repos by visibility
+    // Filter visible repos
     repos = repos.filter((repo) => reposDB.find((r) => r.repoId === repo.id)?.visible ?? true);
 
     // Set descriptions
     repos.forEach(async (repo) => {
-      const description = reposDB.find((d) => d.repoId === repo.id)?.description;
-      if (description) {
+      const repoDb = mapRepoDb.get(repo.id);
+      const description = repoDb?.description;
+
+      if (repoDb) {
         repo.description = description ?? repo.description;
       }
     });
