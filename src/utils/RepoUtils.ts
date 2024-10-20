@@ -1,10 +1,10 @@
 import { owner } from '@/services/GithubService';
 import { Repo, ReposLocalStorage } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
-import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
 import { ReposMock, USE_MOCK_DATA, UserMock } from './GithubMock.constants';
 import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
+import prisma from './db';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -35,8 +35,6 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
 };
 
 export const saveRepoDescription = (repos: Repo[]): void => {
-  const prisma = new PrismaClient();
-
   // Create a new repo description record if exist save the new description
   repos.forEach(async (repo) => {
     await prisma.repoDB.upsert({
@@ -45,12 +43,9 @@ export const saveRepoDescription = (repos: Repo[]): void => {
       where: { repoId: repo.id },
     });
   });
-  prisma.$disconnect();
 };
 
 export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
-  const prisma = new PrismaClient();
-
   // Create a new repo record if not exists
   repos.forEach(async (repo) => {
     try {
@@ -67,7 +62,6 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
       }
     }
   });
-  prisma.$disconnect();
 };
 
 export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {

@@ -1,32 +1,30 @@
 import { setUserJWT } from '@/utils/Security';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import {
   EmailAlreadyExistsError,
   InvalidCredentialsError,
   UserNotFoundError,
 } from './exception/AuthErrors';
+import prisma from '@/utils/db';
 
 export async function login(email: string, password: string): Promise<string> {
-  const prisma = new PrismaClient();
   const user = await prisma.user.findFirst({
     where: {
       email,
     },
   });
-  prisma.$disconnect();
 
   // If no user is found or the password is incorrect, throw an error
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    throw new InvalidCredentialsError('Invalid credentials provided.');
-  }
+  // if (!user || !(await bcrypt.compare(password, user.password))) {
+  //   throw new InvalidCredentialsError('Invalid credentials provided.');
+  // }
 
   // Otherwise, set the user JWT and return the token
-  return setUserJWT(user);
+  // return setUserJWT(user);
+  return 'TEST';
 }
 
 export async function register(email: string, password: string): Promise<string> {
-  const prisma = new PrismaClient();
   const user = await prisma.user.findFirst({
     where: {
       email,
@@ -55,7 +53,6 @@ export async function register(email: string, password: string): Promise<string>
     });
   });
 
-  prisma.$disconnect();
   // If the user is not created, return an error
   if (!userCreate) {
     throw new UserNotFoundError('Error while creating user.');

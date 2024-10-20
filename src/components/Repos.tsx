@@ -1,3 +1,5 @@
+'use client';
+
 import { useFetchRepos } from '@/hooks/useFetchRepos';
 import useFiltersRepos, { Property } from '@/hooks/useFiltersRepos';
 import { useLanguageFilters } from '@/hooks/useLanguageFilters';

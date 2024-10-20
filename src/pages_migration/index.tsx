@@ -10,11 +10,17 @@ import React from 'react';
  *
  * @returns {JSX.Element} - The rendered homepage component.
  */
-export default function Home() {
+export default async function Home(props) {
   const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
+
+  const session = await auth();
 
   return (
     <>
+      <div>
+        <h1>{session?.user ? 'Authenticated' : 'Not authenticated'}</h1>
+        {session?.user ? <LogoutButton /> : <LoginButton />}
+      </div>
       {/* Grid layout for the homepage content */}
       <Grid className="mx-5 grid grid-cols-2 grid-rows-1 space-y-5 pt-5 sm:mx-20 lg:space-x-5 lg:space-y-0">
         {/* Left column */}
@@ -122,6 +128,8 @@ type CustomStyledBoxProps = {
   className?: string;
 };
 
+import { LoginButton, LogoutButton } from '@/components/AuthButtons';
+import { auth } from '@/utils/auth';
 import { motion } from 'framer-motion';
 
 const CustomStyledBox = (props: CustomStyledBoxProps) => {
