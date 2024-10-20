@@ -1,6 +1,6 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
+import prisma from '@/utils/db';
 import { createIfNotExists } from '@/utils/RepoUtils';
-import { PrismaClient } from '@prisma/client';
 import assert from 'assert';
 import { GithubError, RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
@@ -10,8 +10,6 @@ const headers: any = {
 export const owner: string = 'Flotss';
 
 export class GithubService {
-  private prisma: PrismaClient = new PrismaClient();
-
   /**
    * Asynchronous function to retrieve repositories.
    * @returns A promise that resolves to an array of repositories.
@@ -74,7 +72,7 @@ export class GithubService {
 
   private async enrichReposDb(repos: Repo[]): Promise<Repo[]> {
     // GET ALL REPOS IN DB
-    const reposDB = await this.prisma.repoDB.findMany();
+    const reposDB = await prisma.repoDB.findMany();
     const mapRepoDb = new Map(reposDB.map((r) => [r.repoId, r]));
 
     // Filter visible repos
@@ -95,7 +93,7 @@ export class GithubService {
 
   private async enrichRepoDb(repo: Repo): Promise<Repo> {
     // GET REPO IN DB
-    const repoDb = await this.prisma.repoDB.findFirst({
+    const repoDb = await prisma.repoDB.findFirst({
       where: {
         repoId: repo.id,
       },

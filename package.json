@@ -16,6 +16,7 @@
     "*.js": "eslint --cache --fix"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.7.2",
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.8.2",
     "@prisma/client": "^5.15.0",
@@ -27,6 +28,7 @@
     "framer-motion": "^10.16.12",
     "jose": "^5.4.0",
     "next": "^14.2.10",
+    "next-auth": "^5.0.0-beta.25",
     "node-fetch": "^3.3.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Link } from '@chakra-ui/react';
 import { usePathname } from 'next/navigation';
 import { FaCode } from 'react-icons/fa';
