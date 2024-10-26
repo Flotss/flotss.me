@@ -1,4 +1,4 @@
-import { Divider, Text } from '@chakra-ui/layout';
+import { Divider, Text } from '@chakra-ui/react';
 import { StyledBox } from './StyledBox';
 import Title from './Title';
 
@@ -13,7 +13,7 @@ interface ErrorCodeProps {
  * @param {ErrorCodeProps} props - The props for the error code component.
  * @returns {JSX.Element} The rendered error code component.
  */
-const ErrorCode = (props: ErrorCodeProps): JSX.Element => {
+const ErrorCode = (props: ErrorCodeProps) => {
   const { code, message } = props;
 
   // Function to determine the color based on the error code

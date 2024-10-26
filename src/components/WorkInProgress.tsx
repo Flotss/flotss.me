@@ -1,4 +1,4 @@
-import { Divider, Text } from '@chakra-ui/layout';
+import { Divider, Text } from '@chakra-ui/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { StyledBox } from './StyledBox';
