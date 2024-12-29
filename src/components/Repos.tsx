@@ -2,7 +2,6 @@ import { useFetchRepos } from '@/hooks/useFetchRepos';
 import useFiltersRepos, { Property } from '@/hooks/useFiltersRepos';
 import { useLanguageFilters } from '@/hooks/useLanguageFilters';
 import { Repo } from '@/types/types';
-import { breakpoints } from '@/utils/tailwindBreakpoints';
 import {
   Accordion,
   AccordionButton,
@@ -17,7 +16,6 @@ import {
   RadioGroup,
   ScaleFade,
   Stack,
-  useMediaQuery,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +23,7 @@ import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
 import { StyledBox } from './StyledBox';
 import Title from './Title';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 type ReposProps = {
   filterVisible?: boolean;
@@ -55,7 +54,7 @@ const Repos = React.memo((props: ReposProps) => {
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
-  const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
+  const isMobile = useIsMobile();
 
   const setReposCount = props.setReposCount;
 

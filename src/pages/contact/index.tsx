@@ -4,8 +4,7 @@ import { EmailInputs } from '@/services/EmailService';
 import { owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
 import { loadGithubInformation } from '@/utils/RepoUtils';
-import { breakpoints } from '@/utils/tailwindBreakpoints';
-import { Box, Heading, Text, useMediaQuery, useToast } from '@chakra-ui/react';
+import { Box, Heading, Text, useToast } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ContactHeader from './component/ContactHeader';
@@ -25,8 +24,6 @@ export default function Contact(props: any) {
   const [subject, setSubject] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
-
-  const [isMobile] = useMediaQuery(`(max-width:${breakpoints.lg})`);
 
   useEffect(() => {
     loadGithubInformation({

@@ -40,7 +40,7 @@ function ProjectCardComponent(props: ProjectCardProps) {
         className={`glow transform overflow-ellipsis rounded-xl border border-black bg-box-color-light transition-all duration-500 ease-in-out md:max-w-2xl ${
           isPrivate
             ? ''
-            : 'shadow-sm shadow-shadow-color hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'
+            : 'shadow-sm shadow-light-green hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'
         }`}
         p={8}
         width={isMobile ? '20rem' : '26rem'}
