@@ -7,7 +7,7 @@ module.exports = {
         'box-color': '#131312',
         'box-color-light': '#191919',
         'filter-search': '#202020',
-        'shadow-color': '#BDFFE3',
+        'light-green': '#BDFFE3',
       },
     },
     screens: {

@@ -11,6 +11,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: false,
     private: false,
     pinned: true,
+    language: 'java',
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: false,
     private: false,
     pinned: false,
+    language: 'java',
   },
   {
     id: 3,
@@ -29,6 +31,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: true,
     private: false,
     pinned: true,
+    language: 'java',
   },
   {
     id: 4,
@@ -39,6 +42,7 @@ export const ReposMock: Partial<Repo>[] = [
     private: false,
     pinned: false,
     fork: true,
+    language: 'java',
   },
   {
     id: 5,
@@ -48,6 +52,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: false,
     private: true,
     pinned: false,
+    language: 'php',
   },
   {
     id: 6,
@@ -57,6 +62,7 @@ export const ReposMock: Partial<Repo>[] = [
     archived: true,
     private: true,
     pinned: false,
+    language: 'php',
   },
 ];
 
