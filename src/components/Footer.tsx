@@ -12,10 +12,12 @@ const SocialButton = ({
   children,
   label,
   href,
+  color: childrenColor,
 }: {
   children: ReactNode;
   label: string;
   href: string;
+  color?: string;
 }) => {
   return (
     <Link
@@ -33,6 +35,7 @@ const SocialButton = ({
       isExternal
       _hover={{
         transform: 'scale(1.2)',
+        color: childrenColor,
       }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
@@ -45,10 +48,14 @@ export default function Footer() {
   return (
     <Box className="sticky top-[100vh] mx-5 mb-2 flex h-14 items-center justify-between rounded-full bg-box-color px-4 sm:mx-20 lg:px-6">
       <nav className="flex gap-10">
-        <SocialButton label="GitHub" href="https://github.com/flotss">
+        <SocialButton label="GitHub" href="https://github.com/flotss" color="#FFFFFF">
           <BsGithub />
         </SocialButton>
-        <SocialButton label="LinkedIn" href="https://www.linkedin.com/in/florian-mangin-784604208/">
+        <SocialButton
+          label="LinkedIn"
+          href="https://www.linkedin.com/in/florian-mangin-784604208/"
+          color="#0077B5"
+        >
           <BsLinkedin />
         </SocialButton>
       </nav>

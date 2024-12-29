@@ -23,7 +23,6 @@ module.exports = {
       },
       animation: {
         'waving-hand': 'wavingHand 2s linear infinite 5s',
-        'waving-hand-interval': 'wavingHand 2s linear infinite 5s',
       },
     },
     screens: {
