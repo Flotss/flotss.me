@@ -1,8 +1,7 @@
 import Repos from '@/components/Repos';
 import { StyledBox } from '@/components/StyledBox';
 import Title from '@/components/Title';
-import { breakpoints } from '@/utils/tailwindBreakpoints';
-import { Grid, Image, useMediaQuery } from '@chakra-ui/react';
+import { Grid, Image } from '@chakra-ui/react';
 import React from 'react';
 
 /**
@@ -11,7 +10,7 @@ import React from 'react';
  * @returns {JSX.Element} - The rendered homepage component.
  */
 export default function Home() {
-  const [isMobile] = useMediaQuery(`(max-width: ${breakpoints.lg})`);
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -123,6 +122,7 @@ type CustomStyledBoxProps = {
 };
 
 import { motion } from 'framer-motion';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const CustomStyledBox = (props: CustomStyledBoxProps) => {
   return (
