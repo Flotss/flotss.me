@@ -19,7 +19,6 @@ const SocialButton = ({
 }) => {
   return (
     <Link
-      bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
       rounded={'full'}
       w={8}
       h={8}

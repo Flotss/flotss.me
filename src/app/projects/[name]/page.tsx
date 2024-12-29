@@ -26,7 +26,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
@@ -41,9 +41,9 @@ import remarkGfm from 'remark-gfm';
  * @returns {JSX.Element} - The rendered `Project` component.
  */
 export default function Project(props: any) {
-  const router = useRouter();
-  const { name } = router.query as { name: string };
-  const { repo, loading, error } = useFetchRepo({ name });
+  const searchParams = useSearchParams();
+  const name = searchParams.get('name');
+  const { repo, loading, error } = useFetchRepo({ name: name ?? '' });
   const toast = useToast();
 
   let lastToastId: ToastId;
@@ -79,7 +79,7 @@ export default function Project(props: any) {
     return (
       <>
         <Head>
-          {(router.query.name && <title>Loading repository {router.query.name}...</title>) || (
+          {(name && <title>Loading repository {name}...</title>) || (
             <title>Loading repository...</title>
           )}
         </Head>
