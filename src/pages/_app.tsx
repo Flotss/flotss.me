@@ -3,7 +3,6 @@ import '@/styles/globals.css';
 import '@/styles/scrollbar.css';
 import '@/styles/markdown.css';
 import { ChakraProvider } from '@chakra-ui/react';
-import dotenv from 'dotenv';
 import React from 'react';
 
 /**
@@ -19,9 +18,6 @@ export default function App({
   Component: React.ComponentType;
   pageProps: any;
 }) {
-  // Load environment variables from a .env file if available
-  dotenv.config();
-
   return (
     <ChakraProvider>
       {/* Define the overall layout of the application */}
