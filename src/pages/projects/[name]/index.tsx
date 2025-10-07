@@ -40,7 +40,7 @@ import remarkGfm from 'remark-gfm';
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project(props: any) {
+export default function Project() {
   const router = useRouter();
   const { name } = router.query as { name: string };
   const { repo, loading, error } = useFetchRepo({ name });
@@ -385,14 +385,15 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
         style={{ minHeight: '500px' }}
       >
         <Title title={'Readme'} className="text-5xl" />
-        <Divider />
-        <ReactMarkdown
-          className={'markdown'}
-          remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
-        >
-          {repo.readme}
-        </ReactMarkdown>
+        <Divider />{' '}
+        <div className="markdown">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+          >
+            {repo.readme}
+          </ReactMarkdown>
+        </div>
       </Box>
       <Container
         className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"
