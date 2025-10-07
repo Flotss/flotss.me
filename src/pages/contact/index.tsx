@@ -228,7 +228,7 @@ export default function Contact(props: any) {
                 <Text className="text-white">Loading...</Text>
               ) : (
                 <GithubInfo
-                  user={user.user}
+                  user={user?.user}
                   repos={repos}
                   getStargazerCount={getStargazerCount}
                   getWatchersCount={getWatchersCount}

@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-document-import-in-page */
-/* eslint-disable @next/next/no-title-in-document-head */
 import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
