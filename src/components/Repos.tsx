@@ -1,5 +1,6 @@
 import { useFetchRepos } from '@/hooks/useFetchRepos';
 import useFiltersRepos, { Property } from '@/hooks/useFiltersRepos';
+import { useIsMobile } from '@/hooks/useIsMobile';
 import { useLanguageFilters } from '@/hooks/useLanguageFilters';
 import { Repo } from '@/types/types';
 import {
@@ -21,9 +22,8 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
-import { StyledBox } from './StyledBox';
+import { Container } from './StyledBox';
 import Title from './Title';
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 type ReposProps = {
   filterVisible?: boolean;
@@ -222,7 +222,7 @@ const Filters = (props: FilterProps) => {
   } = props;
 
   return (
-    <StyledBox className="col-span-5 flex h-fit min-w-[165px] flex-col text-white lg:col-span-1">
+    <Container className="col-span-5 flex h-fit min-w-[165px] flex-col text-white lg:col-span-1">
       <div className="mr-6 flex w-full flex-row items-center justify-between">
         <span>Filters {countFilter > 0 && <span>({countFilter})</span>}</span>
         <Button
@@ -317,6 +317,6 @@ const Filters = (props: FilterProps) => {
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
-    </StyledBox>
+    </Container>
   );
 };

@@ -1,7 +1,7 @@
 import { Divider, Text } from '@chakra-ui/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { StyledBox } from './StyledBox';
+import { Container } from './StyledBox';
 import Title from './Title';
 
 /**
@@ -12,7 +12,7 @@ import Title from './Title';
  */
 const WorkInProgress = () => (
   <>
-    <StyledBox className="mx-5 mt-5 flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:mx-20 sm:px-20">
+    <Container className="mx-5 mt-5 flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:mx-20 sm:px-20">
       <Title title={'This page is not unvaible '} className={'black'} />
       <Divider />
       <Text className="text-2xl">Work in progress</Text>
@@ -35,7 +35,7 @@ const WorkInProgress = () => (
       >
         GitHub Repository
       </Link>
-    </StyledBox>
+    </Container>
   </>
 );
 

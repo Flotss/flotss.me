@@ -1,5 +1,5 @@
 'use client';
-import { StyledBox } from '@/components/StyledBox';
+import { Container } from '@/components/StyledBox';
 import { EmailInputs } from '@/services/EmailService';
 import { owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
@@ -178,7 +178,7 @@ export default function Contact(props: any) {
         <ContactHeader></ContactHeader>
         {/* Form to send an email to me */}
         <Box className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <StyledBox>
+          <Container>
             <Box className="flex flex-col gap-2">
               <Heading size="md" className="text-white">
                 Contact Me
@@ -217,8 +217,8 @@ export default function Contact(props: any) {
                 ></FormSendEmail>
               </Box>
             </Box>
-          </StyledBox>
-          <StyledBox className="p-4 py-8 lg:p-8">
+          </Container>
+          <Container className="p-4 py-8 lg:p-8">
             <Heading size="md" className="pb-5 text-white lg:pb-10">
               About Me
             </Heading>
@@ -228,14 +228,14 @@ export default function Contact(props: any) {
                 <Text className="text-white">Loading...</Text>
               ) : (
                 <GithubInfo
-                  user={user}
+                  user={user.user}
                   repos={repos}
                   getStargazerCount={getStargazerCount}
                   getWatchersCount={getWatchersCount}
                 />
               )}
             </Box>
-          </StyledBox>
+          </Container>
         </Box>
       </div>
     </>

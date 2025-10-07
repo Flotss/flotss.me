@@ -1,4 +1,4 @@
-import { StyledBox } from '@/components/StyledBox';
+import { Container } from '@/components/StyledBox';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -68,7 +68,7 @@ export default function LoginPage(props: any) {
         <title>Login admin</title>
       </Head>
       <div className="flex w-screen flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
-        <StyledBox className="flex w-full items-center justify-evenly">
+        <Container className="flex w-full items-center justify-evenly">
           <div
             className="flex w-96 flex-col items-center justify-center space-y-5"
             hidden={!isLogin}
@@ -155,7 +155,7 @@ export default function LoginPage(props: any) {
             </form>
             {error && <p className="text-red text-center text-sm font-semibold">{error}</p>}
           </div>
-        </StyledBox>
+        </Container>
       </div>
     </>
   );

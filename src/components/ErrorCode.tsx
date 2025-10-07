@@ -1,5 +1,5 @@
 import { Divider, Text } from '@chakra-ui/react';
-import { StyledBox } from './StyledBox';
+import { Container } from './StyledBox';
 import Title from './Title';
 
 interface ErrorCodeProps {
@@ -29,11 +29,11 @@ const ErrorCode = (props: ErrorCodeProps) => {
 
   return (
     <>
-      <StyledBox className="mx-5 mt-5 flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:mx-20 sm:px-20">
+      <Container className="mx-5 mt-5 flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:mx-20 sm:px-20">
         <Title title={code} className={color} color={color} />
         <Divider />
         <Text className="text-2xl">{message}</Text>
-      </StyledBox>
+      </Container>
     </>
   );
 };

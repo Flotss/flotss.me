@@ -1,5 +1,5 @@
 import ErrorCode from '@/components/ErrorCode';
-import { StyledBox } from '@/components/StyledBox';
+import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useFetchRepo } from '@/hooks/useFetchRepo';
 import { License, Repo } from '@/types/types';
@@ -85,7 +85,7 @@ export default function Project(props: any) {
         </Head>
         <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
           <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
-            <StyledBox className="col-span-3 space-y-5 mdrepo:col-span-2">
+            <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
               <Skeleton width={'30%'}>
                 <Box className="text-7xl">.</Box>
               </Skeleton>
@@ -96,8 +96,8 @@ export default function Project(props: any) {
                   width={`${Math.floor(Math.random() * 40) + 40}%`}
                 ></SkeletonText>
               ))}
-            </StyledBox>
-            <StyledBox className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
+            </Container>
+            <Container className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
               <Skeleton>
                 <Box className="text-6xl">.</Box>
               </Skeleton>
@@ -113,8 +113,8 @@ export default function Project(props: any) {
                   <SkeletonCircle key={index} />
                 ))}
               </Flex>
-            </StyledBox>
-            <StyledBox className="col-span-5 mt-5 flex flex-col items-center justify-center space-y-2 lgrepo:col-span-2 lgrepo:mt-0">
+            </Container>
+            <Container className="col-span-5 mt-5 flex flex-col items-center justify-center space-y-2 lgrepo:col-span-2 lgrepo:mt-0">
               <Skeleton width={'30%'}>
                 <Box className="text-3xl">.</Box>
               </Skeleton>
@@ -128,7 +128,7 @@ export default function Project(props: any) {
                   </Skeleton>
                 ))}
               </Box>
-            </StyledBox>
+            </Container>
           </div>
           <Flex width={'100%'} gap={5} className="justify-around py-5">
             {Array.from({ length: 5 }).map((_, index) => (
@@ -136,7 +136,7 @@ export default function Project(props: any) {
             ))}
           </Flex>
           <div className="grid w-full grid-flow-row-dense grid-cols-3 grid-rows-1 space-y-5 lg:grid-cols-5 lg:space-x-5 lg:space-y-0">
-            <StyledBox className="col-span-3 space-y-2">
+            <Container className="col-span-3 space-y-2">
               <Skeleton width={'30%'}>
                 <Box className="text-5xl">.</Box>
               </Skeleton>
@@ -148,8 +148,8 @@ export default function Project(props: any) {
                   width={`${Math.floor(Math.random() * 40) + 40}%`}
                 ></SkeletonText>
               ))}
-            </StyledBox>
-            <StyledBox className="col-span-2 space-y-2">
+            </Container>
+            <Container className="col-span-2 space-y-2">
               <Skeleton width={'30%'}>
                 <Box className="text-5xl">.</Box>
               </Skeleton>
@@ -161,7 +161,7 @@ export default function Project(props: any) {
                   width={`${Math.floor(Math.random() * 40) + 40}%`}
                 ></SkeletonText>
               ))}
-            </StyledBox>
+            </Container>
           </div>
         </div>
       </>
@@ -176,7 +176,7 @@ export default function Project(props: any) {
       </Head>
       <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
         <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
-          <StyledBox className="col-span-3 space-y-5 mdrepo:col-span-2">
+          <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
             <Title title={repo.name} className="mdrepo:text-5xl lgrepo:text-7xl" />
             <StyledText>{repo.description}</StyledText>
             <Menu>
@@ -224,8 +224,8 @@ export default function Project(props: any) {
                 </MenuItem>
               </MenuList>
             </Menu>
-          </StyledBox>
-          <StyledBox className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
+          </Container>
+          <Container className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
             <StyledText className="lgrepo:text-xl">
               Created : {new Date(repo.created_at).toLocaleDateString()}
             </StyledText>
@@ -260,8 +260,8 @@ export default function Project(props: any) {
                 </>
               ))}
             </Flex>
-          </StyledBox>
-          <StyledBox className="col-span-5 mt-5 flex flex-col items-center justify-center lgrepo:col-span-2 lgrepo:mt-0">
+          </Container>
+          <Container className="col-span-5 mt-5 flex flex-col items-center justify-center lgrepo:col-span-2 lgrepo:mt-0">
             <Title title={'Clone'} className="text-lg mdrepo:text-xl lgrepo:text-2xl" />
             <Box
               gap={2}
@@ -277,7 +277,7 @@ export default function Project(props: any) {
                 Clone (SSH)
               </ButtonCopy>
             </Box>
-          </StyledBox>
+          </Container>
         </div>
         <Flex width={'100%'} gap={5} className="items-center justify-evenly" flexWrap="wrap">
           {repo.languages.map((language, index) => {
@@ -394,7 +394,7 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
           {repo.readme}
         </ReactMarkdown>
       </Box>
-      <StyledBox
+      <Container
         className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"
         style={{ height: `${boxHeight}px` }}
       >
@@ -434,7 +434,7 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
             </Box>
           ))}
         </Box>
-      </StyledBox>
+      </Container>
     </Box>
   );
 };

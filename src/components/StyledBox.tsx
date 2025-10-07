@@ -19,9 +19,17 @@ interface StyledBoxProps {
  * @param {React.CSSProperties} [props.style] - Additional inline styles to apply to the `StyledBox`.
  * @returns {JSX.Element} - The rendered `StyledBox` component.
  */
-export const StyledBox = ({ children, className, ...props }: StyledBoxProps) => {
+export const Container = ({ children, className, ...props }: StyledBoxProps) => {
   return (
-    <Box className={`rounded-3xl bg-box-color p-8 ${className}`} {...props}>
+    <ContainerNoStyle className={`rounded-3xl bg-box-color p-8 ${className}`} {...props}>
+      {children}
+    </ContainerNoStyle>
+  );
+};
+
+export const ContainerNoStyle = ({ children, className, ...props }: StyledBoxProps) => {
+  return (
+    <Box className={`p-8 ${className}`} {...props}>
       {children}
     </Box>
   );
