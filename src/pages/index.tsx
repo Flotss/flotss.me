@@ -4,7 +4,12 @@ import Title from '@/components/Title';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { Box, Grid, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import React from 'react';
+
+const HeroScene = dynamic(() => import('@/components/three/HeroScene'), {
+  ssr: false,
+});
 
 type TechStack = {
   name: string;
@@ -52,22 +57,29 @@ export default function Home() {
       {/* Hero section */}
       <Grid className="mx-5 grid grid-cols-2 grid-rows-1 space-y-5 pt-8 sm:mx-20 lg:space-x-5 lg:space-y-0">
         <Container className="col-span-2 space-y-4 py-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <Title title="Hello ! My name is Florian Mangin" />
-          </motion.div>
-          <motion.p
-            className="mx-auto max-w-[640px] text-center text-lg leading-relaxed text-zinc-400"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            I&apos;m a student in an engineering school and a passionate coder on an internship,
-            always ready to tackle new software challenges!
-          </motion.p>
+          <div className="relative min-h-[280px] sm:min-h-[320px]">
+            <HeroScene />
+            <div className="relative z-10 flex flex-col items-center justify-center pt-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+              >
+                <h1 className="glitch-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-500 bg-clip-text text-center text-4xl font-bold text-transparent sm:text-5xl lg:text-6xl">
+                  Hello ! My name is Florian Mangin
+                </h1>
+              </motion.div>
+              <motion.p
+                className="mx-auto mt-4 max-w-[640px] text-center text-lg leading-relaxed text-zinc-400"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                I&apos;m a student in an engineering school and a passionate coder on an internship,
+                always ready to tackle new software challenges!
+              </motion.p>
+            </div>
+          </div>
         </Container>
       </Grid>
 
