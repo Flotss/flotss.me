@@ -10,13 +10,6 @@ interface ProjectCardProps {
   isMobile?: boolean;
 }
 
-/**
- * Renders a card component for a project.
- *
- * @param {ProjectCardProps} props - The props for the ProjectCard component.
- * @param {Repo} props.repo - The repository object containing project details.
- * @returns {JSX.Element} The rendered ProjectCard component.
- */
 function ProjectCardComponent(props: ProjectCardProps) {
   const { name, description, stargazers_count, archived, pinned } = props.repo;
   const isPrivate = props.repo.private;
@@ -37,10 +30,10 @@ function ProjectCardComponent(props: ProjectCardProps) {
   return (
     <Link href={linkHref} onClick={handleClick}>
       <Box
-        className={`glow transform overflow-ellipsis rounded-xl border border-black bg-box-color-light transition-all duration-500 ease-in-out md:max-w-2xl ${
+        className={`group relative overflow-hidden rounded-xl border transition-all duration-300 md:max-w-2xl ${
           isPrivate
-            ? ''
-            : 'shadow-sm shadow-light-green hover:-translate-y-1 hover:scale-105 hover:rounded-3xl hover:shadow-2xl'
+            ? 'border-white/5 bg-white/[0.02]'
+            : 'border-white/5 bg-white/[0.03] hover:-translate-y-1 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:shadow-lg hover:shadow-emerald-500/5'
         }`}
         p={8}
         width={isMobile ? '20rem' : '26rem'}
@@ -51,45 +44,55 @@ function ProjectCardComponent(props: ProjectCardProps) {
         <Box className="flex flex-col">
           <Box className="flex justify-between">
             <Box
-              className={`mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide ${isPrivate ? 'text-gray-400' : 'text-gray-300'}`}
+              className={`mb-1 mt-0 items-center overflow-hidden overflow-ellipsis whitespace-nowrap text-xl font-semibold uppercase tracking-wide ${isPrivate ? 'text-zinc-600' : 'text-zinc-300 group-hover:text-white'} transition-colors duration-300`}
               fontSize="xl"
               fontWeight="semibold"
               title={name}
             >
               {isFork && (
-                <Box className="absolute top-2 text-sm font-semibold text-gray-400">FORKED</Box>
+                <Box className="absolute top-2 text-xs font-medium text-zinc-500">FORKED</Box>
               )}
               {isPrivate && (
-                <LockIcon className="mr-1 h-6 w-6 -translate-y-1 pr-1 text-[#E2E8F0]" />
+                <LockIcon className="mr-1 h-5 w-5 -translate-y-0.5 pr-1 text-zinc-500" />
               )}
               {name}
               {archived && (
-                <Badge ml={1} fontSize="0.8em" marginBottom={1} colorScheme="whiteAlpha">
+                <Badge
+                  ml={1}
+                  fontSize="0.7em"
+                  marginBottom={1}
+                  colorScheme="whiteAlpha"
+                  className="opacity-60"
+                >
                   Archived
                 </Badge>
               )}
             </Box>
-            <div className="flex items-center">
+            <div className="flex items-center gap-1">
               {stargazers_count > 2 && (
-                <Box className="flex items-center justify-between space-x-1">
-                  <Text className="tracking-wide text-gray-300" fontSize="xl" fontWeight="semibold">
+                <Box className="flex items-center gap-1">
+                  <Text
+                    className="tracking-wide text-zinc-400"
+                    fontSize="lg"
+                    fontWeight="semibold"
+                  >
                     {stargazers_count}
                   </Text>
-                  <StarIcon />
+                  <StarIcon className="h-3.5 w-3.5 text-yellow-500/70" />
                 </Box>
               )}
               {pinned && (
                 <VscPinnedDirty
-                  className={`ml-2 h-6 w-6 text-[#E2E8F0]`}
+                  className="ml-1 h-5 w-5 text-emerald-400/60"
                   title="Pinned repository"
                 />
               )}
             </div>
           </Box>
-          <Divider />
+          <Divider className="opacity-10" />
           {description && (
             <Text
-              className={`mt-1 block text-sm font-medium leading-tight ${isPrivate ? 'text-gray-500' : 'text-gray-300'}`}
+              className={`mt-2 block text-sm leading-relaxed ${isPrivate ? 'text-zinc-600' : 'text-zinc-500 group-hover:text-zinc-400'} transition-colors duration-300`}
             >
               {description}
             </Text>

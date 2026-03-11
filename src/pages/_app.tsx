@@ -5,12 +5,6 @@ import '@/styles/markdown.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import React from 'react';
 
-/**
- * The `App` component is the entry point for your Next.js application.
- *
- * @param {AppProps} props - The properties passed to the `App` component.
- * @returns {JSX.Element} - The rendered `App` component.
- */
 export default function App({
   Component,
   pageProps,
@@ -20,11 +14,8 @@ export default function App({
 }) {
   return (
     <ChakraProvider>
-      {/* Define the overall layout of the application */}
-      <div className="flex min-h-screen flex-col bg-[#000000] text-[#f7fafcd0]">
-        {/* Render the layout, which includes header and footer */}
+      <div className="bg-grid-pattern flex min-h-screen flex-col bg-[#050505] text-[#e4e4e7]">
         <Layout>
-          {/* Render the main content of the application */}
           <Component {...pageProps} />
         </Layout>
       </div>

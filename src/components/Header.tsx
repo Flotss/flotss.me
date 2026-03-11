@@ -25,7 +25,12 @@ type LinkHeaderType = {
 };
 
 const FaHandEmoji = () => <span className="animate-waving-hand text-2xl no-underline">👋🏼</span>;
-const FaCodeLogo = () => <FaCode className="h-6 w-6 text-[#f7fafc62]" />;
+const FaCodeLogo = () => (
+  <span className="flex items-center gap-2">
+    <FaCode className="h-5 w-5 text-emerald-400" />
+    <span className="hidden text-sm font-bold tracking-wider text-zinc-300 sm:inline">FLOTSS</span>
+  </span>
+);
 
 export default function Header() {
   const path = usePathname();
@@ -66,12 +71,12 @@ export default function Header() {
 
   const CustomLink = (link: LinkHeaderType, className?: string) => (
     <Link
-      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 hover:text-[#e7edf5] ${isMobile ? 'bg-[#0f0f0f] text-xl' : ''} ${className}`}
+      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-white/5 hover:text-white ${link.isSelected ? 'bg-white/10' : ''} ${isMobile ? 'bg-[#0f0f0f] text-xl' : ''} ${className}`}
       textColor={link.isSelected ? '#BDFFE3' : '#A0AEC0'}
       href={link.href}
       key={link.href}
     >
-      {React.createElement(link.icon, { className: 'h-6 w-6' })}
+      {React.createElement(link.icon, { className: 'h-5 w-5' })}
       {link.children}
     </Link>
   );
@@ -83,11 +88,11 @@ export default function Header() {
       ))}
       {contactLink && (
         <Link
-          className={`flex items-center gap-2 rounded-full bg-[#2D3748] px-4 py-2 text-sm font-medium no-underline transition-colors duration-300 hover:text-[#e7edf5] ${isMobile ? 'text-xl' : ''}`}
+          className={`flex items-center gap-2 rounded-full bg-emerald-500/15 px-4 py-2 text-sm font-medium no-underline transition-all duration-300 hover:bg-emerald-500/25 hover:text-white ${isMobile ? 'text-xl' : ''}`}
           textColor={contactLink.isSelected ? '#BDFFE3' : '#A0AEC0'}
           href={contactLink.href}
         >
-          {contactLink.icon && <contactLink.icon className="h-6 w-6" />}
+          {contactLink.icon && <contactLink.icon className="h-5 w-5" />}
           {contactLink.children}
         </Link>
       )}
@@ -97,7 +102,7 @@ export default function Header() {
   return (
     <Box
       as="header"
-      className="mx-5 mt-2 flex h-14 items-center rounded-full bg-box-color px-8 sm:mx-20 lg:px-10"
+      className="mx-5 mt-3 flex h-14 items-center rounded-full border border-white/5 bg-white/[0.03] px-8 backdrop-blur-xl sm:mx-20 lg:px-10"
     >
       <Link className="flex items-center justify-center" href="/">
         <FaCodeLogo />
@@ -127,7 +132,7 @@ export default function Header() {
           </Drawer>
         </>
       ) : (
-        <nav className="ml-auto flex items-center gap-4 sm:gap-6">
+        <nav className="ml-auto flex items-center gap-2 sm:gap-3">
           <Links />
         </nav>
       )}

@@ -16,11 +16,9 @@ export default function Contact(props: any) {
 
   const [isLoading, setLoading] = useState<boolean>(true);
 
-  // Get Inforamtion of the user github
   const [user, setUser] = useState<any>(null);
   const [repos, setRepos] = useState<Repo[]>([]);
 
-  // FORM
   const [subject, setSubject] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
@@ -43,7 +41,6 @@ export default function Contact(props: any) {
     return repos.reduce((a, b) => a + b.watchers_count, 0);
   };
 
-  // Form handler
   const emailRequired = 'Email is required.';
   const emailPattern = 'Email is not valid, please enter a valid email like exemple@dom.com';
 
@@ -110,7 +107,6 @@ export default function Contact(props: any) {
       return;
     }
     setIsSending(true);
-    // Send email
     fetch('/api/send/email', {
       method: 'POST',
       headers: {
@@ -175,19 +171,18 @@ export default function Contact(props: any) {
   return (
     <>
       <div className="flex flex-col gap-5 px-5 py-5 sm:px-20">
-        <ContactHeader></ContactHeader>
-        {/* Form to send an email to me */}
+        <ContactHeader />
         <Box className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           <Container>
-            <Box className="flex flex-col gap-2">
-              <Heading size="md" className="text-white">
+            <Box className="flex flex-col gap-3">
+              <Heading size="md" className="text-zinc-100">
                 Contact Me
               </Heading>
-              <Text className="inline text-white">
+              <Text className="inline text-zinc-400">
                 If you have any questions or would like to work together, I would love to hear from
                 you. You can reach me directly via email at:&nbsp;
                 <Link href="mailto:manginf54@gmail.com" className="hover:underline">
-                  <Text as="span" fontWeight={700}>
+                  <Text as="span" fontWeight={700} className="text-emerald-400/80">
                     manginf54@gmail.com
                   </Text>
                 </Link>
@@ -214,18 +209,17 @@ export default function Contact(props: any) {
                   errorSend={errorSend}
                   handlerInput={handlerInput}
                   sendEmail={sendEmail}
-                ></FormSendEmail>
+                />
               </Box>
             </Box>
           </Container>
           <Container className="p-4 py-8 lg:p-8">
-            <Heading size="md" className="pb-5 text-white lg:pb-10">
+            <Heading size="md" className="pb-5 text-zinc-100 lg:pb-10">
               About Me
             </Heading>
             <Box className="flex flex-row flex-wrap justify-around gap-2">
-              {/* Github CARD */}
               {isLoading ? (
-                <Text className="text-white">Loading...</Text>
+                <Text className="text-zinc-500">Loading...</Text>
               ) : (
                 <GithubInfo
                   user={user?.user}

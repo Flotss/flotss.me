@@ -169,12 +169,12 @@ const Repos = React.memo((props: ReposProps) => {
       {props.limit && filteredRepos.length > props.limit && (
         <Box className="mb-5 flex justify-center">
           <button
-            className="w-6/12 rounded-md bg-black px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-[#212120]"
+            className="w-6/12 rounded-full border border-white/10 bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:text-white"
             onClick={() => {
               router.push('/projects');
             }}
           >
-            <b>Show More</b>
+            Show More
           </button>
         </Box>
       )}

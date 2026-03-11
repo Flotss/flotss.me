@@ -9,20 +9,15 @@ interface ProjectCardSkeletonProps {
   isMobile: boolean;
 }
 
-/**
- * Renders a skeleton for a project card.
- * @returns The JSX element representing the project card skeleton.
- */
 export default function ProjectCardSkeleton(props: ProjectCardSkeletonProps) {
   const { isMobile } = props;
   return (
     <motion.div
-      // Make animation to the skeleton
-      animate={{ scale: [1, 1.03, 1] }}
-      transition={{ duration: 1.5, repeat: Infinity }}
+      animate={{ opacity: [0.4, 0.7, 0.4] }}
+      transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
     >
       <Box
-        className="rounded-xl bg-box-color md:max-w-2xl"
+        className="rounded-xl border border-white/5 bg-white/[0.03] md:max-w-2xl"
         p={8}
         width={isMobile ? '20rem' : '26rem'}
         height={isMobile ? '100%' : '10rem'}
@@ -32,7 +27,7 @@ export default function ProjectCardSkeleton(props: ProjectCardSkeletonProps) {
             <SkeletonTextLine width="8rem" />
             <SkeletonTextLine width="5rem" />
           </Box>
-          <Divider className="my-4" />
+          <Divider className="my-4 opacity-10" />
           <Box className="space-y-2">
             <SkeletonTextLine width="13rem" />
             <SkeletonTextLine width="18rem" />
