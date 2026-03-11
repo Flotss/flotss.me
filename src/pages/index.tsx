@@ -109,7 +109,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="group block"
               >
-                <Box className="flex min-w-[130px] max-w-[180px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition-all duration-300 group-hover:border-emerald-500/20 group-hover:bg-white/[0.06]">
+                <Box className="flex min-w-[130px] max-w-[180px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-md p-6 transition-all duration-300 group-hover:border-emerald-500/20 group-hover:bg-white/[0.06]">
                   <Box className="mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-zinc-100 transition-transform duration-300 group-hover:scale-110">
                     {tech.urlImg ? (
                       <Image

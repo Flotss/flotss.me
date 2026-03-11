@@ -32,8 +32,8 @@ function ProjectCardComponent(props: ProjectCardProps) {
       <Box
         className={`group relative overflow-hidden rounded-xl border transition-all duration-300 md:max-w-2xl ${
           isPrivate
-            ? 'border-white/5 bg-white/[0.02]'
-            : 'border-white/5 bg-white/[0.03] hover:-translate-y-1 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:shadow-lg hover:shadow-emerald-500/5'
+            ? 'border-white/5 bg-white/[0.02] backdrop-blur-md'
+            : 'border-white/5 bg-white/[0.03] backdrop-blur-md hover:-translate-y-1 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:shadow-lg hover:shadow-emerald-500/5'
         }`}
         p={8}
         width={isMobile ? '20rem' : '26rem'}

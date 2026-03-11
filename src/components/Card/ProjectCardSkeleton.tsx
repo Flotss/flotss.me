@@ -17,7 +17,7 @@ export default function ProjectCardSkeleton(props: ProjectCardSkeletonProps) {
       transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
     >
       <Box
-        className="rounded-xl border border-white/5 bg-white/[0.03] md:max-w-2xl"
+        className="rounded-xl border border-white/5 bg-white/[0.03] backdrop-blur-md md:max-w-2xl"
         p={8}
         width={isMobile ? '20rem' : '26rem'}
         height={isMobile ? '100%' : '10rem'}

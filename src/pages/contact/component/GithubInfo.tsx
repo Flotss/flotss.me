@@ -12,7 +12,7 @@ type GithubInfoProps = {
 };
 
 const GithubInfo = ({ user, repos, getStargazerCount, getWatchersCount }: GithubInfoProps) => (
-  <Box className="w-[330px] overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] text-white">
+  <Box className="w-[330px] overflow-hidden rounded-xl border border-white/5 bg-white/[0.03] backdrop-blur-md text-white">
     <Box className="flex items-center gap-2 border-b border-white/5 bg-white/[0.05] px-4 py-2.5">
       <Image
         src="logo/github_logo_wide.svg"
