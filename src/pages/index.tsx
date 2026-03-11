@@ -25,30 +25,30 @@ export default function Home() {
     {
       name: 'C# / .NET',
       description:
-        'Professional experience in developing robust applications, including process automation and migrating existing applications to modern web solutions.',
+        'Software engineer at Société Générale, building ASP.NET Core applications, automating release processes, and migrating C# frameworks to modern web solutions.',
       urlImg: 'techstack/Languages/csharp.png',
       link: 'https://dotnet.microsoft.com/',
     },
     {
       name: 'Angular',
       description:
-        'Professional experience in creating dynamic and responsive user interfaces, enhancing user experience and facilitating integration with backend systems.',
+        'Professional experience building dynamic UIs at Société Générale, used by 20+ developers for branch management, Jira tracking, and real-time SQL monitoring.',
       urlImg: 'techstack/Frameworks/Angular.png',
-      link: 'https://angular.io/',
+      link: 'https://angular.dev/',
     },
     {
-      name: 'Next.js',
+      name: 'TypeScript',
       description:
-        'Personal projects focused on developing high-performance websites, emphasizing server-side rendering and SEO optimization.',
-      urlImg: 'techstack/Frameworks/Nextjs.png',
-      link: 'https://nextjs.org/',
+        'Core language across professional and personal projects, from Angular enterprise apps to Next.js personal portfolio and various web applications.',
+      urlImg: 'techstack/Languages/typescript.png',
+      link: 'https://www.typescriptlang.org/',
     },
     {
-      name: 'Java',
+      name: 'Python',
       description:
-        'Academic projects involving object-oriented application development, including management systems and simple games, strengthening my Java programming skills.',
-      urlImg: 'techstack/Languages/java.png',
-      link: 'https://www.java.com/',
+        'Developed redundancy solutions for technical alarm systems at Dalkia (EDF Group), including database design and hotline autocomplete features.',
+      urlImg: 'techstack/Languages/python.png',
+      link: 'https://www.python.org/',
     },
   ];
 
@@ -75,8 +75,8 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                I&apos;m a student in an engineering school and a passionate coder on an internship,
-                always ready to tackle new software challenges!
+                Software engineering student at ISEP Paris, currently working as a software engineer
+                at Société Générale. Passionate about building modern web applications.
               </motion.p>
             </div>
           </div>
