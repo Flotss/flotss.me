@@ -30,13 +30,6 @@ export default function Home() {
       link: 'https://dotnet.microsoft.com/',
     },
     {
-      name: 'Angular',
-      description:
-        'Professional experience building dynamic UIs at Société Générale, used by 20+ developers for branch management, Jira tracking, and real-time SQL monitoring.',
-      urlImg: 'techstack/Frameworks/Angular.png',
-      link: 'https://angular.dev/',
-    },
-    {
       name: 'TypeScript',
       description:
         'Core language across professional and personal projects, from Angular enterprise apps to Next.js personal portfolio and various web applications.',
@@ -44,11 +37,53 @@ export default function Home() {
       link: 'https://www.typescriptlang.org/',
     },
     {
+      name: 'Java',
+      description:
+        'Academic projects involving JavaFX application development, including ObjectAidJava for automatic UML schema generation from Java classes.',
+      urlImg: 'techstack/Languages/java.png',
+      link: 'https://www.java.com/',
+    },
+    {
       name: 'Python',
       description:
         'Developed redundancy solutions for technical alarm systems at Dalkia (EDF Group), including database design and hotline autocomplete features.',
       urlImg: 'techstack/Languages/python.png',
       link: 'https://www.python.org/',
+    },
+    {
+      name: 'Angular',
+      description:
+        'Professional experience building dynamic UIs at Société Générale, used by 20+ developers for branch management, Jira tracking, and real-time SQL monitoring.',
+      urlImg: 'techstack/Frameworks/Angular.png',
+      link: 'https://angular.dev/',
+    },
+    {
+      name: 'Next.js',
+      description:
+        'Personal projects focused on developing high-performance websites with server-side rendering, including this portfolio.',
+      urlImg: 'techstack/Frameworks/nextJs.png',
+      link: 'https://nextjs.org/',
+    },
+    {
+      name: 'Tailwind CSS',
+      description:
+        'Utility-first CSS framework used across personal and professional projects for rapid, responsive UI development.',
+      urlImg: 'techstack/Frameworks/Tailwind CSS.png',
+      link: 'https://tailwindcss.com/',
+    },
+    {
+      name: 'PostgreSQL',
+      description:
+        'Database design and management experience across multiple projects, including production environments.',
+      urlImg: 'techstack/Databases/PostgreSQL.png',
+      link: 'https://www.postgresql.org/',
+    },
+    {
+      name: 'Git',
+      description:
+        'Daily use in professional and personal workflows, including CI/CD pipelines, branch management, and team collaboration.',
+      urlImg: 'techstack/Tools/Git.png',
+      link: 'https://git-scm.com/',
     },
   ];
 
@@ -85,23 +120,13 @@ export default function Home() {
 
       {/* Tech stack */}
       <Box className="mx-5 px-8 pt-5 sm:mx-20">
-        <Box
-          className={`flex flex-wrap justify-center gap-4 ${isMobile ? '' : 'justify-between'}`}
-          style={
-            isMobile
-              ? { flexWrap: 'wrap', justifyContent: 'center' }
-              : {
-                  flexWrap: 'nowrap',
-                  justifyContent: 'space-between',
-                }
-          }
-        >
+        <Box className="flex flex-wrap justify-center gap-3 sm:gap-4">
           {techStack.map((tech: TechStack, index: number) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 * index }}
+              transition={{ duration: 0.5, delay: 0.05 * index }}
             >
               <a
                 href={tech.link}
@@ -109,8 +134,8 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="group block"
               >
-                <Box className="flex min-w-[130px] max-w-[180px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-md p-6 transition-all duration-300 group-hover:border-emerald-500/20 group-hover:bg-white/[0.06]">
-                  <Box className="mb-3 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-zinc-100 transition-transform duration-300 group-hover:scale-110">
+                <Box className="flex w-[100px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] p-3 backdrop-blur-md transition-all duration-300 group-hover:border-emerald-500/20 group-hover:bg-white/[0.06] sm:w-[120px] sm:p-4">
+                  <Box className="mb-2 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-100 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
                     {tech.urlImg ? (
                       <Image
                         src={tech.urlImg}
@@ -121,7 +146,7 @@ export default function Home() {
                       <span className="text-2xl text-zinc-400">?</span>
                     )}
                   </Box>
-                  <p className="text-center text-sm font-semibold text-zinc-300 transition-colors duration-300 group-hover:text-white">
+                  <p className="text-center text-xs font-semibold text-zinc-300 transition-colors duration-300 group-hover:text-white sm:text-sm">
                     {tech.name}
                   </p>
                 </Box>
