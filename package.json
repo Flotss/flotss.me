@@ -74,5 +74,10 @@
   "overrides": {
     "@types/react": "19.2.2",
     "@types/react-dom": "19.2.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "@tootallnate/once": "3.0.1"
+    }
   }
 }
