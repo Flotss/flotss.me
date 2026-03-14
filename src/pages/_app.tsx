@@ -3,14 +3,13 @@ import '@/styles/globals.css';
 import '@/styles/scrollbar.css';
 import '@/styles/markdown.css';
 import { ChakraProvider } from '@chakra-ui/react';
+import dynamic from 'next/dynamic';
 import React from 'react';
 
-/**
- * The `App` component is the entry point for your Next.js application.
- *
- * @param {AppProps} props - The properties passed to the `App` component.
- * @returns {JSX.Element} - The rendered `App` component.
- */
+const ThreeBackground = dynamic(() => import('@/components/three/ThreeBackground'), {
+  ssr: false,
+});
+
 export default function App({
   Component,
   pageProps,
@@ -20,13 +19,13 @@ export default function App({
 }) {
   return (
     <ChakraProvider>
-      {/* Define the overall layout of the application */}
-      <div className="flex min-h-screen flex-col bg-[#000000] text-[#f7fafcd0]">
-        {/* Render the layout, which includes header and footer */}
-        <Layout>
-          {/* Render the main content of the application */}
-          <Component {...pageProps} />
-        </Layout>
+      <div className="bg-grid-pattern relative flex min-h-screen flex-col bg-[#050505] text-[#e4e4e7]">
+        <ThreeBackground />
+        <div className="relative z-10 flex flex-1 flex-col">
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </div>
       </div>
     </ChakraProvider>
   );

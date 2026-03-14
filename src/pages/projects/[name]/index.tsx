@@ -328,19 +328,18 @@ const ButtonCopy = ({
   href,
   target,
   rel,
-}: ButtonCopyProps) => (
-  <Button
-    colorScheme={colorScheme}
-    onClick={onClick}
-    className={`w-full py-9 md:py-7 lgrepo:py-9 ${className}`}
-    as={as}
-    href={href}
-    target={target}
-    rel={rel}
-  >
-    {children}
-  </Button>
-);
+}: ButtonCopyProps) => {
+  const buttonProps = {
+    colorScheme,
+    onClick,
+    className: `w-full py-9 md:py-7 lgrepo:py-9 ${className}`,
+    as,
+    href,
+    target,
+    rel,
+  };
+  return <Button {...(buttonProps as any)}>{children}</Button>;
+};
 
 interface StyledProps {
   children: React.ReactNode;

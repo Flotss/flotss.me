@@ -2,12 +2,6 @@ import { Box, Link, Text, useColorModeValue, VisuallyHidden } from '@chakra-ui/r
 import { ReactNode } from 'react';
 import { BsGithub, BsLinkedin } from 'react-icons/bs';
 
-/**
- * Represents a social media button.
- * @param children - The content of the button.
- * @param label - The label for accessibility.
- * @param href - The URL to navigate to.
- */
 const SocialButton = ({
   children,
   label,
@@ -23,19 +17,20 @@ const SocialButton = ({
     <Link
       bg={useColorModeValue('blackAlpha.100', 'whiteAlpha.100')}
       rounded={'full'}
-      w={8}
-      h={8}
+      w={9}
+      h={9}
       cursor={'pointer'}
       as={'a'}
       href={href}
       display={'inline-flex'}
       alignItems={'center'}
       justifyContent={'center'}
-      transition={'background 0.3s ease'}
+      transition={'all 0.3s ease'}
       isExternal
       _hover={{
-        transform: 'scale(1.2)',
+        transform: 'scale(1.15)',
         color: childrenColor,
+        bg: 'whiteAlpha.200',
       }}
     >
       <VisuallyHidden>{label}</VisuallyHidden>
@@ -46,21 +41,21 @@ const SocialButton = ({
 
 export default function Footer() {
   return (
-    <Box className="sticky top-[100vh] mx-5 mb-2 flex h-14 items-center justify-between rounded-full bg-box-color px-4 sm:mx-20 lg:px-6">
-      <nav className="flex gap-10">
+    <Box className="sticky top-[100vh] mx-5 mb-3 flex h-14 items-center justify-between rounded-full border border-white/5 bg-white/[0.03] px-6 backdrop-blur-xl sm:mx-20">
+      <nav className="flex gap-6">
         <SocialButton label="GitHub" href="https://github.com/flotss" color="#FFFFFF">
-          <BsGithub />
+          <BsGithub className="h-4 w-4" />
         </SocialButton>
         <SocialButton
           label="LinkedIn"
           href="https://www.linkedin.com/in/florian-mangin-784604208/"
           color="#0077B5"
         >
-          <BsLinkedin />
+          <BsLinkedin className="h-4 w-4" />
         </SocialButton>
       </nav>
-      <Text className="text-xs text-[#A0AEC0]">
-        &copy; Flotss&rsquo;s Portfolio. All rights reserved.
+      <Text className="text-xs text-zinc-500">
+        &copy; {new Date().getFullYear()} Flotss. All rights reserved.
       </Text>
     </Box>
   );

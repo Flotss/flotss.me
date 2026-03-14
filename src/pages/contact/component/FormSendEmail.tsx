@@ -69,7 +69,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
     <>
       <FormControl isInvalid={emailError} isRequired>
         <SlideFade offsetY="20px" in={email?.length > 0}>
-          <FormLabel htmlFor="email" className="text-white">
+          <FormLabel htmlFor="email" className="text-sm text-zinc-400">
             Email
           </FormLabel>
         </SlideFade>
@@ -77,7 +77,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
           type="email"
           id="email"
           name="email"
-          className="rounded-md bg-gray-900 p-2 text-white"
+          className="rounded-lg border-white/5 bg-white/[0.03] p-2 text-zinc-200 placeholder:text-zinc-600 focus:border-emerald-500/30"
           placeholder="Email*"
           value={email}
           onInput={(e) => {
@@ -88,7 +88,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
       </FormControl>
       <FormControl isInvalid={subjectError} isRequired>
         <SlideFade offsetY="20px" in={subject?.length > 0}>
-          <FormLabel htmlFor="Subject" className="text-white">
+          <FormLabel htmlFor="Subject" className="text-sm text-zinc-400">
             Subject
           </FormLabel>
         </SlideFade>
@@ -96,7 +96,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
           type="text"
           id="name"
           name="subject"
-          className="rounded-md bg-gray-900 p-2 text-white"
+          className="rounded-lg border-white/5 bg-white/[0.03] p-2 text-zinc-200 placeholder:text-zinc-600 focus:border-emerald-500/30"
           placeholder="Subject*"
           value={subject}
           onChange={(e) => {
@@ -109,7 +109,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
 
       <FormControl isInvalid={messageError} isRequired>
         <SlideFade offsetY="20px" in={message?.length > 0}>
-          <FormLabel htmlFor="message" className="text-white">
+          <FormLabel htmlFor="message" className="text-sm text-zinc-400">
             Message
           </FormLabel>
         </SlideFade>
@@ -118,17 +118,17 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
           name="message"
           placeholder="Message*"
           resize="none"
-          className="rounded-md bg-gray-900 p-2 text-white"
+          className="rounded-lg border-white/5 bg-white/[0.03] p-2 text-zinc-200 placeholder:text-zinc-600 focus:border-emerald-500/30"
           value={message}
           onChange={(e) => {
             setMessage(e.target.value);
             handlerInput(setMessageError, e.target.value);
           }}
-        ></Textarea>
+        />
         <FormErrorMessage>Message is required.</FormErrorMessage>
       </FormControl>
       <Button
-        className="rounded-md bg-black p-2 text-white"
+        className="rounded-full border border-white/10 bg-white/[0.05] px-6 py-2 text-sm font-medium text-zinc-300 transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.1] hover:text-white"
         colorScheme={isSending ? 'blue' : successFullySend ? 'green' : errorSend ? 'red' : 'gray'}
         onClick={() => {
           setErrors();
@@ -136,7 +136,7 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
         }}
       >
         {isSending ? (
-          <Spinner />
+          <Spinner size="sm" />
         ) : successFullySend ? (
           <CheckCircleIcon />
         ) : errorSend ? (
