@@ -1,31 +1,29 @@
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
+import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default [
-  // Base JavaScript recommendations (equivalent to "eslint:recommended")
+  // Base JavaScript recommendations
   js.configs.recommended,
 
-  // Next.js configurations (equivalent to "next", "next/core-web-vitals", "plugin:prettier/recommended")
-  ...compat.extends('next', 'next/core-web-vitals', 'plugin:prettier/recommended'),
+  // Next.js + Core Web Vitals (native flat config in eslint-config-next 16)
+  ...nextCoreWebVitals,
 
-  // Custom rules configuration matching your .eslintrc.json
+  // Prettier
+  prettierRecommended,
+
+  // Custom rules
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
-      // Exact same rules as in your .eslintrc.json
       'react/no-unescaped-entities': 'off',
       '@next/next/no-page-custom-font': 'off',
       'no-unused-vars': 'off',
+      // Disable React Compiler rules (not adopting React Compiler yet)
+      'react-hooks/purity': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/static-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
       'prettier/prettier': [
         'error',
         {
