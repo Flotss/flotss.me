@@ -1,11 +1,47 @@
 import Repos from '@/components/Repos';
+import SEO from '@/components/SEO';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { Box, Grid, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import Head from 'next/head';
 import React from 'react';
+
+/**
+ * Données structurées JSON-LD (Schema.org — type "Person").
+ *
+ * Google lit ce script pour comprendre qui est l'auteur du site et peut
+ * afficher un "Knowledge Panel" dans les résultats de recherche (la box
+ * sur la droite avec photo, nom, titre, liens réseaux sociaux).
+ *
+ * Les propriétés sameAs pointent vers les profils officiels pour que
+ * Google puisse relier les entités entre elles.
+ */
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Florian Mangin',
+  url: 'https://flotss.me',
+  image: 'https://flotss.me/avatar.jpg',
+  jobTitle: 'Software Engineer',
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Société Générale',
+    url: 'https://www.societegenerale.com',
+  },
+  alumniOf: {
+    '@type': 'EducationalOrganization',
+    name: 'ISEP Paris',
+    url: 'https://www.isep.fr',
+  },
+  sameAs: [
+    'https://github.com/Flotss',
+    // Ajoute ton profil LinkedIn ici si tu en as un
+  ],
+  knowsAbout: ['TypeScript', 'Next.js', 'C#', '.NET', 'Angular', 'PostgreSQL', 'React'],
+};
 
 const HeroScene = dynamic(() => import('@/components/three/HeroScene'), {
   ssr: false,
@@ -89,6 +125,26 @@ export default function Home() {
 
   return (
     <>
+      {/* SEO — balises <head> spécifiques à la homepage */}
+      <SEO
+        type="profile"
+        description="Software engineering student at ISEP Paris and software engineer at Société Générale. Building modern web applications with Next.js, TypeScript, Angular and C#."
+        url="/"
+      />
+
+      {/*
+       * JSON-LD injecté dans un <script> dans le <head>.
+       * dangerouslySetInnerHTML est ici la seule façon de produire un <script>
+       * avec du JSON valide sans que React échappe les guillemets.
+       * Le contenu est entièrement statique et contrôlé — pas de risque XSS.
+       */}
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+      </Head>
+
       {/* Hero section */}
       <Grid className="mx-5 grid grid-cols-2 grid-rows-1 space-y-5 pt-8 sm:mx-20 lg:space-x-5 lg:space-y-0">
         <Container className="col-span-2 space-y-4 py-12">
