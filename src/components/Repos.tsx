@@ -15,7 +15,6 @@ import {
   Input,
   Radio,
   RadioGroup,
-  ScaleFade,
   Stack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
@@ -153,10 +152,8 @@ const Repos = React.memo((props: ReposProps) => {
         >
           {loading
             ? skeletons
-            : filteredRepos.slice(0, props.limit).map((repo) => (
-                <ScaleFade key={repo.id} initialScale={0.9} in={true}>
-                  <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} />
-                </ScaleFade>
+            : filteredRepos.slice(0, props.limit).map((repo, index) => (
+                <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} index={index} />
               ))}
           {!loading && filteredRepos.length === 0 && (
             <Title
