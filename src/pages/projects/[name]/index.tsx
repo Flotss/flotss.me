@@ -1,4 +1,5 @@
 import ErrorCode from '@/components/ErrorCode';
+import SEO from '@/components/SEO';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useFetchRepo } from '@/hooks/useFetchRepo';
@@ -25,7 +26,6 @@ import {
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -78,11 +78,10 @@ export default function Project() {
   if (!repo) {
     return (
       <>
-        <Head>
-          {(router.query.name && <title>Loading repository {router.query.name}...</title>) || (
-            <title>Loading repository...</title>
-          )}
-        </Head>
+        <SEO
+          title={name ? `Loading ${name}` : 'Loading project'}
+          noIndex={true}
+        />
         <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
           <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
             <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
@@ -171,9 +170,26 @@ export default function Project() {
   // If the repository data is available, display it
   return (
     <>
-      <Head>
-        <title>{repo.name}</title>
-      </Head>
+      {/*
+       * SEO dynamique : les données viennent de l'API GitHub via useFetchRepo.
+       * Chaque page de projet a donc son propre titre, sa description et son URL
+       * canonique — ce qui permet à Google d'indexer chaque projet séparément.
+       *
+       * Note : comme les données sont chargées côté client (CSR), Google verra
+       * d'abord la page de chargement puis reviendra crawler la version complète.
+       * Pour une indexation optimale des projets, il faudrait passer en SSR/SSG
+       * (getServerSideProps / getStaticProps) — étape future possible.
+       */}
+      <SEO
+        title={repo.name}
+        description={
+          repo.description
+            ? `${repo.description} — GitHub project by Florian Mangin.`
+            : `${repo.name} — open-source project by Florian Mangin, software engineer.`
+        }
+        url={`/projects/${repo.name}`}
+        type="article"
+      />
       <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
         <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
           <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
@@ -295,11 +311,7 @@ export default function Project() {
         </Flex>
         {repo.commits ? (
           <ReadmeAndCommits repo={repo} />
-        ) : (
-          <Head>
-            <title>Loading commits...</title>
-          </Head>
-        )}
+        ) : null}
       </div>
     </>
   );

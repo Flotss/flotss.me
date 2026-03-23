@@ -1,4 +1,5 @@
 'use client';
+import SEO from '@/components/SEO';
 import { Container } from '@/components/StyledBox';
 import { EmailInputs } from '@/services/EmailService';
 import { owner } from '@/services/GithubService';
@@ -170,6 +171,11 @@ export default function Contact(props: any) {
 
   return (
     <>
+      <SEO
+        title="Contact"
+        description="Get in touch with Florian Mangin — software engineer and web developer. Send a message, view GitHub stats, or reach out by email."
+        url="/contact"
+      />
       <div className="flex flex-col gap-5 px-5 py-5 sm:px-20">
         <ContactHeader />
         <Box className="grid grid-cols-1 gap-5 lg:grid-cols-2">

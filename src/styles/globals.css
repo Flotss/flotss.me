@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Theme CSS Variables ─────────────────────────────────────────────────── */
+:root {
+  /* Light mode */
+  --bg-primary: #f4f4f5;
+  --bg-card: rgba(0, 0, 0, 0.04);
+  --bg-card-hover: rgba(0, 0, 0, 0.07);
+  --border-card: rgba(0, 0, 0, 0.08);
+  --border-card-hover: rgba(16, 185, 129, 0.25);
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --glow-opacity: 0.04;
+}
+
+.dark {
+  /* Dark mode */
+  --bg-primary: #050505;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-card-hover: rgba(255, 255, 255, 0.06);
+  --border-card: rgba(255, 255, 255, 0.05);
+  --border-card-hover: rgba(16, 185, 129, 0.2);
+  --text-primary: #e4e4e7;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --glow-opacity: 0.08;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
@@ -20,15 +47,18 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* Smooth theme transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Subtle radial glow on the page */
+/* Subtle radial glow on the page (intensity varies by theme) */
 .bg-grid-pattern {
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.08), transparent);
+  background-image: radial-gradient(
+    ellipse 80% 50% at 50% -20%,
+    rgba(120, 119, 198, var(--glow-opacity)),
+    transparent
+  );
 }
 
 /* Glitch text effect */

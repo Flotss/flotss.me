@@ -1,0 +1,15 @@
+# robots.txt — flotss.me
+# Règles d'indexation pour les moteurs de recherche
+
+User-agent: *
+Allow: /
+
+# Bloquer les pages admin (pas de valeur SEO + accès restreint)
+Disallow: /admin
+Disallow: /admin/
+
+# Bloquer les routes API (contenu non destiné aux humains)
+Disallow: /api/
+
+# Sitemap (indique à Google où trouver la liste de toutes les URLs)
+Sitemap: https://flotss.me/sitemap.xml
