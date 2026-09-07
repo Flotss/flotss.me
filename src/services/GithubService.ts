@@ -2,6 +2,7 @@ import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types
 import { createIfNotExists } from '@/utils/RepoUtils';
 import { PrismaClient } from '@prisma/client';
 import assert from 'assert';
+import { isValidRepoName, isValidUserName } from '@/utils/ValidationUtils';
 import { GithubError, RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
 
 const headers: any = {
@@ -160,7 +161,25 @@ export class GithubService {
    * @param repoName The name of the repository.
    * @returns A promise that resolves to the repository object, or null if not found.
    */
+  private sanitizeRepoName(repoName: string): string {
+    if (!isValidRepoName(repoName)) {
+      throw new RepoNotFoundError('Invalid repository name');
+    }
+    return encodeURIComponent(repoName);
+  }
+
+  private sanitizeUserName(userName: string): string {
+    if (!isValidUserName(userName)) {
+      throw new GithubError('Invalid username');
+    }
+    return encodeURIComponent(userName);
+  }
+
   public async getRepo(repoName: string): Promise<Repo | null> {
+    if (!isValidRepoName(repoName)) {
+      return null;
+    }
+
     let repo: Repo = {} as Repo;
 
     try {
@@ -185,7 +204,11 @@ export class GithubService {
   }
 
   private async getRepoData(repoName: string): Promise<Repo> {
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
+    const url = new URL(`https://api.github.com/repos/${safeOwner}/${safeRepo}`);
+
+    const response = await fetch(url.toString(), {
       headers,
     });
 
@@ -202,11 +225,16 @@ export class GithubService {
   }
 
   public async getCollaborators(repoName: string): Promise<Collaborator[]> {
+    if (!isValidRepoName(repoName)) {
+      return [];
+    }
+
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
+    const url = new URL(`https://api.github.com/repos/${safeOwner}/${safeRepo}/collaborators`);
+
     // Retrieve collaborators
-    const collaboratorsResponse = await fetch(
-      `https://api.github.com/repos/${owner}/${repoName}/collaborators`,
-      { headers },
-    );
+    const collaboratorsResponse = await fetch(url.toString(), { headers });
 
     if (collaboratorsResponse.ok) {
       const collaboratorsJson: unknown = await collaboratorsResponse.json();
@@ -217,11 +245,16 @@ export class GithubService {
   }
 
   public async getLanguages(repoName: string): Promise<Language[]> {
+    if (!isValidRepoName(repoName)) {
+      return [];
+    }
+
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
+    const url = new URL(`https://api.github.com/repos/${safeOwner}/${safeRepo}/languages`);
+
     // Retrieve languages
-    const languagesResponse = await fetch(
-      `https://api.github.com/repos/${owner}/${repoName}/languages`,
-      { headers },
-    );
+    const languagesResponse = await fetch(url.toString(), { headers });
     if (languagesResponse.ok) {
       const languagesJson: unknown = await languagesResponse.json();
       let languages = languagesJson as any;
@@ -255,11 +288,16 @@ export class GithubService {
   }
 
   public async getPullRequests(repoName: string): Promise<PullRequest[]> {
+    if (!isValidRepoName(repoName)) {
+      return [];
+    }
+
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
+    const url = new URL(`https://api.github.com/repos/${safeOwner}/${safeRepo}/pulls`);
+
     // Retrieve pull requests
-    const pullrequestsResponse = await fetch(
-      `https://api.github.com/repos/${owner}/${repoName}/pulls`,
-      { headers },
-    );
+    const pullrequestsResponse = await fetch(url.toString(), { headers });
 
     if (pullrequestsResponse.ok) {
       const pullrequestsJson: unknown = await pullrequestsResponse.json();
@@ -276,14 +314,18 @@ export class GithubService {
    * @returns A promise that resolves to an array of commits.
    */
   public async getAllCommits(repoName: string): Promise<any[]> {
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
     const per_page = 100; // Number of commits per page
     let page = 1;
     let commits: Commit[] = [];
 
     let pageEnd = false;
     while (!pageEnd) {
-      const url = `https://api.github.com/repos/${owner}/${repoName}/commits?page=${page}&per_page=${per_page}`;
-      const response = await fetch(url, { headers });
+      const url = new URL(
+        `https://api.github.com/repos/${safeOwner}/${safeRepo}/commits?page=${page}&per_page=${per_page}`,
+      );
+      const response = await fetch(url.toString(), { headers });
 
       if (response.status === 404) {
         throw new RepoNotFoundError('Repository not found');
@@ -317,11 +359,18 @@ export class GithubService {
   }
 
   public async getReadme(repoName: string): Promise<string> {
-    // Retrieve README.md file
-    const readmeResponse = await fetch(
-      `https://raw.githubusercontent.com/${owner}/${repoName}/main/README.md`,
-      { headers },
+    if (!isValidRepoName(repoName)) {
+      return '';
+    }
+
+    const safeRepo = this.sanitizeRepoName(repoName);
+    const safeOwner = encodeURIComponent(owner);
+    const url = new URL(
+      `https://raw.githubusercontent.com/${safeOwner}/${safeRepo}/main/README.md`,
     );
+
+    // Retrieve README.md file
+    const readmeResponse = await fetch(url.toString(), { headers });
     if (readmeResponse.ok) {
       return await readmeResponse.text();
     } else {
@@ -330,7 +379,9 @@ export class GithubService {
   }
 
   public async getUser(name: string): Promise<any> {
-    const response = await fetch(`https://api.github.com/users/${name}`, { headers });
+    const safeUser = this.sanitizeUserName(name);
+    const url = new URL(`https://api.github.com/users/${safeUser}`);
+    const response = await fetch(url.toString(), { headers });
     const user = await response.json();
     return user;
   }

@@ -2,7 +2,7 @@ import js from '@eslint/js';
 import nextCoreWebVitals from 'eslint-config-next/core-web-vitals';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
-export default [
+const eslintConfig = [
   // Base JavaScript recommendations
   js.configs.recommended,
 
@@ -32,9 +32,17 @@ export default [
       ],
     },
   },
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      'no-undef': 'off',
+    },
+  },
 
   // Global ignores
   {
     ignores: ['node_modules/**', '.next/**', 'dist/**', 'build/**'],
   },
 ];
+
+export default eslintConfig;

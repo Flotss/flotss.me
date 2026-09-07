@@ -1,5 +1,6 @@
 import { GithubService } from '@/services/GithubService';
 import { Commit } from '@/types/types';
+import { isValidRepoName } from '@/utils/ValidationUtils';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -12,22 +13,19 @@ export default async function handler(
   }
 
   const { repo } = req.query;
-  if (typeof repo !== 'string') {
-    res.status(400).json({ message: 'Repo name must be a string' });
+  if (!isValidRepoName(repo)) {
+    res.status(400).json({ message: 'Invalid repository name' });
     return;
   }
 
   const githubService = new GithubService();
 
   try {
-    // Si le nom du dépôt est fourni, récupérer le dépôt spécifique
-    if (repo !== undefined) {
-      const commits = await githubService.getAllCommits(repo as string);
-      if (commits) {
-        res.status(200).json(commits);
-      } else {
-        res.status(404).json({ message: 'Repo not found' });
-      }
+    const commits = await githubService.getAllCommits(repo);
+    if (commits) {
+      res.status(200).json(commits);
+    } else {
+      res.status(404).json({ message: 'Repo not found' });
     }
   } catch (e: any) {
     // Gestion des erreurs

@@ -110,8 +110,8 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                Software engineering student at ISEP Paris, currently working as a software engineer
-                at Société Générale. Passionate about building modern web applications.
+                Software Engineer passionate about crafting robust software, clean architectures,
+                and modern web applications.
               </motion.p>
             </div>
           </div>
@@ -128,12 +128,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05 * index }}
             >
-              <a
-                href={tech.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block"
-              >
+              <a href={tech.link} target="_blank" rel="noopener noreferrer" className="group block">
                 <Box className="flex w-[100px] flex-col items-center justify-center rounded-2xl border border-white/5 bg-white/[0.03] p-3 backdrop-blur-md transition-all duration-300 group-hover:border-emerald-500/20 group-hover:bg-white/[0.06] sm:w-[120px] sm:p-4">
                   <Box className="mb-2 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-zinc-100 transition-transform duration-300 group-hover:scale-110 sm:h-14 sm:w-14">
                     {tech.urlImg ? (

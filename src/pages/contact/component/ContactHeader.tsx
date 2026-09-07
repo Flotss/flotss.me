@@ -17,12 +17,7 @@ const ContactHeader = () => (
     </Box>
     <Box className="flex items-center justify-center">
       <picture>
-        <img
-          src="/images/contactflatdesign.png"
-          alt="contact"
-          width={150}
-          className="opacity-80"
-        />
+        <img src="/images/contactflatdesign.png" alt="contact" width={150} className="opacity-80" />
       </picture>
     </Box>
   </Container>

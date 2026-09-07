@@ -19,7 +19,8 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
 import { Container } from './StyledBox';
@@ -46,11 +47,14 @@ const Repos = React.memo((props: ReposProps) => {
   const [isArchived, setIsArchived] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isFork, setIsFork] = useState(false);
-  const properties: Property<boolean>[] = [
-    { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
-    { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
-    { value: isFork, setValue: setIsFork, propertyName: 'fork' },
-  ];
+  const properties: Property<boolean>[] = useMemo(
+    () => [
+      { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
+      { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
+      { value: isFork, setValue: setIsFork, propertyName: 'fork' },
+    ],
+    [isArchived, isPrivate, isFork],
+  );
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
@@ -59,16 +63,21 @@ const Repos = React.memo((props: ReposProps) => {
   const setReposCount = props.setReposCount;
 
   const { languages, languageCountMap, setLanguageCountMap } = useLanguageFilters(repos);
-  const options = {
-    properties,
-    selectedLanguage,
-    search,
-    setLanguageCountMap,
-  };
+  const options = useMemo(
+    () => ({
+      properties,
+      selectedLanguage,
+      search,
+      setLanguageCountMap,
+    }),
+    [properties, selectedLanguage, search, setLanguageCountMap],
+  );
   const { filteredRepos, countFilter, repoCount } = useFiltersRepos(repos, options);
 
   useEffect(() => {
-    setReposCount && setReposCount(repoCount);
+    if (setReposCount) {
+      setReposCount(repoCount);
+    }
   }, [setReposCount, repoCount]);
 
   const router = useRouter();
@@ -169,7 +178,7 @@ const Repos = React.memo((props: ReposProps) => {
       {props.limit && filteredRepos.length > props.limit && (
         <Box className="mb-5 flex justify-center">
           <button
-            className="w-6/12 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md px-6 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:text-white"
+            className="w-6/12 rounded-full border border-white/10 bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:text-white"
             onClick={() => {
               router.push('/projects');
             }}

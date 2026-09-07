@@ -1,3 +1,4 @@
+import type React from 'react';
 import ErrorCode from '@/components/ErrorCode';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
@@ -33,6 +34,11 @@ import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
+
+const SKELETON_WIDTHS_COL_1 = ['75%', '60%', '80%', '55%', '70%', '65%', '50%', '72%'];
+const SKELETON_WIDTHS_COL_2 = ['85%', '60%', '95%', '45%', '75%', '55%', '65%'];
+const SKELETON_WIDTHS_README = ['70%', '55%', '80%', '60%', '75%'];
+const SKELETON_WIDTHS_COMMITS = ['65%', '80%', '50%', '70%'];
 
 /**
  * The `Project` component displays information about a GitHub repository.
@@ -93,7 +99,7 @@ export default function Project() {
                 <SkeletonText
                   key={index}
                   noOfLines={1}
-                  width={`${Math.floor(Math.random() * 40) + 40}%`}
+                  width={SKELETON_WIDTHS_COL_1[index % SKELETON_WIDTHS_COL_1.length]}
                 ></SkeletonText>
               ))}
             </Container>
@@ -105,7 +111,7 @@ export default function Project() {
                 <SkeletonText
                   key={index}
                   noOfLines={1}
-                  width={`${Math.floor(Math.random() * 100)}%`}
+                  width={SKELETON_WIDTHS_COL_2[index % SKELETON_WIDTHS_COL_2.length]}
                 ></SkeletonText>
               ))}
               <Flex width={'100%'} gap={5} className="justify-around pt-5">
@@ -145,7 +151,7 @@ export default function Project() {
                 <SkeletonText
                   key={index}
                   noOfLines={4}
-                  width={`${Math.floor(Math.random() * 40) + 40}%`}
+                  width={SKELETON_WIDTHS_README[index % SKELETON_WIDTHS_README.length]}
                 ></SkeletonText>
               ))}
             </Container>
@@ -158,7 +164,7 @@ export default function Project() {
                 <SkeletonText
                   key={index}
                   noOfLines={4}
-                  width={`${Math.floor(Math.random() * 40) + 40}%`}
+                  width={SKELETON_WIDTHS_COMMITS[index % SKELETON_WIDTHS_COMMITS.length]}
                 ></SkeletonText>
               ))}
             </Container>
@@ -235,29 +241,28 @@ export default function Project() {
 
             <StyledText className="pb-2 pt-5">Collaborators :</StyledText>
             <Flex width={'100%'} gap={5} className="justify-around" flexWrap={'wrap'}>
-              {repo.collaborators.map((collaborator, index) => (
-                <>
-                  <Tooltip
-                    hasArrow
-                    label={collaborator.login}
-                    bg="gray.300"
-                    placement="top"
-                    color="black"
+              {repo.collaborators.map((collaborator) => (
+                <Tooltip
+                  key={collaborator.login}
+                  hasArrow
+                  label={collaborator.login}
+                  bg="gray.300"
+                  placement="top"
+                  color="black"
+                >
+                  <Link
+                    className="flex flex-col items-center space-y-2"
+                    href={collaborator.html_url}
+                    isExternal
                   >
-                    <Link
-                      className="flex flex-col items-center space-y-2"
-                      href={collaborator.html_url}
-                      isExternal
-                    >
-                      <Avatar name={collaborator.login} src={collaborator.avatar_url} size={'md'} />
-                      {collaborator.login == 'Flotss' && (
-                        <Badge ml="1" colorScheme="green">
-                          Me
-                        </Badge>
-                      )}
-                    </Link>
-                  </Tooltip>
-                </>
+                    <Avatar name={collaborator.login} src={collaborator.avatar_url} size={'md'} />
+                    {collaborator.login == 'Flotss' && (
+                      <Badge ml="1" colorScheme="green">
+                        Me
+                      </Badge>
+                    )}
+                  </Link>
+                </Tooltip>
               ))}
             </Flex>
           </Container>
@@ -283,7 +288,7 @@ export default function Project() {
           {repo.languages.map((language, index) => {
             return (
               <Box
-                key={index}
+                key={language.name || index}
                 className={`w-${(100 / repo.languages.length).toFixed(
                   2,
                 )} flex items-center justify-center rounded-3xl bg-box-color px-6 py-1`}
