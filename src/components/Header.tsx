@@ -10,24 +10,24 @@ import {
   DrawerCloseButton,
 } from '@chakra-ui/react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { FaCode, FaEnvelope, FaHome, FaProjectDiagram, FaBars } from 'react-icons/fa';
 import { useState } from 'react';
 import { IconType } from 'react-icons/lib';
 import React from 'react';
+import { motion } from 'framer-motion';
 
-type LinkHeaderType = {
+type NavLinkItem = {
   href: string;
-  children?: React.ReactNode;
+  label: string;
   icon: IconType;
   isSelected: boolean;
-  className?: string;
+  emoji?: string;
 };
 
-const FaHandEmoji = () => <span className="animate-waving-hand text-2xl no-underline">👋🏼</span>;
 const FaCodeLogo = () => (
   <span className="flex items-center gap-2.5">
-    <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm shadow-emerald-500/10">
+    <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm shadow-emerald-500/10 transition-transform duration-200 hover:scale-105">
       <FaCode className="h-4 w-4" />
     </span>
     <span className="text-sm font-bold tracking-wider text-zinc-200">FLOTSS</span>
@@ -35,8 +35,8 @@ const FaCodeLogo = () => (
 );
 
 export default function Header() {
-  const path = usePathname();
-  const pathTab = path?.split('/');
+  const router = useRouter();
+  const currentPath = router.pathname;
 
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
@@ -45,68 +45,27 @@ export default function Header() {
     setIsOpen(!isOpen);
   };
 
-  const isSelected = (href: string) => {
-    return pathTab?.includes(href);
-  };
-
-  const links: LinkHeaderType[] = [
-    { href: '/', children: 'Home', icon: FaHome, isSelected: path === '/' },
+  const navLinks: NavLinkItem[] = [
+    {
+      href: '/',
+      label: 'Home',
+      icon: FaHome,
+      isSelected: currentPath === '/',
+    },
     {
       href: '/projects',
-      children: 'Projects',
+      label: 'Projects',
       icon: FaProjectDiagram,
-      isSelected: isSelected('projects') || false,
+      isSelected: currentPath.startsWith('/projects'),
+    },
+    {
+      href: '/contact',
+      label: 'Contact',
+      icon: FaEnvelope,
+      isSelected: currentPath.startsWith('/contact'),
+      emoji: '👋🏼',
     },
   ];
-
-  const contactLink: LinkHeaderType = {
-    href: '/contact',
-    children: (
-      <>
-        <span>Contact</span> <FaHandEmoji />
-      </>
-    ),
-    icon: FaEnvelope,
-    isSelected: isSelected('contact') || false,
-  };
-
-  const CustomLink = (link: LinkHeaderType, className?: string) => (
-    <Link
-      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
-        link.isSelected
-          ? 'border border-white/10 bg-white/10 text-emerald-300 shadow-sm'
-          : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
-      } ${isMobile ? 'text-lg' : ''} ${className || ''}`}
-      href={link.href}
-      key={link.href}
-      onClick={() => setIsOpen(false)}
-    >
-      {React.createElement(link.icon, { className: 'h-4 w-4' })}
-      {link.children}
-    </Link>
-  );
-
-  const Links = () => (
-    <>
-      {links.map((link) => (
-        <CustomLink {...link} key={link.href} />
-      ))}
-      {contactLink && (
-        <Link
-          className={`flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-500/20 hover:text-emerald-200 hover:shadow-sm hover:shadow-emerald-500/20 ${
-            contactLink.isSelected
-              ? 'border-emerald-500/60 bg-emerald-500/25 font-semibold text-emerald-200 shadow-sm shadow-emerald-500/20'
-              : ''
-          } ${isMobile ? 'text-lg' : ''}`}
-          href={contactLink.href}
-          onClick={() => setIsOpen(false)}
-        >
-          {contactLink.icon && <contactLink.icon className="h-4 w-4" />}
-          {contactLink.children}
-        </Link>
-      )}
-    </>
-  );
 
   return (
     <Box
@@ -146,15 +105,65 @@ export default function Header() {
               </DrawerHeader>
               <DrawerBody className="py-8">
                 <nav className="flex flex-col gap-3">
-                  <Links />
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsOpen(false)}
+                      className={`flex items-center gap-3 rounded-xl px-4 py-3 text-base font-medium transition-all ${
+                        link.isSelected
+                          ? 'border border-emerald-500/30 bg-emerald-500/10 font-semibold text-emerald-300'
+                          : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+                      }`}
+                    >
+                      <link.icon
+                        className={`h-5 w-5 ${link.isSelected ? 'text-emerald-400' : 'text-zinc-400'}`}
+                      />
+                      <span>{link.label}</span>
+                      {link.emoji && (
+                        <span className="animate-waving-hand text-lg leading-none no-underline">
+                          {link.emoji}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
                 </nav>
               </DrawerBody>
             </DrawerContent>
           </Drawer>
         </>
       ) : (
-        <nav className="ml-auto flex items-center gap-2 sm:gap-3">
-          <Links />
+        <nav className="ml-auto flex items-center gap-1 sm:gap-1.5">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`group relative flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                link.isSelected ? 'text-emerald-300' : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+            >
+              {link.isSelected && (
+                <motion.span
+                  layoutId="navbar-dock-indicator"
+                  className="absolute inset-0 rounded-full border border-emerald-500/30 bg-emerald-500/15 shadow-sm shadow-emerald-500/10"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                <link.icon
+                  className={`h-4 w-4 transition-colors duration-200 ${
+                    link.isSelected ? 'text-emerald-400' : 'text-zinc-400 group-hover:text-zinc-300'
+                  }`}
+                />
+                <span>{link.label}</span>
+                {link.emoji && (
+                  <span className="animate-waving-hand text-base leading-none no-underline">
+                    {link.emoji}
+                  </span>
+                )}
+              </span>
+            </Link>
+          ))}
         </nav>
       )}
     </Box>
