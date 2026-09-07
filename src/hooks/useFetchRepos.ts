@@ -11,13 +11,14 @@ export function useFetchRepos(initialRepos: Repo[] = []) {
   useEffect(() => {
     const fetchData = async () => {
       await loadGithubInformation({
-        setRepos: setRepos,
+        setRepos,
         toast,
-        setLoading: setLoading,
+        setLoading,
       });
     };
     fetchData();
-  }, [toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { repos, loading };
 }

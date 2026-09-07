@@ -19,7 +19,8 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import ProjectCard from './Card/ProjectCard';
 import ProjectCardSkeleton from './Card/ProjectCardSkeleton';
 import { Container } from './StyledBox';
@@ -46,11 +47,14 @@ const Repos = React.memo((props: ReposProps) => {
   const [isArchived, setIsArchived] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
   const [isFork, setIsFork] = useState(false);
-  const properties: Property<boolean>[] = [
-    { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
-    { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
-    { value: isFork, setValue: setIsFork, propertyName: 'fork' },
-  ];
+  const properties: Property<boolean>[] = useMemo(
+    () => [
+      { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
+      { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
+      { value: isFork, setValue: setIsFork, propertyName: 'fork' },
+    ],
+    [isArchived, isPrivate, isFork],
+  );
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
   const [isOpenFilterMobile, setIsOpenFilterMobile] = useState(false);
@@ -59,16 +63,21 @@ const Repos = React.memo((props: ReposProps) => {
   const setReposCount = props.setReposCount;
 
   const { languages, languageCountMap, setLanguageCountMap } = useLanguageFilters(repos);
-  const options = {
-    properties,
-    selectedLanguage,
-    search,
-    setLanguageCountMap,
-  };
+  const options = useMemo(
+    () => ({
+      properties,
+      selectedLanguage,
+      search,
+      setLanguageCountMap,
+    }),
+    [properties, selectedLanguage, search, setLanguageCountMap],
+  );
   const { filteredRepos, countFilter, repoCount } = useFiltersRepos(repos, options);
 
   useEffect(() => {
-    setReposCount && setReposCount(repoCount);
+    if (setReposCount) {
+      setReposCount(repoCount);
+    }
   }, [setReposCount, repoCount]);
 
   const router = useRouter();

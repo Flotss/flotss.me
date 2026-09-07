@@ -1,7 +1,7 @@
 import { Repo } from '@/types/types';
 import { getMapCountOfLang } from '@/utils/RepoUtils';
 import assert from 'assert';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export interface Property<T> {
   value: T;
@@ -20,30 +20,19 @@ const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
   assert(options.properties != null, 'Provide properties parameters');
 
   const { properties, selectedLanguage, search, setLanguageCountMap } = options;
-  const [filteredRepos, setFilteredRepos] = useState<Repo[]>([]);
-  const [countFilter, setCountFilter] = useState(0);
-  const [repoCount, setRepoCount] = useState(0);
 
-  const propertiesChange = properties.map((property) => property.value).join('');
+  const propertiesChange = properties
+    .map((property) => `${property.propertyName}:${property.value}`)
+    .join(';');
 
-  useEffect(() => {
-    const updateNumberOfFilters = () => {
-      let count = 0;
-      properties.forEach((property) => {
-        if (property.value == true) count++;
-      });
-
-      if (selectedLanguage !== 'All') count++;
-      if (search.length) count++;
-      setCountFilter(count);
-    };
+  const filteredRepos = useMemo(() => {
     let filtered = [...repos];
 
     if (search.length) {
+      const filterSearch = search.toLowerCase();
       filtered = filtered.filter((repo) => {
-        let name = repo.name.toLowerCase();
-        let desc = repo.description?.toLowerCase();
-        let filterSearch = search.toLowerCase();
+        const name = repo.name.toLowerCase();
+        const desc = repo.description?.toLowerCase();
         return name.includes(filterSearch) || desc?.includes(filterSearch);
       });
     }
@@ -54,16 +43,31 @@ const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
       }
     });
 
-    setLanguageCountMap(getMapCountOfLang(filtered));
-
     if (selectedLanguage !== 'All') {
       filtered = filtered.filter((repo) => repo.language === selectedLanguage);
     }
 
-    setFilteredRepos(filtered);
-    updateNumberOfFilters();
-    setRepoCount(filtered.length);
-  }, [repos, selectedLanguage, search, propertiesChange, properties, setLanguageCountMap]);
+    return filtered;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [repos, search, selectedLanguage, propertiesChange]);
+
+  const countFilter = useMemo(() => {
+    let count = 0;
+    properties.forEach((property) => {
+      if (property.value) count++;
+    });
+
+    if (selectedLanguage !== 'All') count++;
+    if (search.length) count++;
+    return count;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedLanguage, search, propertiesChange]);
+
+  const repoCount = filteredRepos.length;
+
+  useEffect(() => {
+    setLanguageCountMap(getMapCountOfLang(filteredRepos));
+  }, [filteredRepos, setLanguageCountMap]);
 
   return { filteredRepos, countFilter, repoCount };
 };
