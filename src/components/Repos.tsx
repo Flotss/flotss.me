@@ -236,11 +236,14 @@ const Filters = (props: FilterProps) => {
   return (
     <Container className="col-span-5 flex h-fit min-w-[165px] flex-col text-white lg:col-span-1">
       <div className="mr-6 flex w-full flex-row items-center justify-between">
-        <span>Filters {countFilter > 0 && <span>({countFilter})</span>}</span>
+        <span className="text-sm font-medium text-zinc-300">
+          Filters {countFilter > 0 && <span className="text-emerald-400">({countFilter})</span>}
+        </span>
         <Button
-          size="sm"
-          colorScheme="red"
+          size="xs"
           variant="outline"
+          colorScheme="whiteAlpha"
+          className="border-white/10 text-xs text-zinc-400 hover:border-white/20 hover:text-white"
           onClick={clearFilters}
           visibility={countFilter > 0 ? 'visible' : 'hidden'}
         >
@@ -248,12 +251,12 @@ const Filters = (props: FilterProps) => {
         </Button>
       </div>
       <Input
-        className="my-4 rounded-md ring-orange-500"
+        className="my-4 rounded-lg border-white/10 bg-white/[0.03] text-sm text-zinc-200 placeholder:text-zinc-500 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
         placeholder="Search for a project"
         size="sm"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-      ></Input>
+      />
       <Accordion allowMultiple={true}>
         <AccordionItem>
           <h2>

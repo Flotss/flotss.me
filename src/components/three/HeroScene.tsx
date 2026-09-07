@@ -85,13 +85,13 @@ function OrbitingRings() {
       <group ref={group2}>
         <mesh>
           <torusGeometry args={[3.2, 0.008, 16, 100]} />
-          <meshBasicMaterial color="#8b5cf6" transparent opacity={0.15} />
+          <meshBasicMaterial color="#6ee7b7" transparent opacity={0.15} />
         </mesh>
       </group>
       <group ref={group3}>
         <mesh>
           <torusGeometry args={[3.6, 0.006, 16, 100]} />
-          <meshBasicMaterial color="#06b6d4" transparent opacity={0.1} />
+          <meshBasicMaterial color="#a7f3d0" transparent opacity={0.1} />
         </mesh>
       </group>
     </>
@@ -116,7 +116,7 @@ function MouseFollower() {
   return (
     <mesh ref={meshRef} scale={0.3}>
       <octahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial color="#a78bfa" wireframe transparent opacity={0.3} />
+      <meshBasicMaterial color="#34d399" wireframe transparent opacity={0.25} />
     </mesh>
   );
 }
@@ -133,13 +133,13 @@ export default function HeroScene() {
         <Suspense fallback={null}>
           <ambientLight intensity={0.4} />
           <pointLight position={[5, 5, 5]} intensity={0.8} color="#34d399" />
-          <pointLight position={[-5, -5, 5]} intensity={0.4} color="#8b5cf6" />
+          <pointLight position={[-5, -5, 5]} intensity={0.3} color="#10b981" />
           <spotLight
             position={[0, 10, 0]}
             angle={0.3}
             penumbra={1}
-            intensity={0.5}
-            color="#06b6d4"
+            intensity={0.4}
+            color="#34d399"
           />
           <GlowingSphere />
           <WireframeIcosahedron />

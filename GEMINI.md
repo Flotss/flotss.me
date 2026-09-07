@@ -46,7 +46,11 @@ Welcome to the **flotss.me** repository! This document defines workspace rules, 
    - Always use absolute paths with leading slash (e.g. `/projects/${name}`) to prevent broken nested navigation when clicking links from `/projects`.
 
 4. **Design & Styling Guidelines**:
-   - Maintain the refined dark aesthetic: zinc-950/black background, subtle borders (`border-white/5` or `border-white/10`), glassmorphism (`backdrop-blur-md`/`backdrop-blur-xl`), and emerald (`emerald-400`/`emerald-500`), cyan, and purple accents.
+   - Maintain the refined dark aesthetic: zinc-950/black background, subtle borders (`border-white/5` or `border-white/10`), glassmorphism (`backdrop-blur-md`/`backdrop-blur-xl`), and signature emerald (`emerald-400`/`emerald-500`) accents.
+   - **Green / Emerald Accents**: Primary actions, CTAs, commit timelines, and active indicators use emerald green. Never use blue/cyan for commits.
+   - **Repository Metrics (Stars, Forks, Watchers)**: Always rendered as clean neutral badges (`border-white/10 bg-white/[0.04] text-zinc-300`) with neutral icons—never use rainbow colors (no yellow stars, no cyan forks, no purple watchers).
+   - **Languages**: Standard GitHub language color mappings are preserved for language indicators and breakdown bars.
+   - **Alerts**: Red and orange are strictly reserved for critical alerts, error states, and private locks.
    - Language of user-facing UI copy: **English**.
 
 ---

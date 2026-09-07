@@ -43,13 +43,13 @@ export default function Footer() {
   return (
     <Box className="sticky top-[100vh] mx-5 mb-3 flex h-14 items-center justify-between rounded-full border border-white/5 bg-white/[0.03] px-6 backdrop-blur-xl sm:mx-20">
       <nav className="flex gap-6">
-        <SocialButton label="GitHub" href="https://github.com/flotss" color="#FFFFFF">
+        <SocialButton label="GitHub" href="https://github.com/flotss" color="#34d399">
           <BsGithub className="h-4 w-4" />
         </SocialButton>
         <SocialButton
           label="LinkedIn"
           href="https://www.linkedin.com/in/florian-mangin-784604208/"
-          color="#0077B5"
+          color="#34d399"
         >
           <BsLinkedin className="h-4 w-4" />
         </SocialButton>

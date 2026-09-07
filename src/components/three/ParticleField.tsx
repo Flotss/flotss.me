@@ -26,18 +26,21 @@ export default function ParticleField() {
       velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.005;
 
       const t = Math.random();
-      if (t < 0.33) {
-        particleColors[i * 3] = 0.18;
-        particleColors[i * 3 + 1] = 0.85;
-        particleColors[i * 3 + 2] = 0.55;
-      } else if (t < 0.66) {
+      if (t < 0.4) {
+        // Emerald
+        particleColors[i * 3] = 0.1;
+        particleColors[i * 3 + 1] = 0.8;
+        particleColors[i * 3 + 2] = 0.5;
+      } else if (t < 0.7) {
+        // Mint / soft teal
         particleColors[i * 3] = 0.2;
-        particleColors[i * 3 + 1] = 0.7;
-        particleColors[i * 3 + 2] = 0.9;
+        particleColors[i * 3 + 1] = 0.85;
+        particleColors[i * 3 + 2] = 0.65;
       } else {
-        particleColors[i * 3] = 0.6;
-        particleColors[i * 3 + 1] = 0.3;
-        particleColors[i * 3 + 2] = 0.9;
+        // Neutral white
+        particleColors[i * 3] = 0.7;
+        particleColors[i * 3 + 1] = 0.75;
+        particleColors[i * 3 + 2] = 0.7;
       }
     }
     return { positions, velocities, particleColors };

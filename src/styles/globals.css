@@ -28,7 +28,7 @@ a {
 
 /* Subtle radial glow on the page */
 .bg-grid-pattern {
-  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.08), transparent);
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(16, 185, 129, 0.08), transparent);
 }
 
 /* Glitch text effect */

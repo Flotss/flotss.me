@@ -151,21 +151,21 @@ export default function Project() {
           <Container className="col-span-1 flex flex-col justify-between space-y-4 lg:col-span-6 xl:col-span-6">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl">
+                <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
                   {repo.name}
                 </h1>
                 {repo.archived && (
-                  <span className="rounded-md border border-zinc-700 bg-zinc-800/80 px-2 py-0.5 text-xs font-semibold text-zinc-400">
+                  <span className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs font-medium text-zinc-400">
                     Archived
                   </span>
                 )}
                 {repo.fork && (
-                  <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-300">
+                  <span className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs font-medium text-zinc-400">
                     FORKED
                   </span>
                 )}
                 {repo.private && (
-                  <span className="inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-300">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-red-500/20 bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-400">
                     <LockIcon className="h-3 w-3" /> Private
                   </span>
                 )}
@@ -177,16 +177,16 @@ export default function Project() {
 
             {/* Badges / Stats row */}
             <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
-                <FaStar className="h-3 w-3 text-amber-400" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
+                <FaStar className="h-3 w-3 text-zinc-400" />
                 {repo.stargazers_count} {repo.stargazers_count === 1 ? 'star' : 'stars'}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300">
-                <FaCodeBranch className="h-3 w-3 text-cyan-400" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
+                <FaCodeBranch className="h-3 w-3 text-zinc-400" />
                 {repo.forks_count} {repo.forks_count === 1 ? 'fork' : 'forks'}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-300">
-                <FaEye className="h-3 w-3 text-purple-400" />
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
+                <FaEye className="h-3 w-3 text-zinc-400" />
                 {repo.watchers_count} {repo.watchers_count === 1 ? 'watcher' : 'watchers'}
               </span>
               {repo.license && repo.license !== 'null' && (
@@ -283,11 +283,11 @@ export default function Project() {
               href={repo.html_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-xs font-medium text-zinc-200 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/40 hover:bg-emerald-500/15 hover:text-white"
+              className="group flex w-full items-center justify-center gap-2 rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-4 py-2.5 text-xs font-medium text-emerald-200 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/60 hover:bg-emerald-500/25 hover:text-white hover:shadow-md hover:shadow-emerald-500/10"
             >
               <FaGithub className="h-4 w-4" />
               <span>View on GitHub</span>
-              <FaExternalLinkAlt className="h-2.5 w-2.5 opacity-60 transition-transform duration-200 group-hover:translate-x-0.5" />
+              <FaExternalLinkAlt className="h-2.5 w-2.5 opacity-70 transition-transform duration-200 group-hover:translate-x-0.5" />
             </a>
 
             <button
@@ -423,10 +423,10 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
       <div className="flex flex-col rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-md lg:sticky lg:top-24 lg:col-span-2">
         <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
           <div className="flex items-center gap-2.5">
-            <FaHistory className="h-5 w-5 text-cyan-400" />
+            <FaHistory className="h-5 w-5 text-emerald-400" />
             <h2 className="text-lg font-bold tracking-tight text-white">Commits</h2>
           </div>
-          <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-300">
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
             {commits.length} commits
           </span>
         </div>

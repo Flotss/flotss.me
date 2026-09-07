@@ -10,7 +10,7 @@ export default function Title({ title, className, color }: TitleProps) {
   return (
     <Box className="flex items-center justify-center">
       <Text
-        className={`bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text pb-5 pr-1 text-3xl font-bold tracking-tight text-transparent drop-shadow-sm sm:text-5xl mdrepo:text-5xl lgrepo:text-7xl ${className}`}
+        className={`bg-gradient-to-b from-white via-zinc-100 to-zinc-400 bg-clip-text pb-5 pr-1 text-3xl font-bold tracking-tight text-transparent drop-shadow-sm sm:text-5xl mdrepo:text-5xl lgrepo:text-6xl ${className || ''}`}
         color={color}
       >
         {title}
