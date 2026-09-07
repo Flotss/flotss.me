@@ -3,24 +3,25 @@
 .markdown h3,
 .markdown h4,
 .markdown h5 {
-  color: #e6edf3;
+  color: #f4f4f5;
   font-weight: 600;
-  border-bottom: 1px solid #262b32;
-  padding-bottom: 0.3em;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4em;
+  margin-top: 1.5em;
+  margin-bottom: 0.8em;
+  letter-spacing: -0.02em;
 }
 
 .markdown h1 {
-  font-size: 2em;
+  font-size: 1.85em;
 }
 
 .markdown h2 {
-  font-size: 1.5em;
+  font-size: 1.45em;
 }
 
 .markdown h3 {
-  font-size: 1.25em;
+  font-size: 1.2em;
 }
 
 .markdown h4 {
@@ -32,93 +33,139 @@
 }
 
 .markdown pre {
-  background-color: #161b22;
-  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
   overflow: auto;
-  margin: 1em 0;
-  font-size: 13.6px;
+  margin: 1.25em 0;
+  font-size: 13.5px;
+  line-height: 1.6;
 }
 
 .markdown p {
-  margin: 0.5rem 0;
+  margin: 0.75rem 0;
+  color: #d4d4d8;
+  line-height: 1.7;
 }
 
 .markdown p code,
-.markdown li code
-{
-    font-size: 13.6px;
-    background-color: #343942;
-    padding: 2.720px 5.440px;
-    border-radius: 6px;
-    font-family: inherit;
+.markdown li code {
+  font-size: 13px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #6ee7b7;
+  padding: 0.2em 0.45em;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .markdown ul {
-    padding-left: 2em;
+  padding-left: 1.75em;
+  color: #d4d4d8;
+  margin: 0.75em 0;
 }
 
 .markdown li {
-    margin: 0.5em 0;
-    /* add ° like decorator to the left */
-    list-style-type: initial
+  margin: 0.35em 0;
+  list-style-type: disc;
 }
 
 .markdown ul ul li {
-    list-style-type: circle;
+  list-style-type: circle;
 }
 
 .markdown ul ul ul li {
-    list-style-type: square;
+  list-style-type: square;
 }
 
 .markdown ol {
-    padding-left: 2em;
+  padding-left: 1.75em;
+  color: #d4d4d8;
+  margin: 0.75em 0;
 }
 
 .markdown a {
-    color: #0366d6;
-    text-decoration: none;
+  color: #34d399;
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 .markdown a:hover {
-    text-decoration: underline;
-}
-
-.markdown p img{
-    margin: 0;
-    padding: 0;
-    display: inline-block;
-    max-width: 100%;
-    margin-bottom: 1em;
-}
-
-.markdown div div:has(img) {
-    flex-wrap: wrap
-}
-
-.markdown table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1em;
-}
-
-.markdown th {
-  font-weight: bold;
-}
-
-.markdown th,
-.markdown td {
-  padding: 6px 13px;
-  border: 1px solid #dfe2e5;
+  color: #6ee7b7;
+  text-decoration: underline;
 }
 
 .markdown img {
   max-width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+  margin: 1.25rem 0;
+}
+
+.markdown p img {
+  margin: 0.5rem 0;
+  display: inline-block;
+  max-width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.markdown div div:has(img) {
+  flex-wrap: wrap;
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5em 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.markdown th {
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #f4f4f5;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  text-align: left;
+}
+
+.markdown th:last-child {
+  border-right: none;
+}
+
+.markdown td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  color: #d4d4d8;
+  font-size: 0.9em;
+}
+
+.markdown td:last-child {
+  border-right: none;
+}
+
+.markdown tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown tr:hover td {
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .markdown blockquote {
-  margin: 0;
-  padding: 0.5em 1em;
-  background-color: #f8f9fa;
-  border-left: 0.25em solid #dfe2e5;
+  margin: 1.25em 0;
+  padding: 0.75em 1.25em;
+  background-color: rgba(16, 185, 129, 0.04);
+  border-left: 3px solid #10b981;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: #a1a1aa;
 }

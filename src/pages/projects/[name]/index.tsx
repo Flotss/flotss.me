@@ -1,44 +1,60 @@
 import type React from 'react';
 import ErrorCode from '@/components/ErrorCode';
 import { Container } from '@/components/StyledBox';
-import Title from '@/components/Title';
 import { useFetchRepo } from '@/hooks/useFetchRepo';
 import { License, Repo } from '@/types/types';
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { LockIcon } from '@chakra-ui/icons';
 import {
   Avatar,
-  Badge,
   Box,
-  Button,
-  Divider,
-  Flex,
-  Image,
   Link,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
-  Text,
-  ToastId,
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
+import {
+  FaBalanceScale,
+  FaBookOpen,
+  FaCalendarAlt,
+  FaCheck,
+  FaClock,
+  FaCodeBranch,
+  FaCopy,
+  FaExternalLinkAlt,
+  FaEye,
+  FaGithub,
+  FaHistory,
+  FaStar,
+} from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
 import rehypeRaw from 'rehype-raw';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 
-const SKELETON_WIDTHS_COL_1 = ['75%', '60%', '80%', '55%', '70%', '65%', '50%', '72%'];
-const SKELETON_WIDTHS_COL_2 = ['85%', '60%', '95%', '45%', '75%', '55%', '65%'];
-const SKELETON_WIDTHS_README = ['70%', '55%', '80%', '60%', '75%'];
-const SKELETON_WIDTHS_COMMITS = ['65%', '80%', '50%', '70%'];
+const LANGUAGE_COLORS: Record<string, string> = {
+  TypeScript: '#3178c6',
+  JavaScript: '#f1e05a',
+  'C#': '#68217a',
+  Python: '#3572A5',
+  Java: '#b07219',
+  HTML: '#e34c26',
+  CSS: '#563d7c',
+  PHP: '#4F5D95',
+  Shell: '#89e051',
+  Batchfile: '#C1F12E',
+  Go: '#00ADD8',
+  Rust: '#dea584',
+  'C++': '#f34b7d',
+  C: '#555555',
+  Kotlin: '#A97BFF',
+  Ruby: '#701516',
+};
 
 /**
  * The `Project` component displays information about a GitHub repository.
@@ -51,27 +67,20 @@ export default function Project() {
   const { name } = router.query as { name: string };
   const { repo, loading, error } = useFetchRepo({ name });
   const toast = useToast();
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  let lastToastId: ToastId;
-  /**
-   * Copies text to the clipboard and displays a toast notification.
-   *
-   * @param {string | undefined} text - The text to copy to the clipboard.
-   */
-  const copyInClipBoard = (text: string | undefined) => () => {
+  const copyInClipBoard = (text: string | undefined, key: string) => () => {
     if (!text) return;
-
     navigator.clipboard.writeText(text);
 
-    if (lastToastId) {
-      toast.close(lastToastId);
-    }
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
 
-    lastToastId = toast({
+    toast({
       title: 'Copied to clipboard',
       description: text,
       status: 'success',
-      duration: 4000,
+      duration: 3000,
       isClosable: true,
     });
   };
@@ -81,7 +90,7 @@ export default function Project() {
   }
 
   // If the repository data is not available yet, display a skeleton
-  if (!repo) {
+  if (!repo || loading) {
     return (
       <>
         <Head>
@@ -89,84 +98,39 @@ export default function Project() {
             <title>Loading repository...</title>
           )}
         </Head>
-        <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
-          <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
-            <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
-              <Skeleton width={'30%'}>
-                <Box className="text-7xl">.</Box>
-              </Skeleton>
-              {Array.from({ length: 8 }).map((_, index) => (
-                <SkeletonText
-                  key={index}
-                  noOfLines={1}
-                  width={SKELETON_WIDTHS_COL_1[index % SKELETON_WIDTHS_COL_1.length]}
-                ></SkeletonText>
-              ))}
+        <div className="flex flex-col items-center justify-center space-y-6 px-5 py-8 sm:px-20">
+          <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-12">
+            <Container className="col-span-1 space-y-4 lg:col-span-6 xl:col-span-6">
+              <Skeleton width="50%" height="2.5rem" rounded="xl" />
+              <SkeletonText noOfLines={3} spacing="3" />
+              <div className="flex gap-2 pt-3">
+                <Skeleton width="5rem" height="1.5rem" rounded="full" />
+                <Skeleton width="5rem" height="1.5rem" rounded="full" />
+                <Skeleton width="5rem" height="1.5rem" rounded="full" />
+              </div>
             </Container>
-            <Container className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
-              <Skeleton>
-                <Box className="text-6xl">.</Box>
-              </Skeleton>
-              {Array.from({ length: 7 }).map((_, index) => (
-                <SkeletonText
-                  key={index}
-                  noOfLines={1}
-                  width={SKELETON_WIDTHS_COL_2[index % SKELETON_WIDTHS_COL_2.length]}
-                ></SkeletonText>
-              ))}
-              <Flex width={'100%'} gap={5} className="justify-around pt-5">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <SkeletonCircle key={index} />
-                ))}
-              </Flex>
+            <Container className="col-span-1 space-y-4 lg:col-span-3 xl:col-span-3">
+              <Skeleton width="60%" height="1.2rem" rounded="md" />
+              <SkeletonText noOfLines={2} spacing="3" />
+              <div className="flex gap-2 pt-2">
+                <SkeletonCircle size="8" />
+              </div>
             </Container>
-            <Container className="col-span-5 mt-5 flex flex-col items-center justify-center space-y-2 lgrepo:col-span-2 lgrepo:mt-0">
-              <Skeleton width={'30%'}>
-                <Box className="text-3xl">.</Box>
-              </Skeleton>
-              <Box
-                gap={2}
-                className="flex w-full flex-col items-center justify-center md:flex-row lgrepo:flex-col"
-              >
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <Skeleton key={index} className="w-full">
-                    <h1 className="text-6xl">.</h1>
-                  </Skeleton>
-                ))}
-              </Box>
+            <Container className="col-span-1 space-y-3 lg:col-span-3 xl:col-span-3">
+              <Skeleton width="50%" height="1.2rem" rounded="md" />
+              <Skeleton width="100%" height="2.5rem" rounded="xl" />
+              <Skeleton width="100%" height="2.5rem" rounded="xl" />
+              <Skeleton width="100%" height="2.5rem" rounded="xl" />
             </Container>
           </div>
-          <Flex width={'100%'} gap={5} className="justify-around py-5">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <SkeletonCircle key={index} width="100%" height={'2rem'} />
-            ))}
-          </Flex>
-          <div className="grid w-full grid-flow-row-dense grid-cols-3 grid-rows-1 space-y-5 lg:grid-cols-5 lg:space-x-5 lg:space-y-0">
-            <Container className="col-span-3 space-y-2">
-              <Skeleton width={'30%'}>
-                <Box className="text-5xl">.</Box>
-              </Skeleton>
-              <Divider />
-              {Array.from({ length: 5 }).map((_, index) => (
-                <SkeletonText
-                  key={index}
-                  noOfLines={4}
-                  width={SKELETON_WIDTHS_README[index % SKELETON_WIDTHS_README.length]}
-                ></SkeletonText>
-              ))}
+          <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-5">
+            <Container className="col-span-1 space-y-4 lg:col-span-3">
+              <Skeleton width="30%" height="2rem" rounded="lg" />
+              <SkeletonText noOfLines={8} spacing="3" />
             </Container>
-            <Container className="col-span-2 space-y-2">
-              <Skeleton width={'30%'}>
-                <Box className="text-5xl">.</Box>
-              </Skeleton>
-              <Divider />
-              {Array.from({ length: 4 }).map((_, index) => (
-                <SkeletonText
-                  key={index}
-                  noOfLines={4}
-                  width={SKELETON_WIDTHS_COMMITS[index % SKELETON_WIDTHS_COMMITS.length]}
-                ></SkeletonText>
-              ))}
+            <Container className="col-span-1 space-y-4 lg:col-span-2">
+              <Skeleton width="40%" height="2rem" rounded="lg" />
+              <SkeletonText noOfLines={6} spacing="3" />
             </Container>
           </div>
         </div>
@@ -180,124 +144,230 @@ export default function Project() {
       <Head>
         <title>{repo.name}</title>
       </Head>
-      <div className="flex flex-col items-center justify-center space-y-5 px-5 py-5 sm:px-20">
-        <div className="grid w-full grid-flow-row-dense grid-cols-1 grid-rows-1 mdrepo:grid-cols-3 lgrepo:grid-cols-5 lgrepo:space-x-5">
-          <Container className="col-span-3 space-y-5 mdrepo:col-span-2">
-            <Title title={repo.name} className="mdrepo:text-5xl lgrepo:text-7xl" />
-            <StyledText>{repo.description}</StyledText>
-            <Menu>
-              <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>
-                Plus d&apos;information
-              </MenuButton>
-              <MenuList style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }} border={'none'}>
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/Stars-${repo.stargazers_count}-green`}
-                    alt="Stars"
-                  />
-                </MenuItem>
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/Forks-${repo.forks_count}-blue`}
-                    alt="Forks"
-                  />
-                </MenuItem>
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/Open_Issues-${repo.open_issues_count}-blue`}
-                    alt="Open Issues"
-                  />
-                </MenuItem>
-                {repo.license && repo.license != 'null' && (
-                  <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                    <Image
-                      src={`https://img.shields.io/badge/License-${(repo.license as License).name}-black`}
-                      alt="License"
-                    />
-                  </MenuItem>
+      <div className="flex flex-col items-center justify-center space-y-6 px-5 py-8 sm:px-20">
+        {/* Top Hero Grid */}
+        <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-12">
+          {/* Main Info Card */}
+          <Container className="col-span-1 flex flex-col justify-between space-y-4 lg:col-span-6 xl:col-span-6">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="bg-gradient-to-r from-white via-zinc-100 to-zinc-400 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-4xl lg:text-5xl">
+                  {repo.name}
+                </h1>
+                {repo.archived && (
+                  <span className="rounded-md border border-zinc-700 bg-zinc-800/80 px-2 py-0.5 text-xs font-semibold text-zinc-400">
+                    Archived
+                  </span>
                 )}
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/Watchers-${repo.watchers_count}-yellow`}
-                    alt="Watchers"
-                  />
-                </MenuItem>
-                <MenuItem style={{ backgroundColor: 'rgb(30, 30, 30, 1)' }}>
-                  <Image
-                    src={`https://img.shields.io/badge/Subscribers-${repo.subscribers_count}-yellow`}
-                    alt="Subscribers"
-                  />
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Container>
-          <Container className="col-span-3 mt-5 mdrepo:col-span-1 mdrepo:ml-5 mdrepo:mt-0 lgrepo:col-span-1">
-            <StyledText className="lgrepo:text-xl">
-              Created : {new Date(repo.created_at).toLocaleDateString()}
-            </StyledText>
-            <StyledText className="lgrepo:text-xl">
-              Updated : {new Date(repo.updated_at).toLocaleDateString()}
-            </StyledText>
+                {repo.fork && (
+                  <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-300">
+                    FORKED
+                  </span>
+                )}
+                {repo.private && (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-300">
+                    <LockIcon className="h-3 w-3" /> Private
+                  </span>
+                )}
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-300 sm:text-base">
+                {repo.description || 'No description provided for this repository.'}
+              </p>
+            </div>
 
-            <StyledText className="pb-2 pt-5">Collaborators :</StyledText>
-            <Flex width={'100%'} gap={5} className="justify-around" flexWrap={'wrap'}>
-              {repo.collaborators.map((collaborator) => (
-                <Tooltip
-                  key={collaborator.login}
-                  hasArrow
-                  label={collaborator.login}
-                  bg="gray.300"
-                  placement="top"
-                  color="black"
-                >
-                  <Link
-                    className="flex flex-col items-center space-y-2"
-                    href={collaborator.html_url}
-                    isExternal
-                  >
-                    <Avatar name={collaborator.login} src={collaborator.avatar_url} size={'md'} />
-                    {collaborator.login == 'Flotss' && (
-                      <Badge ml="1" colorScheme="green">
-                        Me
-                      </Badge>
-                    )}
-                  </Link>
-                </Tooltip>
-              ))}
-            </Flex>
+            {/* Badges / Stats row */}
+            <div className="flex flex-wrap items-center gap-2 border-t border-white/5 pt-3">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
+                <FaStar className="h-3 w-3 text-amber-400" />
+                {repo.stargazers_count} {repo.stargazers_count === 1 ? 'star' : 'stars'}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-500/20 bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-300">
+                <FaCodeBranch className="h-3 w-3 text-cyan-400" />
+                {repo.forks_count} {repo.forks_count === 1 ? 'fork' : 'forks'}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-300">
+                <FaEye className="h-3 w-3 text-purple-400" />
+                {repo.watchers_count} {repo.watchers_count === 1 ? 'watcher' : 'watchers'}
+              </span>
+              {repo.license && repo.license !== 'null' && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
+                  <FaBalanceScale className="h-3 w-3 text-zinc-400" />
+                  {typeof repo.license === 'object' ? (repo.license as License).name : repo.license}
+                </span>
+              )}
+            </div>
           </Container>
-          <Container className="col-span-5 mt-5 flex flex-col items-center justify-center lgrepo:col-span-2 lgrepo:mt-0">
-            <Title title={'Clone'} className="text-lg mdrepo:text-xl lgrepo:text-2xl" />
-            <Box
-              gap={2}
-              className="flex w-full flex-col items-center justify-center md:flex-row lgrepo:flex-col"
+
+          {/* Details & Collaborators Card */}
+          <Container className="col-span-1 flex flex-col justify-between space-y-4 lg:col-span-3 xl:col-span-3">
+            <div>
+              <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Repository Details
+              </h2>
+              <div className="space-y-2.5 text-xs text-zinc-300">
+                <div className="flex items-center gap-2">
+                  <FaCalendarAlt className="h-3.5 w-3.5 text-zinc-500" />
+                  <span>
+                    Created:{' '}
+                    <strong className="font-medium text-zinc-200">
+                      {new Date(repo.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </strong>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <FaClock className="h-3.5 w-3.5 text-zinc-500" />
+                  <span>
+                    Updated:{' '}
+                    <strong className="font-medium text-zinc-200">
+                      {new Date(repo.updated_at).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-white/5 pt-3">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Collaborators
+              </h3>
+              <div className="flex flex-wrap items-center gap-3">
+                {repo.collaborators.map((collaborator) => (
+                  <Tooltip
+                    key={collaborator.login}
+                    hasArrow
+                    label={collaborator.login}
+                    bg="gray.900"
+                    color="white"
+                    border="1px solid"
+                    borderColor="whiteAlpha.200"
+                    rounded="lg"
+                    placement="top"
+                  >
+                    <Link
+                      className="group relative flex items-center gap-2"
+                      href={collaborator.html_url}
+                      isExternal
+                    >
+                      <Avatar
+                        name={collaborator.login}
+                        src={collaborator.avatar_url}
+                        size="sm"
+                        className="transition-transform duration-200 group-hover:scale-110"
+                      />
+                      {collaborator.login === 'Flotss' && (
+                        <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                          Owner
+                        </span>
+                      )}
+                    </Link>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+          </Container>
+
+          {/* Quick Actions / Clone Card */}
+          <Container className="col-span-1 flex flex-col justify-center space-y-3 lg:col-span-3 xl:col-span-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              Quick Actions
+            </h2>
+            <a
+              href={repo.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-xs font-medium text-zinc-200 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/40 hover:bg-emerald-500/15 hover:text-white"
             >
-              <ButtonCopy as="a" href={repo.html_url} target="_blank" rel="noopener noreferrer">
-                View on GitHub
-              </ButtonCopy>
-              <ButtonCopy colorScheme="blue" onClick={copyInClipBoard(repo.clone_url)}>
-                Clone (HTTPS)
-              </ButtonCopy>
-              <ButtonCopy colorScheme="blue" onClick={copyInClipBoard(repo.ssh_url)}>
-                Clone (SSH)
-              </ButtonCopy>
-            </Box>
+              <FaGithub className="h-4 w-4" />
+              <span>View on GitHub</span>
+              <FaExternalLinkAlt className="h-2.5 w-2.5 opacity-60 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </a>
+
+            <button
+              onClick={copyInClipBoard(repo.clone_url, 'https')}
+              className="group flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+              title="Click to copy HTTPS clone command"
+            >
+              <span className="flex items-center gap-2 truncate">
+                <span className="font-sans text-[11px] font-semibold text-zinc-400">HTTPS</span>
+                <span className="truncate text-zinc-500">git clone ...</span>
+              </span>
+              <span className="flex-shrink-0 text-emerald-400 transition-transform group-hover:scale-110">
+                {copiedKey === 'https' ? (
+                  <FaCheck className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <FaCopy className="h-3.5 w-3.5 text-zinc-400" />
+                )}
+              </span>
+            </button>
+
+            <button
+              onClick={copyInClipBoard(repo.ssh_url, 'ssh')}
+              className="group flex w-full items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 font-mono text-xs text-zinc-300 backdrop-blur-md transition-all duration-200 hover:border-white/20 hover:bg-white/[0.06] hover:text-white"
+              title="Click to copy SSH clone command"
+            >
+              <span className="flex items-center gap-2 truncate">
+                <span className="font-sans text-[11px] font-semibold text-zinc-400">SSH</span>
+                <span className="truncate text-zinc-500">git clone git@...</span>
+              </span>
+              <span className="flex-shrink-0 text-emerald-400 transition-transform group-hover:scale-110">
+                {copiedKey === 'ssh' ? (
+                  <FaCheck className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <FaCopy className="h-3.5 w-3.5 text-zinc-400" />
+                )}
+              </span>
+            </button>
           </Container>
         </div>
-        <Flex width={'100%'} gap={5} className="items-center justify-evenly" flexWrap="wrap">
-          {repo.languages.map((language, index) => {
-            return (
-              <Box
-                key={language.name || index}
-                className={`w-${(100 / repo.languages.length).toFixed(
-                  2,
-                )} flex items-center justify-center rounded-3xl bg-box-color px-6 py-1`}
-              >
-                <StyledText>{language.name}</StyledText>
-              </Box>
-            );
-          })}
-        </Flex>
+
+        {/* Language Breakdown Bar */}
+        {repo.languages && repo.languages.length > 0 && (
+          <Container className="w-full px-6 py-4">
+            <div className="flex flex-col gap-2.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold uppercase tracking-wider text-zinc-400">
+                  Languages
+                </span>
+                <span className="text-zinc-500">{repo.languages.length} detected</span>
+              </div>
+              <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/5">
+                {repo.languages.map((language, idx) => (
+                  <div
+                    key={language.name || idx}
+                    style={{
+                      width: `${language.percentage}%`,
+                      backgroundColor: LANGUAGE_COLORS[language.name] || '#10b981',
+                    }}
+                    title={`${language.name}: ${language.percentage}%`}
+                    className="h-full transition-all duration-500"
+                  />
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-4 pt-1">
+                {repo.languages.map((language, idx) => (
+                  <div key={language.name || idx} className="flex items-center gap-1.5 text-xs">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: LANGUAGE_COLORS[language.name] || '#10b981' }}
+                    />
+                    <span className="font-medium text-zinc-300">{language.name}</span>
+                    <span className="text-zinc-500">{language.percentage}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        )}
+
+        {/* Readme & Commits */}
         {repo.commits ? (
           <ReadmeAndCommits repo={repo} />
         ) : (
@@ -310,56 +380,6 @@ export default function Project() {
   );
 }
 
-interface ButtonCopyProps {
-  children: React.ReactNode;
-  colorScheme?: string;
-  onClick?: () => void;
-  className?: string;
-  as?: React.ElementType;
-  href?: string;
-  target?: string;
-  rel?: string;
-}
-
-/**
- * Represents a button that copies text to the clipboard.
- */
-const ButtonCopy = ({
-  colorScheme,
-  children,
-  onClick,
-  className,
-  as,
-  href,
-  target,
-  rel,
-}: ButtonCopyProps) => {
-  const buttonProps = {
-    colorScheme,
-    onClick,
-    className: `w-full py-9 md:py-7 lgrepo:py-9 ${className}`,
-    as,
-    href,
-    target,
-    rel,
-  };
-  return <Button {...(buttonProps as any)}>{children}</Button>;
-};
-
-interface StyledProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-/**
- * Represents a styled text component.
- */
-const StyledText = ({ children, className, ...props }: StyledProps) => (
-  <Text className={`sm:text-xl md:text-2xl ${className}`} {...props}>
-    {children}
-  </Text>
-);
-
 interface ReadmeAndCommitsProps {
   repo: Repo;
 }
@@ -370,76 +390,94 @@ interface ReadmeAndCommitsProps {
  * @return {JSX.Element} The rendered ReadmeAndCommits component.
  */
 const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
-  const [boxHeight, setBoxHeight] = useState<number>(0);
-  const refFirstBox = useRef<HTMLDivElement>(null);
-
-  const commits = repo.commits;
-
-  useEffect(() => {
-    if (refFirstBox.current) {
-      setBoxHeight(refFirstBox.current.offsetHeight);
-    }
-  }, [repo.readme]); // Change the height of the commits box when the readme changes
+  const commits = repo.commits || [];
 
   return (
-    <Box className="grid w-full grid-flow-row-dense grid-cols-3 grid-rows-1 space-y-5 lg:grid-cols-5 lg:space-x-5 lg:space-y-0">
-      <Box // TODO : Change Box to StyledBox
-        ref={refFirstBox}
-        className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8"
-        style={{ minHeight: '500px' }}
-      >
-        <Title title={'Readme'} className="text-5xl" />
-        <Divider />{' '}
-        <div className="markdown">
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
-          >
-            {repo.readme}
-          </ReactMarkdown>
+    <div className="grid w-full grid-cols-1 items-start gap-6 lg:grid-cols-5">
+      {/* README Column */}
+      <div className="rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-md sm:p-8 lg:col-span-3">
+        <div className="mb-6 flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="flex items-center gap-2.5">
+            <FaBookOpen className="h-5 w-5 text-emerald-400" />
+            <h2 className="text-lg font-bold tracking-tight text-white">README.md</h2>
+          </div>
+          <span className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-xs font-medium text-zinc-400">
+            Rendered Markdown
+          </span>
         </div>
-      </Box>
-      <Container
-        className="col-span-3 space-y-2 rounded-3xl bg-box-color p-8 lg:col-span-2"
-        style={{ height: `${boxHeight}px` }}
-      >
-        <Title title={`Commits (${commits.length})`} className="text-5xl" />
-        <Divider />
-        <Box
-          className="scrollbar flex flex-col space-y-2 p-2"
-          style={{ overflowY: 'auto' }}
-          height={`${boxHeight - 180}px`}
-        >
-          {commits.map((commit, index) => (
-            <Box key={index} width={'100%'} height={'100%'} className="group">
-              <Box className="space-y-2 rounded-3xl bg-[#202020] px-4 py-2 transition-all duration-300 ease-in-out hover:scale-[1.02] hover:rounded-3xl">
-                <h1 className="text-xl" title={commit.message}>
-                  {commit.message.slice(0, 80)}
-                  {commit.message.slice(0, 80).length == 80 ? `...` : ''}
-                </h1>
+        {repo.readme ? (
+          <div className="markdown">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeSlug, rehypeAutolinkHeadings, rehypeRaw]}
+            >
+              {repo.readme}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <p className="text-sm italic text-zinc-500">No README.md found in this repository.</p>
+        )}
+      </div>
 
-                <Box className="between flex items-center justify-between space-x-2">
-                  <Box className="flex items-start justify-start space-x-2">
-                    <h1 className="text-lg">
-                      Date: {new Date(commit.author.date).toLocaleDateString()}
-                    </h1>
-                    <h1 className="text-lg">Author: {commit.author.name}</h1>
-                  </Box>
-                  <Link href={commit.url} isExternal textDecoration={'none'}>
-                    <Button
-                      colorScheme="blue"
-                      size={'xs'}
-                      className="opacity-0 transition-opacity delay-150 ease-in-out group-hover:opacity-100"
-                    >
-                      See on GitHub
-                    </Button>
-                  </Link>
-                </Box>
-              </Box>
-            </Box>
+      {/* Commits Column (Sticky on desktop) */}
+      <div className="flex flex-col rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-md lg:sticky lg:top-24 lg:col-span-2">
+        <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+          <div className="flex items-center gap-2.5">
+            <FaHistory className="h-5 w-5 text-cyan-400" />
+            <h2 className="text-lg font-bold tracking-tight text-white">Commits</h2>
+          </div>
+          <span className="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-0.5 text-xs font-semibold text-cyan-300">
+            {commits.length} commits
+          </span>
+        </div>
+
+        <div className="scrollbar flex max-h-[750px] flex-col space-y-2.5 overflow-y-auto pr-1">
+          {commits.length === 0 && (
+            <p className="text-xs italic text-zinc-500">No commits found.</p>
+          )}
+          {commits.map((commit, index) => (
+            <div
+              key={index}
+              className="group flex flex-col gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-500/30 hover:bg-white/[0.05] hover:shadow-md hover:shadow-emerald-500/5"
+            >
+              <div className="flex items-start justify-between gap-2">
+                <p
+                  className="text-xs font-medium leading-snug text-zinc-200 transition-colors group-hover:text-emerald-300 sm:text-sm"
+                  title={commit.message}
+                >
+                  {commit.message}
+                </p>
+                {commit.url && (
+                  <a
+                    href={commit.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 rounded-md bg-white/5 p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-white/10 hover:text-white group-hover:opacity-100"
+                    title="View commit on GitHub"
+                  >
+                    <FaExternalLinkAlt className="h-2.5 w-2.5" />
+                  </a>
+                )}
+              </div>
+              <div className="flex items-center justify-between border-t border-white/[0.04] pt-2 text-[11px] text-zinc-500">
+                <span className="flex items-center gap-1.5 truncate">
+                  <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-emerald-400/80" />
+                  <span className="truncate text-zinc-400">{commit.author?.name || 'Unknown'}</span>
+                </span>
+                <span className="flex-shrink-0 text-zinc-500">
+                  {commit.author?.date
+                    ? new Date(commit.author.date).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })
+                    : ''}
+                </span>
+              </div>
+            </div>
           ))}
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
