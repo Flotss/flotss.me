@@ -34,14 +34,16 @@ type ReposProps = {
 };
 
 /**
- * The `Repos` component displays a list of GitHub repositories. It fetches data from an API and can also use cached data from localStorage.
- * It handles loading states, error handling, and rendering the repository cards.
+ * The `Repos` component displays a list of GitHub repositories.
+ * It handles loading states, error handling, filtering, and rendering repository cards.
  *
  * @returns {JSX.Element} - The rendered Repos component.
  */
+const EMPTY_REPOS: Repo[] = [];
+
 const Repos = React.memo((props: ReposProps) => {
   Repos.displayName = 'Repos';
-  const { repos, loading } = useFetchRepos(props.repos ?? []);
+  const { repos, loading } = useFetchRepos(props.repos || EMPTY_REPOS);
 
   const [search, setSearch] = useState('');
   const [isArchived, setIsArchived] = useState(false);
@@ -176,14 +178,17 @@ const Repos = React.memo((props: ReposProps) => {
         </Box>
       </section>
       {props.limit && filteredRepos.length > props.limit && (
-        <Box className="mb-5 flex justify-center">
+        <Box className="mb-8 mt-6 flex justify-center">
           <button
-            className="w-6/12 rounded-full border border-white/10 bg-white/[0.03] px-6 py-2.5 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.06] hover:text-white"
+            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-7 py-3 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white hover:shadow-lg hover:shadow-emerald-500/10 active:translate-y-0"
             onClick={() => {
               router.push('/projects');
             }}
           >
-            Show More
+            <span>Explore All Projects</span>
+            <span className="text-sm text-zinc-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-emerald-300">
+              →
+            </span>
           </button>
         </Box>
       )}
@@ -233,11 +238,14 @@ const Filters = (props: FilterProps) => {
   return (
     <Container className="col-span-5 flex h-fit min-w-[165px] flex-col text-white lg:col-span-1">
       <div className="mr-6 flex w-full flex-row items-center justify-between">
-        <span>Filters {countFilter > 0 && <span>({countFilter})</span>}</span>
+        <span className="text-sm font-medium text-zinc-300">
+          Filters {countFilter > 0 && <span className="text-emerald-400">({countFilter})</span>}
+        </span>
         <Button
-          size="sm"
-          colorScheme="red"
+          size="xs"
           variant="outline"
+          colorScheme="whiteAlpha"
+          className="border-white/10 text-xs text-zinc-400 hover:border-white/20 hover:text-white"
           onClick={clearFilters}
           visibility={countFilter > 0 ? 'visible' : 'hidden'}
         >
@@ -245,12 +253,12 @@ const Filters = (props: FilterProps) => {
         </Button>
       </div>
       <Input
-        className="my-4 rounded-md ring-orange-500"
+        className="my-4 rounded-lg border-white/10 bg-white/[0.03] text-sm text-zinc-200 placeholder:text-zinc-500 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
         placeholder="Search for a project"
         size="sm"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-      ></Input>
+      />
       <Accordion allowMultiple={true}>
         <AccordionItem>
           <h2>

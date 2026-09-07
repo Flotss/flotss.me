@@ -1,29 +1,41 @@
-'use client';
 import { Container } from '@/components/StyledBox';
 import { EmailInputs } from '@/services/EmailService';
-import { owner } from '@/services/GithubService';
+import { GithubService, owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
 import { loadGithubInformation } from '@/utils/RepoUtils';
 import { Box, Heading, Text, useToast } from '@chakra-ui/react';
+import type { GetStaticProps } from 'next';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import ContactHeader from './component/ContactHeader';
 import FormSendEmail from './component/FormSendEmail';
 import GithubInfo from './component/GithubInfo';
 
-export default function Contact(props: any) {
+interface ContactProps {
+  user?: any;
+  repos?: Repo[];
+}
+
+export default function Contact({
+  user: initialUser = null,
+  repos: initialRepos = [],
+}: ContactProps) {
   const toast = useToast();
 
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const [isLoading, setLoading] = useState<boolean>(!initialUser && initialRepos.length === 0);
 
-  const [user, setUser] = useState<any>(null);
-  const [repos, setRepos] = useState<Repo[]>([]);
+  const [user, setUser] = useState<any>(initialUser);
+  const [repos, setRepos] = useState<Repo[]>(initialRepos);
 
   const [subject, setSubject] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
+    if (initialUser && initialRepos.length > 0) {
+      return;
+    }
+
     loadGithubInformation({
       owner: owner,
       setUser: setUser,
@@ -31,7 +43,7 @@ export default function Contact(props: any) {
       toast: toast,
       setLoading: setLoading,
     });
-  }, [toast]);
+  }, [toast, initialUser, initialRepos.length]);
 
   const getStargazerCount = () => {
     return repos.reduce((a, b) => a + b.stargazers_count, 0);
@@ -235,3 +247,30 @@ export default function Contact(props: any) {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<ContactProps> = async () => {
+  try {
+    const githubService = new GithubService();
+    const [user, repos] = await Promise.all([
+      githubService.getUser(owner),
+      githubService.getRepos(),
+    ]);
+
+    return {
+      props: {
+        user: { user: JSON.parse(JSON.stringify(user || null)) },
+        repos: JSON.parse(JSON.stringify(repos || [])),
+      },
+      revalidate: 3600,
+    };
+  } catch (err) {
+    console.error('Error in Contact getStaticProps:', err);
+    return {
+      props: {
+        user: null,
+        repos: [],
+      },
+      revalidate: 60,
+    };
+  }
+};

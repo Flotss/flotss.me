@@ -1,7 +1,6 @@
 import { useIsMobile } from '@/hooks/useIsMobile';
 import {
   Box,
-  Link,
   IconButton,
   Drawer,
   DrawerBody,
@@ -10,6 +9,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaCode, FaEnvelope, FaHome, FaProjectDiagram, FaBars } from 'react-icons/fa';
 import { useState } from 'react';
@@ -26,9 +26,11 @@ type LinkHeaderType = {
 
 const FaHandEmoji = () => <span className="animate-waving-hand text-2xl no-underline">👋🏼</span>;
 const FaCodeLogo = () => (
-  <span className="flex items-center gap-2">
-    <FaCode className="h-5 w-5 text-emerald-400" />
-    <span className="hidden text-sm font-bold tracking-wider text-zinc-300 sm:inline">FLOTSS</span>
+  <span className="flex items-center gap-2.5">
+    <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-sm shadow-emerald-500/10">
+      <FaCode className="h-4 w-4" />
+    </span>
+    <span className="text-sm font-bold tracking-wider text-zinc-200">FLOTSS</span>
   </span>
 );
 
@@ -48,12 +50,12 @@ export default function Header() {
   };
 
   const links: LinkHeaderType[] = [
-    { href: '/', children: 'Home', icon: FaHome, isSelected: path == '/' },
+    { href: '/', children: 'Home', icon: FaHome, isSelected: path === '/' },
     {
       href: '/projects',
-      children: 'My projects',
+      children: 'Projects',
       icon: FaProjectDiagram,
-      isSelected: isSelected('projects'),
+      isSelected: isSelected('projects') || false,
     },
   ];
 
@@ -61,22 +63,25 @@ export default function Header() {
     href: '/contact',
     children: (
       <>
-        Contact <FaHandEmoji />
+        <span>Contact</span> <FaHandEmoji />
       </>
     ),
     icon: FaEnvelope,
-    isSelected: isSelected('contact'),
-    className: 'bg-[#2D3748]',
+    isSelected: isSelected('contact') || false,
   };
 
   const CustomLink = (link: LinkHeaderType, className?: string) => (
     <Link
-      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-white/5 hover:text-white ${link.isSelected ? 'bg-white/10' : ''} ${isMobile ? 'bg-[#0f0f0f] text-xl' : ''} ${className}`}
-      textColor={link.isSelected ? '#BDFFE3' : '#A0AEC0'}
+      className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
+        link.isSelected
+          ? 'border border-white/10 bg-white/10 text-emerald-300 shadow-sm'
+          : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200'
+      } ${isMobile ? 'text-lg' : ''} ${className || ''}`}
       href={link.href}
       key={link.href}
+      onClick={() => setIsOpen(false)}
     >
-      {React.createElement(link.icon, { className: 'h-5 w-5' })}
+      {React.createElement(link.icon, { className: 'h-4 w-4' })}
       {link.children}
     </Link>
   );
@@ -88,11 +93,15 @@ export default function Header() {
       ))}
       {contactLink && (
         <Link
-          className={`flex items-center gap-2 rounded-full bg-emerald-500/15 px-4 py-2 text-sm font-medium no-underline transition-all duration-300 hover:bg-emerald-500/25 hover:text-white ${isMobile ? 'text-xl' : ''}`}
-          textColor={contactLink.isSelected ? '#BDFFE3' : '#A0AEC0'}
+          className={`flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-300 transition-all duration-300 hover:border-emerald-500/50 hover:bg-emerald-500/20 hover:text-emerald-200 hover:shadow-sm hover:shadow-emerald-500/20 ${
+            contactLink.isSelected
+              ? 'border-emerald-500/60 bg-emerald-500/25 font-semibold text-emerald-200 shadow-sm shadow-emerald-500/20'
+              : ''
+          } ${isMobile ? 'text-lg' : ''}`}
           href={contactLink.href}
+          onClick={() => setIsOpen(false)}
         >
-          {contactLink.icon && <contactLink.icon className="h-5 w-5" />}
+          {contactLink.icon && <contactLink.icon className="h-4 w-4" />}
           {contactLink.children}
         </Link>
       )}
@@ -102,29 +111,41 @@ export default function Header() {
   return (
     <Box
       as="header"
-      className="mx-5 mt-3 flex h-14 items-center rounded-full border border-white/5 bg-white/[0.03] px-8 backdrop-blur-xl sm:mx-20 lg:px-10"
+      className="sticky top-4 z-50 mx-5 mt-4 flex h-14 items-center justify-between rounded-full border border-white/10 bg-zinc-950/70 px-6 shadow-lg shadow-black/40 backdrop-blur-xl sm:mx-20 lg:px-8"
     >
-      <Link className="flex items-center justify-center" href="/">
+      <Link
+        className="flex items-center justify-center focus:outline-none"
+        href="/"
+        onClick={() => setIsOpen(false)}
+      >
         <FaCodeLogo />
       </Link>
       {isMobile ? (
         <>
           <IconButton
             aria-label="Open Menu"
-            icon={<FaBars />}
+            icon={<FaBars className="h-4 w-4 text-zinc-300" />}
             onClick={toggleDrawer}
             className="ml-auto"
-            colorScheme="transparent"
+            variant="ghost"
+            colorScheme="whiteAlpha"
+            size="sm"
+            rounded="full"
           />
           <Drawer isOpen={isOpen} placement="top" onClose={toggleDrawer} size="full">
-            <DrawerOverlay />
-            <DrawerContent color="white" bg={'black'}>
-              <DrawerHeader>
+            <DrawerOverlay className="backdrop-blur-sm" />
+            <DrawerContent color="white" bg="#09090b" className="border-b border-white/10">
+              <DrawerHeader className="flex items-center justify-between border-b border-white/5 py-4">
                 <FaCodeLogo />
+                <DrawerCloseButton
+                  position="relative"
+                  top="auto"
+                  right="auto"
+                  className="text-zinc-400 hover:text-white"
+                />
               </DrawerHeader>
-              <DrawerCloseButton />
-              <DrawerBody>
-                <nav className="flex flex-col gap-4">
+              <DrawerBody className="py-8">
+                <nav className="flex flex-col gap-3">
                   <Links />
                 </nav>
               </DrawerBody>

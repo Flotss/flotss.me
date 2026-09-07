@@ -128,19 +128,19 @@ const FormSendEmail: React.FC<Props> = (props: Props) => {
         <FormErrorMessage>Message is required.</FormErrorMessage>
       </FormControl>
       <Button
-        className="rounded-full border border-white/10 bg-white/[0.05] px-6 py-2 text-sm font-medium text-zinc-300 transition-all duration-300 hover:border-emerald-500/20 hover:bg-white/[0.1] hover:text-white"
-        colorScheme={isSending ? 'blue' : successFullySend ? 'green' : errorSend ? 'red' : 'gray'}
+        className="rounded-full border border-emerald-500/40 bg-emerald-500/15 px-6 py-2 text-sm font-medium text-emerald-200 transition-all duration-200 hover:border-emerald-500/60 hover:bg-emerald-500/25 hover:text-white active:scale-95"
+        colorScheme="transparent"
         onClick={() => {
           setErrors();
           sendEmail();
         }}
       >
         {isSending ? (
-          <Spinner size="sm" />
+          <Spinner size="sm" className="text-emerald-400" />
         ) : successFullySend ? (
-          <CheckCircleIcon />
+          <CheckCircleIcon className="text-emerald-400" />
         ) : errorSend ? (
-          <CrossCircledIcon />
+          <CrossCircledIcon className="text-red-400" />
         ) : (
           'Send'
         )}

@@ -1,13 +1,3 @@
-export type ReposLocalStorage = {
-  repos: Repo[];
-  lastRequestDate: number;
-};
-
-export type RepoLocalStorage = {
-  repo: Repo;
-  lastRequestDate: number;
-};
-
 /**
  * Represents a GitHub repository.
  */
@@ -30,7 +20,7 @@ export type Repo = {
   fork: boolean;
   commits: Commit[];
   readme: string;
-  owner: Owner;
+  owner?: Owner;
   open_issues_count: number;
   license: string | License;
   subscribers_count: number;
