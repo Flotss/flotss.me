@@ -3,11 +3,10 @@ import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
 import Footer from './Footer';
 import Header from './Header';
-import RouteProgressBar from './RouteProgressBar';
 
 /**
  * The Layout component provides a consistent structure for web pages within the application.
- * It includes a route progress indicator, a header, animated page content, and a footer.
+ * It includes a header, animated page content, and a footer.
  *
  * @param {Object} props - The component's props.
  * @param {React.ReactNode} props.children - The content to be rendered within the main content area.
@@ -19,7 +18,6 @@ export default function Layout({ children }: { children: React.ReactNode }): Rea
 
   return (
     <>
-      <RouteProgressBar />
       <Header />
       <main className="flex flex-1 flex-col">
         <AnimatePresence mode="wait" initial={false}>
