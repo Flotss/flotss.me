@@ -34,14 +34,16 @@ type ReposProps = {
 };
 
 /**
- * The `Repos` component displays a list of GitHub repositories. It fetches data from an API and can also use cached data from localStorage.
- * It handles loading states, error handling, and rendering the repository cards.
+ * The `Repos` component displays a list of GitHub repositories.
+ * It handles loading states, error handling, filtering, and rendering repository cards.
  *
  * @returns {JSX.Element} - The rendered Repos component.
  */
+const EMPTY_REPOS: Repo[] = [];
+
 const Repos = React.memo((props: ReposProps) => {
   Repos.displayName = 'Repos';
-  const { repos, loading } = useFetchRepos(props.repos ?? []);
+  const { repos, loading } = useFetchRepos(props.repos || EMPTY_REPOS);
 
   const [search, setSearch] = useState('');
   const [isArchived, setIsArchived] = useState(false);

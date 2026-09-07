@@ -1,5 +1,5 @@
 import { Repo } from '@/types/types';
-import { getMapCountOfLang } from '@/utils/RepoUtils';
+import { getMapCountOfLang, sortRepos } from '@/utils/RepoUtils';
 import assert from 'assert';
 import { useEffect, useMemo } from 'react';
 
@@ -47,7 +47,7 @@ const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
       filtered = filtered.filter((repo) => repo.language === selectedLanguage);
     }
 
-    return filtered;
+    return sortRepos(filtered);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repos, search, selectedLanguage, propertiesChange]);
 

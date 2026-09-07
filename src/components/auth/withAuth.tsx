@@ -7,8 +7,8 @@ const withAuth = (WrappedComponent: React.ComponentType<any>) => {
     const router = useRouter();
 
     useEffect(() => {
-      const token = localStorage.getItem('token');
-      if (!token) {
+      const hasAuthCookie = typeof document !== 'undefined' && document.cookie.includes('UserJWT=');
+      if (!hasAuthCookie) {
         router.push('/admin');
       }
     }, [router]);

@@ -2,8 +2,12 @@ import Repos from '@/components/Repos';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { GithubService } from '@/services/GithubService';
+import { Repo } from '@/types/types';
+import { sortRepos } from '@/utils/RepoUtils';
 import { Box, Grid, Image, Tooltip } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import type { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React from 'react';
@@ -20,7 +24,11 @@ type TechStack = {
   link?: string;
 };
 
-export default function Home() {
+interface HomeProps {
+  repos?: Repo[];
+}
+
+export default function Home({ repos = [] }: HomeProps) {
   const isMobile = useIsMobile();
 
   const techStack: TechStack[] = [
@@ -172,15 +180,15 @@ export default function Home() {
                 placement="top"
                 hasArrow
                 rounded="xl"
-                bg="zinc.900"
-                color="zinc.300"
+                bg="#18181b"
+                color="#f4f4f5"
                 border="1px solid"
-                borderColor="zinc.800"
+                borderColor="rgba(255, 255, 255, 0.15)"
                 p={3}
                 fontSize="xs"
                 maxW="280px"
                 textAlign="center"
-                shadow="xl"
+                shadow="2xl"
                 openDelay={150}
               >
                 <a
@@ -220,9 +228,30 @@ export default function Home() {
           transition={{ duration: 0.6, delay: 0.4 }}
         >
           <Title title="Projects" className="text-2xl mdrepo:text-4xl lgrepo:text-6xl" />
-          <Repos limit={isMobile ? 3 : 6} />
+          <Repos repos={repos} limit={isMobile ? 3 : 6} />
         </motion.div>
       </Container>
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+  try {
+    const githubService = new GithubService();
+    const repos = await githubService.getRepos();
+    return {
+      props: {
+        repos: JSON.parse(JSON.stringify(sortRepos(repos || []))),
+      },
+      revalidate: 3600,
+    };
+  } catch (err) {
+    console.error('Error in Home getStaticProps:', err);
+    return {
+      props: {
+        repos: [],
+      },
+      revalidate: 60,
+    };
+  }
+};

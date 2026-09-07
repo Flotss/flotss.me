@@ -13,7 +13,6 @@ export default async function registerHandler(
 
   try {
     const token = await register(email, password);
-    localStorage.setItem('UserJWT', token);
     res.setHeader('Set-Cookie', `UserJWT=${token}; Path=/; HttpOnly; SameSite=Strict;`);
     res.status(200).json({ message: 'Login successful' });
   } catch (e: any) {

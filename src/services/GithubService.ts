@@ -1,5 +1,5 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
-import { createIfNotExists } from '@/utils/RepoUtils';
+import { createIfNotExists, sortRepos } from '@/utils/RepoUtils';
 import { PrismaClient } from '@prisma/client';
 import assert from 'assert';
 import { isValidRepoName, isValidUserName } from '@/utils/ValidationUtils';
@@ -69,6 +69,7 @@ export class GithubService {
 
     createIfNotExists(repos);
     repos = await this.enrichReposDb(repos);
+    repos = sortRepos(repos);
 
     return repos;
   }

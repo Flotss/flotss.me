@@ -2,6 +2,7 @@ import type React from 'react';
 import ErrorCode from '@/components/ErrorCode';
 import { Container } from '@/components/StyledBox';
 import { useFetchRepo } from '@/hooks/useFetchRepo';
+import { GithubService } from '@/services/GithubService';
 import { License, Repo } from '@/types/types';
 import { LockIcon } from '@chakra-ui/icons';
 import {
@@ -14,6 +15,7 @@ import {
   Tooltip,
   useToast,
 } from '@chakra-ui/react';
+import type { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -62,10 +64,18 @@ const LANGUAGE_COLORS: Record<string, string> = {
  *
  * @returns {JSX.Element} - The rendered `Project` component.
  */
-export default function Project() {
+interface ProjectPageProps {
+  repo?: Repo | null;
+  error?: { error: string; code: string } | null;
+}
+
+export default function Project({ repo: initialRepo, error: initialError }: ProjectPageProps) {
   const router = useRouter();
   const { name } = router.query as { name: string };
-  const { repo, loading, error } = useFetchRepo({ name });
+  const { repo, loading, error } = useFetchRepo({
+    initialRepos: initialRepo,
+    name: name || initialRepo?.name || '',
+  });
   const toast = useToast();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
@@ -85,12 +95,14 @@ export default function Project() {
     });
   };
 
-  if (error && !repo) {
-    return <ErrorCode code={error.code} message={error.error} />;
+  const activeError = initialError || error;
+
+  if (activeError && !repo) {
+    return <ErrorCode code={activeError.code} message={activeError.error} />;
   }
 
   // If the repository data is not available yet, display a skeleton
-  if (!repo || loading) {
+  if (!repo || loading || router.isFallback) {
     return (
       <>
         <Head>
@@ -480,4 +492,64 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
       </div>
     </div>
   );
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  try {
+    const githubService = new GithubService();
+    const repos = await githubService.getRepos();
+    const paths = (repos || []).map((r) => ({
+      params: { name: r.name },
+    }));
+    return {
+      paths,
+      fallback: 'blocking',
+    };
+  } catch (err) {
+    console.error('Error in getStaticPaths for projects:', err);
+    return {
+      paths: [],
+      fallback: 'blocking',
+    };
+  }
+};
+
+export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({ params }) => {
+  const name = params?.name as string;
+  if (!name) {
+    return { notFound: true };
+  }
+
+  try {
+    const githubService = new GithubService();
+    const repo = await githubService.getRepo(name);
+    if (!repo) {
+      return { notFound: true, revalidate: 60 };
+    }
+
+    try {
+      const commits = await githubService.getAllCommits(name);
+      repo.commits = commits;
+    } catch {
+      repo.commits = [];
+    }
+
+    return {
+      props: {
+        repo: JSON.parse(JSON.stringify(repo)),
+      },
+      revalidate: 3600, // Revalidate every 1 hour via ISR
+    };
+  } catch (err: any) {
+    console.error(`Error in getStaticProps for ${name}:`, err);
+    return {
+      props: {
+        error: {
+          error: err.message || 'Failed to load repository',
+          code: '500',
+        },
+      },
+      revalidate: 60,
+    };
+  }
 };

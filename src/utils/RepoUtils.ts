@@ -1,10 +1,9 @@
 import { owner } from '@/services/GithubService';
-import { Repo, ReposLocalStorage } from '@/types/types';
+import { Repo } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
 import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
 import { ReposMock, USE_MOCK_DATA, UserMock } from './GithubMock.constants';
-import { getLocalStorage, saveDataToLocalStorage } from './LocalStorage';
 
 // Définissez vos priorités de tri ici
 const priorityOrder: any[] = [
@@ -17,10 +16,14 @@ const priorityOrder: any[] = [
 ];
 
 export const sortRepos = (repos: Repo[]): Repo[] => {
-  return repos.sort((a, b) => {
+  return [...repos].sort((a, b) => {
     for (const priority of priorityOrder) {
-      const aMatches = Object.keys(priority).every((key) => (a as any)[key] === priority[key]);
-      const bMatches = Object.keys(priority).every((key) => (b as any)[key] === priority[key]);
+      const aMatches = Object.keys(priority).every(
+        (key) => Boolean((a as any)[key]) === Boolean(priority[key]),
+      );
+      const bMatches = Object.keys(priority).every(
+        (key) => Boolean((b as any)[key]) === Boolean(priority[key]),
+      );
 
       if (aMatches && !bMatches) {
         return -1; // a comes before b
@@ -30,7 +33,7 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
     }
 
     // If everything else is equal, sort alphabetically
-    return a.name.localeCompare(b.name);
+    return (a.name || '').localeCompare(b.name || '');
   });
 };
 
@@ -115,7 +118,7 @@ export const loadGithubInformation = async ({
   setLoading(true);
   if (setRepos) {
     const fetchRepos = async () => {
-      const response = await fetch('api/get/repos');
+      const response = await fetch('/api/get/repos');
       const data = await response.json();
 
       if (response.status === 400) {
@@ -142,7 +145,6 @@ export const loadGithubInformation = async ({
       const repositoryArray = sortRepos(data);
 
       setRepos(repositoryArray);
-      saveDataToLocalStorage('repos', 'repos', repositoryArray);
       setLoading(false);
     };
 
@@ -153,21 +155,7 @@ export const loadGithubInformation = async ({
       return;
     }
 
-    // Check if cached data is available and not expired
-    const cachedRepos = getLocalStorage<ReposLocalStorage>('repos');
-    if (cachedRepos) {
-      const { lastRequestDate, repos } = cachedRepos;
-
-      if (new Date().getTime() - lastRequestDate > 3600000) {
-        await fetchRepos();
-        return;
-      } else {
-        setRepos(sortRepos(repos));
-        setLoading(false);
-      }
-    } else {
-      await fetchRepos();
-    }
+    await fetchRepos();
   }
 
   if (setUser) {
@@ -178,19 +166,12 @@ export const loadGithubInformation = async ({
       return;
     }
 
-    const storedUser = getLocalStorage<any>('user');
-    if (storedUser) {
-      setUser(storedUser);
-      setLoading(false);
-    } else {
-      fetch(`/api/get/user?name=${userOwner ?? owner}`)
-        .then((response) => response.json())
-        .then((user) => {
-          setUser(user);
-          saveDataToLocalStorage('user', 'user', user);
-          setLoading(false);
-        });
-    }
+    fetch(`/api/get/user?name=${userOwner ?? owner}`)
+      .then((response) => response.json())
+      .then((user) => {
+        setUser(user);
+        setLoading(false);
+      });
   }
   callback && callback();
 };
