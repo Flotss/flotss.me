@@ -14,6 +14,8 @@ describe('ValidationUtils', () => {
       expect(isValidRepoName('../evil')).toBe(false);
       expect(isValidRepoName('repo/../sub')).toBe(false);
       expect(isValidRepoName('..')).toBe(false);
+      expect(isValidRepoName('.repo')).toBe(false);
+      expect(isValidRepoName('repo.')).toBe(false);
       expect(isValidRepoName('../../etc/passwd')).toBe(false);
       expect(isValidRepoName('repo/with/slash')).toBe(false);
       expect(isValidRepoName('repo\\backslash')).toBe(false);
@@ -32,6 +34,8 @@ describe('ValidationUtils', () => {
     it('should return false for invalid types, empty or oversized names', () => {
       expect(isValidRepoName('')).toBe(false);
       expect(isValidRepoName('   ')).toBe(false);
+      expect(isValidRepoName(' repo')).toBe(false);
+      expect(isValidRepoName('repo ')).toBe(false);
       expect(isValidRepoName(null)).toBe(false);
       expect(isValidRepoName(undefined)).toBe(false);
       expect(isValidRepoName(123)).toBe(false);
@@ -54,6 +58,8 @@ describe('ValidationUtils', () => {
       expect(isValidUserName('user:colon')).toBe(false);
       expect(isValidUserName('user%20name')).toBe(false);
       expect(isValidUserName('')).toBe(false);
+      expect(isValidUserName(' user')).toBe(false);
+      expect(isValidUserName('user ')).toBe(false);
       expect(isValidUserName(null)).toBe(false);
       expect(isValidUserName(undefined)).toBe(false);
       expect(isValidUserName('-invalid-start')).toBe(false);

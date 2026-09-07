@@ -16,7 +16,6 @@ const eslintConfig = [
   {
     files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
-      'no-undef': 'off',
       'react/no-unescaped-entities': 'off',
       '@next/next/no-page-custom-font': 'off',
       'no-unused-vars': 'off',
@@ -31,6 +30,12 @@ const eslintConfig = [
           endOfLine: 'auto',
         },
       ],
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx}'],
+    rules: {
+      'no-undef': 'off',
     },
   },
 

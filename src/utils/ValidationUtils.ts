@@ -18,9 +18,12 @@ export const GITHUB_USER_REGEX = /^[a-zA-Z0-9](?:[a-zA-Z0-9]|-(?=[a-zA-Z0-9])){0
 export function isValidRepoName(repoName: unknown): repoName is string {
   if (typeof repoName !== 'string') return false;
   const trimmed = repoName.trim();
+  if (trimmed !== repoName) return false;
   if (trimmed.length === 0 || trimmed.length > 100) return false;
   if (!GITHUB_REPO_REGEX.test(trimmed)) return false;
   if (
+    trimmed.startsWith('.') ||
+    trimmed.endsWith('.') ||
     trimmed.includes('..') ||
     trimmed.includes('/') ||
     trimmed.includes('\\') ||
@@ -36,6 +39,7 @@ export function isValidRepoName(repoName: unknown): repoName is string {
 export function isValidUserName(userName: unknown): userName is string {
   if (typeof userName !== 'string') return false;
   const trimmed = userName.trim();
+  if (trimmed !== userName) return false;
   if (trimmed.length === 0 || trimmed.length > 39) return false;
   if (!GITHUB_USER_REGEX.test(trimmed)) return false;
   if (
