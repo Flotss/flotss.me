@@ -59,15 +59,45 @@ export class GithubService {
       `The number of repositories fetched does not match the total count {${total_count} | ${reposResponse.items.length}} ${reposResponse.toString()}`,
     );
 
-    // Use Promise.all to wait for all promises to resolve
+    // Map to sanitized Repo objects with only relevant fields
     const pinnedRepos = await this.getPinnedRepos();
-    await Promise.all(
-      reposResponse.items.map(async (rep: any) => {
-        repos.push({ ...rep, pinned: pinnedRepos.includes(rep.name) } as Repo);
-      }),
+    const pinnedSet = new Set(pinnedRepos);
+
+    repos = reposResponse.items.map(
+      (rep: any) =>
+        ({
+          id: rep.id,
+          name: rep.name,
+          description: rep.description ?? '',
+          url: rep.html_url || rep.url || '',
+          html_url: rep.html_url || rep.url || '',
+          created_at: rep.created_at ?? '',
+          updated_at: rep.updated_at ?? '',
+          stargazers_count: rep.stargazers_count ?? 0,
+          archived: Boolean(rep.archived),
+          language: rep.language ?? '',
+          homepage: rep.homepage ?? '',
+          git_url: rep.git_url ?? '',
+          ssh_url: rep.ssh_url ?? '',
+          clone_url: rep.clone_url ?? '',
+          svn_url: rep.svn_url ?? '',
+          fork: Boolean(rep.fork),
+          open_issues_count: rep.open_issues_count ?? 0,
+          license: rep.license?.name || rep.license || '',
+          subscribers_count: rep.subscribers_count ?? 0,
+          forks_count: rep.forks_count ?? 0,
+          watchers_count: rep.watchers_count ?? rep.stargazers_count ?? 0,
+          private: Boolean(rep.private),
+          pinned: pinnedSet.has(rep.name),
+          collaborators: [],
+          languages: [],
+          pullRequests: [],
+          commits: [],
+          readme: '',
+        }) as Repo,
     );
 
-    createIfNotExists(repos);
+    await createIfNotExists(repos);
     repos = await this.enrichReposDb(repos);
     repos = sortRepos(repos);
 
@@ -75,37 +105,45 @@ export class GithubService {
   }
 
   private async enrichReposDb(repos: Repo[]): Promise<Repo[]> {
-    // GET ALL REPOS IN DB
-    const reposDB = await this.prisma.repoDB.findMany();
-    const mapRepoDb = new Map(reposDB.map((r) => [r.repoId, r]));
+    try {
+      // GET ALL REPOS IN DB
+      const reposDB = await this.prisma.repoDB.findMany();
+      const mapRepoDb = new Map(reposDB.map((r) => [r.repoId, r]));
 
-    // Filter visible repos
-    repos = repos.filter((repo) => reposDB.find((r) => r.repoId === repo.id)?.visible ?? true);
+      // Filter visible repos
+      repos = repos.filter((repo) => mapRepoDb.get(repo.id)?.visible ?? true);
 
-    // Set descriptions
-    repos.forEach(async (repo) => {
-      const repoDb = mapRepoDb.get(repo.id);
-      const description = repoDb?.description;
+      // Set descriptions
+      repos.forEach((repo) => {
+        const repoDb = mapRepoDb.get(repo.id);
+        const description = repoDb?.description;
 
-      if (repoDb) {
-        repo.description = description ?? repo.description;
-      }
-    });
+        if (repoDb && description) {
+          repo.description = description;
+        }
+      });
+    } catch (dbError) {
+      console.warn('Could not enrich repos from DB:', dbError);
+    }
 
     return repos;
   }
 
   private async enrichRepoDb(repo: Repo): Promise<Repo> {
-    // GET REPO IN DB
-    const repoDb = await this.prisma.repoDB.findFirst({
-      where: {
-        repoId: repo.id,
-      },
-    });
+    try {
+      // GET REPO IN DB
+      const repoDb = await this.prisma.repoDB.findFirst({
+        where: {
+          repoId: repo.id,
+        },
+      });
 
-    // Set descriptions
-    if (repoDb) {
-      repo.description = repoDb.description ?? repo.description;
+      // Set descriptions
+      if (repoDb && repoDb.description) {
+        repo.description = repoDb.description;
+      }
+    } catch (dbError) {
+      console.warn('Could not enrich repo from DB:', dbError);
     }
 
     return repo;
@@ -222,7 +260,36 @@ export class GithubService {
       throw new RateLimitError('API rate limit exceeded');
     }
 
-    return reponseJson as Repo;
+    return {
+      id: reponseJson.id,
+      name: reponseJson.name,
+      description: reponseJson.description ?? '',
+      url: reponseJson.html_url || reponseJson.url || '',
+      html_url: reponseJson.html_url || reponseJson.url || '',
+      created_at: reponseJson.created_at,
+      updated_at: reponseJson.updated_at,
+      stargazers_count: reponseJson.stargazers_count ?? 0,
+      archived: Boolean(reponseJson.archived),
+      language: reponseJson.language ?? '',
+      homepage: reponseJson.homepage ?? '',
+      git_url: reponseJson.git_url ?? '',
+      ssh_url: reponseJson.ssh_url ?? '',
+      clone_url: reponseJson.clone_url ?? '',
+      svn_url: reponseJson.svn_url ?? '',
+      fork: Boolean(reponseJson.fork),
+      open_issues_count: reponseJson.open_issues_count ?? 0,
+      license: reponseJson.license,
+      subscribers_count: reponseJson.subscribers_count ?? 0,
+      forks_count: reponseJson.forks_count ?? 0,
+      watchers_count: reponseJson.watchers_count ?? reponseJson.stargazers_count ?? 0,
+      private: Boolean(reponseJson.private),
+      pinned: false,
+      collaborators: [],
+      languages: [],
+      pullRequests: [],
+      commits: [],
+      readme: '',
+    } as Repo;
   }
 
   public async getCollaborators(repoName: string): Promise<Collaborator[]> {
@@ -302,7 +369,25 @@ export class GithubService {
 
     if (pullrequestsResponse.ok) {
       const pullrequestsJson: unknown = await pullrequestsResponse.json();
-      return pullrequestsJson as PullRequest[];
+      if (!Array.isArray(pullrequestsJson)) return [];
+      return pullrequestsJson.map((pr: any) => ({
+        id: pr.id,
+        node_id: pr.node_id || '',
+        number: pr.number,
+        title: pr.title || '',
+        url: pr.url || '',
+        html_url: pr.html_url || '',
+        diff_url: pr.diff_url || '',
+        patch_url: pr.patch_url || '',
+        issue_url: pr.issue_url || '',
+        body: pr.body ? pr.body.slice(0, 500) : '',
+        user: {
+          login: pr.user?.login || '',
+          avatar_url: pr.user?.avatar_url || '',
+          url: pr.user?.url || '',
+          html_url: pr.user?.html_url || '',
+        },
+      })) as PullRequest[];
     } else {
       return [];
     }
@@ -384,6 +469,18 @@ export class GithubService {
     const url = new URL(`https://api.github.com/users/${safeUser}`);
     const response = await fetch(url.toString(), { headers });
     const user = await response.json();
-    return user;
+    if (!user || user.message) {
+      return null;
+    }
+    return {
+      login: user.login,
+      avatar_url: user.avatar_url,
+      html_url: user.html_url,
+      name: user.name,
+      bio: user.bio,
+      public_repos: user.public_repos,
+      followers: user.followers,
+      following: user.following,
+    };
   }
 }

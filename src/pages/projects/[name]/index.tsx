@@ -27,6 +27,7 @@ import {
   FaClock,
   FaCodeBranch,
   FaCopy,
+  FaCrown,
   FaExternalLinkAlt,
   FaEye,
   FaGithub,
@@ -251,37 +252,49 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
                 Collaborators
               </h3>
               <div className="flex flex-wrap items-center gap-3">
-                {repo.collaborators.map((collaborator) => (
-                  <Tooltip
-                    key={collaborator.login}
-                    hasArrow
-                    label={collaborator.login}
-                    bg="gray.900"
-                    color="white"
-                    border="1px solid"
-                    borderColor="whiteAlpha.200"
-                    rounded="lg"
-                    placement="top"
-                  >
-                    <Link
-                      className="group relative flex items-center gap-2"
-                      href={collaborator.html_url}
-                      isExternal
+                {repo.collaborators.map((collaborator) => {
+                  const isOwner = collaborator.login === 'Flotss';
+                  return (
+                    <Tooltip
+                      key={collaborator.login}
+                      hasArrow
+                      label={isOwner ? `${collaborator.login} (Owner)` : collaborator.login}
+                      bg="gray.900"
+                      color="white"
+                      border="1px solid"
+                      borderColor="whiteAlpha.200"
+                      rounded="lg"
+                      placement="top"
                     >
-                      <Avatar
-                        name={collaborator.login}
-                        src={collaborator.avatar_url}
-                        size="sm"
-                        className="transition-transform duration-200 group-hover:scale-110"
-                      />
-                      {collaborator.login === 'Flotss' && (
-                        <span className="rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                          Owner
-                        </span>
-                      )}
-                    </Link>
-                  </Tooltip>
-                ))}
+                      <Link
+                        className="group relative inline-block transition-transform duration-200 hover:-translate-y-0.5"
+                        href={collaborator.html_url}
+                        isExternal
+                      >
+                        <div className="relative">
+                          <Avatar
+                            name={collaborator.login}
+                            src={collaborator.avatar_url}
+                            size="sm"
+                            className={`transition-all duration-200 group-hover:scale-105 ${
+                              isOwner
+                                ? 'ring-2 ring-emerald-500/80 ring-offset-2 ring-offset-zinc-950'
+                                : 'border border-white/10 group-hover:border-white/30'
+                            }`}
+                          />
+                          {isOwner && (
+                            <span
+                              className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 shadow-md shadow-emerald-500/30"
+                              title="Repository Owner"
+                            >
+                              <FaCrown className="h-2 w-2 text-zinc-950" />
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    </Tooltip>
+                  );
+                })}
               </div>
             </div>
           </Container>
@@ -533,6 +546,9 @@ export const getStaticProps: GetStaticProps<ProjectPageProps> = async ({ params 
     } catch {
       repo.commits = [];
     }
+
+    // projects/[name] does not display pull requests; keep it empty to stay under 128 kB
+    repo.pullRequests = [];
 
     return {
       props: {
