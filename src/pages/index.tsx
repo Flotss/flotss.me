@@ -110,8 +110,8 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                Software engineering student at ISEP Paris, currently working as a software engineer
-                at Société Générale. Passionate about building modern web applications.
+                Software Engineer passionate about crafting robust software, clean architectures,
+                and modern web applications.
               </motion.p>
             </div>
           </div>
