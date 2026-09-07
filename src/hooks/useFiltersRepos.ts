@@ -1,7 +1,7 @@
 import { Repo } from '@/types/types';
 import { getMapCountOfLang } from '@/utils/RepoUtils';
 import assert from 'assert';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export interface Property<T> {
   value: T;
@@ -19,50 +19,51 @@ interface FilterOptions {
 const useFiltersRepos = (repos: Repo[], options: FilterOptions) => {
   assert(options.properties != null, 'Provide properties parameters');
 
+  const { properties, selectedLanguage, search, setLanguageCountMap } = options;
   const [filteredRepos, setFilteredRepos] = useState<Repo[]>([]);
   const [countFilter, setCountFilter] = useState(0);
   const [repoCount, setRepoCount] = useState(0);
 
-  const propertiesChange = options.properties.map((property) => property.value).join('');
+  const propertiesChange = properties.map((property) => property.value).join('');
 
   useEffect(() => {
     const updateNumberOfFilters = () => {
       let count = 0;
-      options.properties.forEach((property) => {
+      properties.forEach((property) => {
         if (property.value == true) count++;
       });
 
-      if (options.selectedLanguage !== 'All') count++;
-      if (options.search.length) count++;
+      if (selectedLanguage !== 'All') count++;
+      if (search.length) count++;
       setCountFilter(count);
     };
     let filtered = [...repos];
 
-    if (options.search.length) {
+    if (search.length) {
       filtered = filtered.filter((repo) => {
         let name = repo.name.toLowerCase();
         let desc = repo.description?.toLowerCase();
-        let filterSearch = options.search.toLowerCase();
+        let filterSearch = search.toLowerCase();
         return name.includes(filterSearch) || desc?.includes(filterSearch);
       });
     }
 
-    options.properties.forEach((property) => {
+    properties.forEach((property) => {
       if (property.value) {
         filtered = filtered.filter((repo) => (repo as any)[property.propertyName]);
       }
     });
 
-    options.setLanguageCountMap(getMapCountOfLang(filtered));
+    setLanguageCountMap(getMapCountOfLang(filtered));
 
-    if (options.selectedLanguage !== 'All') {
-      filtered = filtered.filter((repo) => repo.language === options.selectedLanguage);
+    if (selectedLanguage !== 'All') {
+      filtered = filtered.filter((repo) => repo.language === selectedLanguage);
     }
 
     setFilteredRepos(filtered);
     updateNumberOfFilters();
     setRepoCount(filtered.length);
-  }, [repos, options.selectedLanguage, options.search, propertiesChange]);
+  }, [repos, selectedLanguage, search, propertiesChange, properties, setLanguageCountMap]);
 
   return { filteredRepos, countFilter, repoCount };
 };

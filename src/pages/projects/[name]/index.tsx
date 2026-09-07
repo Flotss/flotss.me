@@ -1,3 +1,4 @@
+import type React from 'react';
 import ErrorCode from '@/components/ErrorCode';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';

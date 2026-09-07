@@ -71,11 +71,7 @@ function ProjectCardComponent(props: ProjectCardProps) {
             <div className="flex items-center gap-1">
               {stargazers_count > 2 && (
                 <Box className="flex items-center gap-1">
-                  <Text
-                    className="tracking-wide text-zinc-400"
-                    fontSize="lg"
-                    fontWeight="semibold"
-                  >
+                  <Text className="tracking-wide text-zinc-400" fontSize="lg" fontWeight="semibold">
                     {stargazers_count}
                   </Text>
                   <StarIcon className="h-3.5 w-3.5 text-yellow-500/70" />

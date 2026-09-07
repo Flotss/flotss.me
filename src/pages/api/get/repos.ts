@@ -1,5 +1,6 @@
 import { GithubService } from '@/services/GithubService';
 import { Repo } from '@/types/types';
+import { isValidRepoName } from '@/utils/ValidationUtils';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -18,7 +19,11 @@ export default async function handler(
   try {
     // Si le nom du dépôt est fourni, récupérer le dépôt spécifique
     if (name !== undefined) {
-      const repo = await githubService.getRepo(name as string);
+      if (!isValidRepoName(name)) {
+        res.status(400).json({ message: 'Invalid repository name' });
+        return;
+      }
+      const repo = await githubService.getRepo(name);
       if (repo) {
         if (repo.private) {
           res.status(403).json({ message: 'Repository is private' });

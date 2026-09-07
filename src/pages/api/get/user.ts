@@ -1,4 +1,5 @@
 import { GithubService } from '@/services/GithubService';
+import { isValidUserName } from '@/utils/ValidationUtils';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(
@@ -17,7 +18,11 @@ export default async function handler(
   try {
     // Si le nom du dépôt est fourni, récupérer le dépôt spécifique
     if (name !== undefined) {
-      const user = await githubService.getUser(name as string);
+      if (!isValidUserName(name)) {
+        res.status(400).json({ message: 'Invalid username' });
+        return;
+      }
+      const user = await githubService.getUser(name);
       return res.status(200).json(user);
     }
   } catch (e: any) {

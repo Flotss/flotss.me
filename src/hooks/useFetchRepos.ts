@@ -17,7 +17,7 @@ export function useFetchRepos(initialRepos: Repo[] = []) {
       });
     };
     fetchData();
-  }, []);
+  }, [toast]);
 
   return { repos, loading };
 }
