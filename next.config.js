@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  turbopack: {
+    root: __dirname,
+  },
   reactStrictMode: true,
   pageExtensions: ['tsx', 'ts'],
   images: {
@@ -11,9 +14,6 @@ const nextConfig = {
         pathname: '**',
       },
     ],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 };
 
