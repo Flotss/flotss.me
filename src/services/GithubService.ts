@@ -1,6 +1,6 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
 import { createIfNotExists, sortRepos } from '@/utils/RepoUtils';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import assert from 'assert';
 import { isValidRepoName, isValidUserName } from '@/utils/ValidationUtils';
 import { GithubError, RateLimitError, RepoNotFoundError } from './exception/GithubErrors';
@@ -11,7 +11,7 @@ const headers: any = {
 export const owner: string = 'Flotss';
 
 export class GithubService {
-  private prisma: PrismaClient = new PrismaClient();
+  private prisma = prisma;
 
   /**
    * Asynchronous function to retrieve repositories.
@@ -97,6 +97,9 @@ export class GithubService {
         }) as Repo,
     );
 
+    // Filter out private repositories completely
+    repos = repos.filter((rep) => !rep.private);
+
     await createIfNotExists(repos);
     repos = await this.enrichReposDb(repos);
     repos = sortRepos(repos);
@@ -110,16 +113,19 @@ export class GithubService {
       const reposDB = await this.prisma.repoDB.findMany();
       const mapRepoDb = new Map(reposDB.map((r) => [r.repoId, r]));
 
-      // Filter visible repos
-      repos = repos.filter((repo) => mapRepoDb.get(repo.id)?.visible ?? true);
+      // Filter visible repos and exclude private repos
+      repos = repos.filter((repo) => !repo.private && (mapRepoDb.get(repo.id)?.visible ?? true));
 
-      // Set descriptions
+      // Set descriptions and custom display order
       repos.forEach((repo) => {
         const repoDb = mapRepoDb.get(repo.id);
-        const description = repoDb?.description;
-
-        if (repoDb && description) {
-          repo.description = description;
+        if (repoDb) {
+          if (repoDb.description) {
+            repo.description = repoDb.description;
+          }
+          if (repoDb.order !== undefined && repoDb.order > 0) {
+            repo.order = repoDb.order;
+          }
         }
       });
     } catch (dbError) {
@@ -138,9 +144,14 @@ export class GithubService {
         },
       });
 
-      // Set descriptions
-      if (repoDb && repoDb.description) {
-        repo.description = repoDb.description;
+      // Set descriptions and order
+      if (repoDb) {
+        if (repoDb.description) {
+          repo.description = repoDb.description;
+        }
+        if (repoDb.order !== undefined && repoDb.order > 0) {
+          repo.order = repoDb.order;
+        }
       }
     } catch (dbError) {
       console.warn('Could not enrich repo from DB:', dbError);
@@ -223,6 +234,9 @@ export class GithubService {
 
     try {
       repo = await this.getRepoData(repoName);
+      if (repo.private) {
+        return null;
+      }
     } catch (error) {
       return null;
     }

@@ -24,12 +24,7 @@ export default async function handler(
         return;
       }
       const repo = await githubService.getRepo(name);
-      if (repo) {
-        if (repo.private) {
-          res.status(403).json({ message: 'Repository is private' });
-          return;
-        }
-
+      if (repo && !repo.private) {
         res.status(200).json(repo);
       } else {
         res.status(404).json({ message: 'Repo not found' });
@@ -38,7 +33,8 @@ export default async function handler(
     }
 
     // Récupérer la liste des dépôts
-    const repos: Repo[] = await githubService.getRepos();
+    let repos: Repo[] = await githubService.getRepos();
+    repos = repos.filter((r) => !r.private);
 
     // Si aucun dépôt n'est trouvé
     if (repos.length === 0) {
