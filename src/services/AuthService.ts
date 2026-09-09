@@ -1,64 +1,46 @@
+import { prisma } from '@/lib/prisma';
 import { setUserJWT } from '@/utils/Security';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import {
-  EmailAlreadyExistsError,
-  InvalidCredentialsError,
-  UserNotFoundError,
-} from './exception/AuthErrors';
+import { InvalidCredentialsError } from './exception/AuthErrors';
+
+export async function ensureDefaultRoles(): Promise<void> {
+  try {
+    await prisma.role.upsert({
+      where: { id: 1 },
+      update: {},
+      create: { id: 1, name: 'ADMIN' },
+    });
+    await prisma.role.upsert({
+      where: { id: 2 },
+      update: {},
+      create: { id: 2, name: 'USER' },
+    });
+  } catch (error) {
+    console.warn('Could not ensure default roles:', error);
+  }
+}
 
 export async function login(email: string, password: string): Promise<string> {
-  const prisma = new PrismaClient();
+  if (!email || !password) {
+    throw new InvalidCredentialsError('Email and password are required.');
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+
   const user = await prisma.user.findFirst({
     where: {
-      email,
+      email: normalizedEmail,
+    },
+    include: {
+      role: true,
     },
   });
-  prisma.$disconnect();
 
-  // If no user is found or the password is incorrect, throw an error
+  // If no user is found or the password does not match
   if (!user || !(await bcrypt.compare(password, user.password))) {
     throw new InvalidCredentialsError('Invalid credentials provided.');
   }
 
-  // Otherwise, set the user JWT and return the token
+  // Generate and return JWT token
   return setUserJWT(user);
-}
-
-export async function register(email: string, password: string): Promise<string> {
-  const prisma = new PrismaClient();
-  try {
-    const user = await prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
-
-    // If the user is found
-    if (user) {
-      throw new EmailAlreadyExistsError('Email already exists.');
-    }
-
-    const saltRounds = 10;
-    const salt = await bcrypt.genSalt(saltRounds);
-    const hash = await bcrypt.hash(password, salt);
-
-    const userCreate = await prisma.user.create({
-      data: {
-        email,
-        password: hash,
-        roleId: 2,
-      },
-    });
-
-    // If the user is not created, return an error
-    if (!userCreate) {
-      throw new UserNotFoundError('Error while creating user.');
-    }
-
-    // Otherwise, set the user JWT and return the token
-    return setUserJWT(userCreate);
-  } finally {
-    await prisma.$disconnect();
-  }
 }

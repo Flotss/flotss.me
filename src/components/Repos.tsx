@@ -47,15 +47,13 @@ const Repos = React.memo((props: ReposProps) => {
 
   const [search, setSearch] = useState('');
   const [isArchived, setIsArchived] = useState(false);
-  const [isPrivate, setIsPrivate] = useState(false);
   const [isFork, setIsFork] = useState(false);
   const properties: Property<boolean>[] = useMemo(
     () => [
       { value: isArchived, setValue: setIsArchived, propertyName: 'archived' },
-      { value: isPrivate, setValue: setIsPrivate, propertyName: 'private' },
       { value: isFork, setValue: setIsFork, propertyName: 'fork' },
     ],
-    [isArchived, isPrivate, isFork],
+    [isArchived, isFork],
   );
 
   const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
@@ -123,8 +121,6 @@ const Repos = React.memo((props: ReposProps) => {
                   setSearch={setSearch}
                   isArchived={isArchived}
                   setIsArchived={setIsArchived}
-                  isPrivate={isPrivate}
-                  setIsPrivate={setIsPrivate}
                   isFork={isFork}
                   setIsFork={setIsFork}
                   selectedLanguage={selectedLanguage}
@@ -145,8 +141,6 @@ const Repos = React.memo((props: ReposProps) => {
             setSearch={setSearch}
             isArchived={isArchived}
             setIsArchived={setIsArchived}
-            isPrivate={isPrivate}
-            setIsPrivate={setIsPrivate}
             isFork={isFork}
             setIsFork={setIsFork}
             selectedLanguage={selectedLanguage}
@@ -204,8 +198,6 @@ type FilterProps = {
   setSearch: (value: string) => void;
   isArchived: boolean;
   setIsArchived: (value: boolean) => void;
-  isPrivate: boolean;
-  setIsPrivate: (value: boolean) => void;
   isFork: boolean;
   setIsFork: (value: boolean) => void;
   selectedLanguage: string;
@@ -223,8 +215,6 @@ const Filters = (props: FilterProps) => {
     setSearch,
     isArchived,
     setIsArchived,
-    isPrivate,
-    setIsPrivate,
     isFork,
     setIsFork,
     selectedLanguage,
@@ -282,16 +272,6 @@ const Filters = (props: FilterProps) => {
                 Archived
               </Checkbox>
               <Checkbox
-                value="Private"
-                isChecked={isPrivate}
-                colorScheme="transparent"
-                onChange={(e) => {
-                  setIsPrivate(e.target.checked);
-                }}
-              >
-                Private
-              </Checkbox>
-              <Checkbox
                 value="Fork"
                 isChecked={isFork}
                 colorScheme="transparent"
@@ -325,11 +305,14 @@ const Filters = (props: FilterProps) => {
               }}
             >
               <Radio value={'All'}>All</Radio>
-              {Array.from(languages).map((lang, index) => (
-                <Radio key={index} value={lang} disabled={!languageCountMap.has(lang)}>
-                  {lang} {languageCountMap.has(lang) && <span>({languageCountMap.get(lang)})</span>}
-                </Radio>
-              ))}
+              {Array.from(languages)
+                .filter((lang) => Boolean(lang && lang.trim().length > 0))
+                .map((lang, index) => (
+                  <Radio key={index} value={lang} disabled={!languageCountMap.has(lang)}>
+                    {lang}{' '}
+                    {languageCountMap.has(lang) && <span>({languageCountMap.get(lang)})</span>}
+                  </Radio>
+                ))}
             </RadioGroup>
           </AccordionPanel>
         </AccordionItem>

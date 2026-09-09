@@ -31,6 +31,7 @@ export type Repo = {
   languages: Language[];
   collaborators: Collaborator[];
   pullRequests: PullRequest[];
+  order?: number;
 };
 
 /**

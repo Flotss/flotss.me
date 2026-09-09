@@ -243,7 +243,7 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
       props: {
         repos: JSON.parse(JSON.stringify(sortRepos(repos || []))),
       },
-      revalidate: 3600,
+      revalidate: 60,
     };
   } catch (err) {
     console.error('Error in Home getStaticProps:', err);

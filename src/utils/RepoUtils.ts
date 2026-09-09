@@ -1,7 +1,7 @@
 import { owner } from '@/services/GithubService';
+import { prisma } from '@/lib/prisma';
 import { Repo } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
-import { PrismaClient } from '@prisma/client';
 import { Dispatch } from 'react';
 import { ReposMock, USE_MOCK_DATA, UserMock } from './GithubMock.constants';
 
@@ -17,6 +17,14 @@ const priorityOrder: any[] = [
 
 export const sortRepos = (repos: Repo[]): Repo[] => {
   return [...repos].sort((a, b) => {
+    // Custom display order (order > 0 has highest priority, ordered ascending: 1, 2, 3...)
+    const orderA = a.order && a.order > 0 ? a.order : Infinity;
+    const orderB = b.order && b.order > 0 ? b.order : Infinity;
+
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+
     for (const priority of priorityOrder) {
       const aMatches = Object.keys(priority).every(
         (key) => Boolean((a as any)[key]) === Boolean(priority[key]),
@@ -37,23 +45,28 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
   });
 };
 
-export const saveRepoDescription = (repos: Repo[]): void => {
-  const prisma = new PrismaClient();
-
-  // Create a new repo description record if exist save the new description
-  repos.forEach(async (repo) => {
-    await prisma.repoDB.upsert({
-      update: { description: repo.description, name: repo.name, url: repo.url },
-      create: { repoId: repo.id, description: repo.description, name: repo.name, url: repo.url },
-      where: { repoId: repo.id },
-    });
-  });
-  prisma.$disconnect();
+export const saveRepoDescription = async (repos: Repo[]): Promise<void> => {
+  try {
+    await Promise.all(
+      repos.map(async (repo) => {
+        await prisma.repoDB.upsert({
+          update: { description: repo.description, name: repo.name, url: repo.url },
+          create: {
+            repoId: repo.id,
+            description: repo.description,
+            name: repo.name,
+            url: repo.url,
+          },
+          where: { repoId: repo.id },
+        });
+      }),
+    );
+  } catch (err) {
+    console.warn('Could not save repo descriptions:', err);
+  }
 };
 
 export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
-  const prisma = new PrismaClient();
-
   try {
     // Create a new repo record if not exists
     await Promise.all(
@@ -80,34 +93,29 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
     );
   } catch (err) {
     console.warn('Could not connect to DB in createIfNotExists:', err);
-  } finally {
-    await prisma.$disconnect();
   }
 };
 
 export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {
-  let languageCountMap = new Map<string, number>();
+  const languageCountMap = new Map<string, number>();
 
   reposParam.forEach((repo) => {
-    if (repo.language) {
-      if (languageCountMap.has(repo.language)) {
-        languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
-      } else {
-        languageCountMap.set(repo.language, 1);
-      }
+    const lang = repo.language?.trim();
+    if (lang) {
+      languageCountMap.set(lang, (languageCountMap.get(lang) || 0) + 1);
     }
   });
 
   return languageCountMap;
 };
 
-export const getLanguageValues = (reposParam: Repo[]) => {
-  return new Set<string>(
-    reposParam
-      .map((repo) => repo.language)
-      .filter((language) => language !== null)
-      .sort(),
-  );
+export const getLanguageValues = (reposParam: Repo[]): Set<string> => {
+  const validLanguages = reposParam
+    .map((repo) => repo.language?.trim())
+    .filter((language): language is string => Boolean(language && language.length > 0))
+    .sort();
+
+  return new Set<string>(validLanguages);
 };
 
 interface loadGithubInformationProps {

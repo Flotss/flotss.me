@@ -39,4 +39,15 @@ describe('GithubService SSRF Prevention', () => {
   it('should throw Error for invalid username in getUser', async () => {
     await expect(service.getUser('invalid/user')).rejects.toThrow('Invalid username');
   });
+
+  it('should return null if repository is private in getRepo', async () => {
+    const getRepoDataSpy = jest.spyOn(service as any, 'getRepoData').mockResolvedValueOnce({
+      id: 1,
+      name: 'secret-repo',
+      private: true,
+    });
+    const result = await service.getRepo('secret-repo');
+    expect(result).toBeNull();
+    getRepoDataSpy.mockRestore();
+  });
 });
