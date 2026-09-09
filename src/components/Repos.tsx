@@ -305,11 +305,14 @@ const Filters = (props: FilterProps) => {
               }}
             >
               <Radio value={'All'}>All</Radio>
-              {Array.from(languages).map((lang, index) => (
-                <Radio key={index} value={lang} disabled={!languageCountMap.has(lang)}>
-                  {lang} {languageCountMap.has(lang) && <span>({languageCountMap.get(lang)})</span>}
-                </Radio>
-              ))}
+              {Array.from(languages)
+                .filter((lang) => Boolean(lang && lang.trim().length > 0))
+                .map((lang, index) => (
+                  <Radio key={index} value={lang} disabled={!languageCountMap.has(lang)}>
+                    {lang}{' '}
+                    {languageCountMap.has(lang) && <span>({languageCountMap.get(lang)})</span>}
+                  </Radio>
+                ))}
             </RadioGroup>
           </AccordionPanel>
         </AccordionItem>

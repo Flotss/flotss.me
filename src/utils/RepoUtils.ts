@@ -97,28 +97,25 @@ export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
 };
 
 export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {
-  let languageCountMap = new Map<string, number>();
+  const languageCountMap = new Map<string, number>();
 
   reposParam.forEach((repo) => {
-    if (repo.language) {
-      if (languageCountMap.has(repo.language)) {
-        languageCountMap.set(repo.language, languageCountMap.get(repo.language)! + 1);
-      } else {
-        languageCountMap.set(repo.language, 1);
-      }
+    const lang = repo.language?.trim();
+    if (lang) {
+      languageCountMap.set(lang, (languageCountMap.get(lang) || 0) + 1);
     }
   });
 
   return languageCountMap;
 };
 
-export const getLanguageValues = (reposParam: Repo[]) => {
-  return new Set<string>(
-    reposParam
-      .map((repo) => repo.language)
-      .filter((language) => language !== null)
-      .sort(),
-  );
+export const getLanguageValues = (reposParam: Repo[]): Set<string> => {
+  const validLanguages = reposParam
+    .map((repo) => repo.language?.trim())
+    .filter((language): language is string => Boolean(language && language.length > 0))
+    .sort();
+
+  return new Set<string>(validLanguages);
 };
 
 interface loadGithubInformationProps {

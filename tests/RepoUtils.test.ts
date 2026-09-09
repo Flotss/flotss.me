@@ -1,5 +1,5 @@
 import { Repo } from '@/types/types';
-import { sortRepos } from '@/utils/RepoUtils';
+import { getLanguageValues, getMapCountOfLang, sortRepos } from '@/utils/RepoUtils';
 import { describe, expect, it } from '@jest/globals';
 
 describe('sortRepos', () => {
@@ -65,5 +65,38 @@ describe('sortRepos', () => {
     const sorted = sortRepos(repos);
 
     expect(sorted.map((r) => r.name)).toEqual(['Alpha', 'Beta', 'Zebra']);
+  });
+});
+
+describe('getLanguageValues and getMapCountOfLang', () => {
+  it('should ignore empty, whitespace, and null language strings in getLanguageValues', () => {
+    const repos = [
+      { name: 'Repo 1', language: 'TypeScript' } as Repo,
+      { name: 'Repo 2', language: '' } as Repo,
+      { name: 'Repo 3', language: '   ' } as Repo,
+      { name: 'Repo 4', language: null as any } as Repo,
+      { name: 'Repo 5', language: 'Python' } as Repo,
+    ];
+
+    const languages = getLanguageValues(repos);
+
+    expect(Array.from(languages)).toEqual(['Python', 'TypeScript']);
+    expect(languages.has('')).toBe(false);
+  });
+
+  it('should only count valid, trimmed languages in getMapCountOfLang', () => {
+    const repos = [
+      { name: 'Repo 1', language: 'TypeScript' } as Repo,
+      { name: 'Repo 2', language: ' TypeScript ' } as Repo,
+      { name: 'Repo 3', language: '' } as Repo,
+      { name: 'Repo 4', language: '   ' } as Repo,
+      { name: 'Repo 5', language: 'Java' } as Repo,
+    ];
+
+    const countMap = getMapCountOfLang(repos);
+
+    expect(countMap.get('TypeScript')).toBe(2);
+    expect(countMap.get('Java')).toBe(1);
+    expect(countMap.has('')).toBe(false);
   });
 });
