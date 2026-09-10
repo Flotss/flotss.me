@@ -1,4 +1,4 @@
-import Head from 'next/head';
+import SEO from '@/components/SEO';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { FaLock, FaSignInAlt } from 'react-icons/fa';
@@ -82,9 +82,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <Head>
-        <title>Login — Back Office</title>
-      </Head>
+      <SEO page="admin" />
       <div className="relative flex min-h-[75vh] w-full items-center justify-center px-4 py-12">
         {/* Ambient glow */}
         <div className="pointer-events-none absolute -top-10 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl filter" />

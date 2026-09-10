@@ -465,17 +465,36 @@ export class GithubService {
 
     const safeRepo = this.sanitizeRepoName(repoName);
     const safeOwner = encodeURIComponent(owner);
-    const url = new URL(
-      `https://raw.githubusercontent.com/${safeOwner}/${safeRepo}/main/README.md`,
-    );
 
-    // Retrieve README.md file
-    const readmeResponse = await fetch(url.toString(), { headers });
-    if (readmeResponse.ok) {
-      return await readmeResponse.text();
-    } else {
+    try {
+      // 1. Fetch README via official GitHub API with raw accept header (auto-resolves default branch)
+      const apiUrl = new URL(`https://api.github.com/repos/${safeOwner}/${safeRepo}/readme`);
+      const apiResponse = await fetch(apiUrl.toString(), {
+        headers: {
+          ...headers,
+          Accept: 'application/vnd.github.raw',
+        },
+      });
+
+      if (apiResponse.ok) {
+        return await apiResponse.text();
+      }
+
+      // 2. Fallback: try raw.githubusercontent.com for main and master if needed
+      for (const branch of ['main', 'master']) {
+        const fallbackUrl = new URL(
+          `https://raw.githubusercontent.com/${safeOwner}/${safeRepo}/${branch}/README.md`,
+        );
+        const fallbackResponse = await fetch(fallbackUrl.toString(), { headers });
+        if (fallbackResponse.ok) {
+          return await fallbackResponse.text();
+        }
+      }
+    } catch {
       return '';
     }
+
+    return '';
   }
 
   public async getUser(name: string): Promise<any> {

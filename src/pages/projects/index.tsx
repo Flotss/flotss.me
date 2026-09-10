@@ -1,4 +1,5 @@
 import Repos from '@/components/Repos';
+import SEO from '@/components/SEO';
 import Title from '@/components/Title';
 import { GithubService } from '@/services/GithubService';
 import { Repo } from '@/types/types';
@@ -20,6 +21,7 @@ export default function Projects({ repos = [] }: ProjectsProps) {
 
   return (
     <>
+      <SEO page="projects" />
       <Title
         title={`My projects${reposCount !== 0 && reposCount ? ` (${reposCount})` : ''}`}
         className="mt-10"

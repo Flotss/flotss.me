@@ -7,6 +7,7 @@ import { Repo } from '@/types/types';
 import { sortRepos } from '@/utils/RepoUtils';
 import { Box, Grid, Image, Tooltip } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import SEO from '@/components/SEO';
 import type { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -99,6 +100,8 @@ export default function Home({ repos = [] }: HomeProps) {
 
   return (
     <>
+      <SEO page="home" />
+
       {/* Hero section */}
       <Grid className="mx-5 grid grid-cols-2 grid-rows-1 space-y-5 pt-8 sm:mx-20 lg:space-x-5 lg:space-y-0">
         <Container className="col-span-2 space-y-4 py-12">

@@ -36,6 +36,47 @@ describe('GithubService SSRF Prevention', () => {
     expect(result).toBe('');
   });
 
+  it('should fetch README using GitHub API with raw accept header', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (url.includes('api.github.com/repos/Flotss/FacebookLike/readme')) {
+        expect(options?.headers?.Accept).toBe('application/vnd.github.raw');
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve('# FacebookLike Content'),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    }) as any;
+
+    const result = await service.getReadme('FacebookLike');
+    expect(result).toBe('# FacebookLike Content');
+    global.fetch = originalFetch;
+  });
+
+  it('should fallback to raw.githubusercontent.com if GitHub API fails', async () => {
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockImplementation((url: string) => {
+      if (url.includes('api.github.com/repos/Flotss/legacy-repo/readme')) {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      if (url.includes('raw.githubusercontent.com/Flotss/legacy-repo/main/README.md')) {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      if (url.includes('raw.githubusercontent.com/Flotss/legacy-repo/master/README.md')) {
+        return Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve('# Legacy Master Content'),
+        });
+      }
+      return Promise.resolve({ ok: false, status: 404 });
+    }) as any;
+
+    const result = await service.getReadme('legacy-repo');
+    expect(result).toBe('# Legacy Master Content');
+    global.fetch = originalFetch;
+  });
+
   it('should throw Error for invalid username in getUser', async () => {
     await expect(service.getUser('invalid/user')).rejects.toThrow('Invalid username');
   });

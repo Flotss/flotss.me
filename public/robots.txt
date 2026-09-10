@@ -1,0 +1,14 @@
+# Robots.txt for flotss.me
+# Allow search engine crawlers on portfolio showcase and contact pages
+# Disallow projects indexing per developer preference
+User-agent: *
+Allow: /$
+Allow: /contact
+Disallow: /projects
+Disallow: /projects/
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /api/*
+
+Sitemap: https://flotss.me/sitemap.xml
