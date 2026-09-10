@@ -4,12 +4,13 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 📊 Synthèse des Priorités
+## 📊 Synthèse des Priorités & Progression
 
 | Priorité | Axe | Impact | Difficulté | Statut |
 | :--- | :--- | :---: | :---: | :---: |
-| 🔴 **P1** | **SEO, Indexabilité & Référencement** | Élevé | Faible | ⏳ Planifié |
-| 🔴 **P1** | **Section Expérience & Timeline Pro** | Très élevé | Modérée | ⏳ Planifié |
+| 🔴 **P1** | **SEO, Indexabilité & Référencement Contrôlé** | Élevé | Faible | ✅ **Terminé (PR #25)** |
+| 🔴 **P1** | **Correction Fetch READMEs (Branches `master`/`main`)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
+| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | 🚀 **Prêt à démarrer** |
 | 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ⏳ Planifié |
 | 🟡 **P2** | **Back-Office Enrichi (Démos, Images, Statut)** | Élevé | Modérée | ⏳ Planifié |
 | 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | ⏳ Planifié |
@@ -19,32 +20,33 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 1. 🔍 SEO, Découvrabilité & Indexation (Priorité 1)
+## 1. 🔍 SEO, Découvrabilité & Indexation (Priorité 1) — ✅ TERMINÉ
 
-> **Objectif** : Maximiser la visibilité sur Google, Bing et les partages de liens sur LinkedIn, Twitter et Discord.
+> **Objectif** : Maximiser la visibilité sur Google du site personnel (`/`, `/contact`) tout en verrouillant l'indexation des projets et de l'administration selon les souhaits de Florian.
 
-- [ ] **Correction de `robots.txt`** :
-  - Renommer `public/robot.txt` en `public/robots.txt` (avec un **s** indispensable).
-  - Corriger la directive `Disallow: /` actuelle qui bloque les robots d'indexation.
-  - Autoriser l'indexation de la home `/`, de `/projects`, `/projects/*` et de `/contact`.
-  - Protéger les routes sensibles : `Disallow: /admin` et `Disallow: /api/`.
-- [ ] **Génération dynamique du `sitemap.xml`** :
-  - Créer un endpoint ou script générant dynamiquement le `sitemap.xml` contenant toutes les pages statiques et les URLs de chaque dépôt public (`/projects/[name]`).
-- [ ] **Métadonnées OpenGraph & Twitter Cards dynamiques par projet** :
-  - Sur `/projects/[name]`, injecter des balises dynamiques :
-    - `og:title` : `{repo.name} — Florian Mangin`
-    - `og:description` : description personnalisée ou résumé du projet
-    - `og:url` : `https://flotss.me/projects/{repo.name}`
-    - `og:image` : image de prévisualisation ou image générée (carte de partage avec nom, langage et étoiles)
-- [ ] **Données structurées JSON-LD (`schema.org`)** :
-  - Intégrer un bloc `schema.org/Person` sur la page d'accueil (nom, fonction, entreprise, compétences, profils sociaux).
-  - Intégrer `schema.org/SoftwareSourceCode` sur les pages de projets.
+- [x] **Architecture SEO centralisée (`src/config/seo.config.ts`)** :
+  - Single Source of Truth pour les métadonnées, titres, descriptions, URLs canoniques et statut d'indexation.
+  - Règles d'indexation : autorisée pour `/` et `/contact` (`noindex: false`), interdite pour `/projects`, `/projects/*`, `/admin`, `/admin/*` (`noindex: true`).
+- [x] **Composant réutilisable `<SEO />` (`src/components/SEO.tsx`)** :
+  - Remplace les blocs `<Head>` volumineux par un simple appel `<SEO page="..." />`.
+  - Gestion automatique des balises OpenGraph, Twitter Cards, balises `<meta name="robots">` et `<meta name="googlebot">` avec directives `noindex, nofollow, noarchive, nosnippet`.
+- [x] **Directive `public/robots.txt`** :
+  - Correction du nom du fichier (suppression de l'ancien `robot.txt`).
+  - Autorise `/` et `/contact`.
+  - Bloque explicitement `/projects`, `/projects/`, `/admin`, `/admin/`, `/api/`.
+- [x] **Sitemap XML statique (`public/sitemap.xml`)** :
+  - Référence uniquement les pages indexables (`/` et `/contact`).
+- [x] **Protection HTTP `X-Robots-Tag` (`next.config.js`)** :
+  - En-tête HTTP renvoyé pour `/admin/:path*`, `/projects/:path*` et `/api/:path*`.
+- [x] **Correction récupération READMEs via GitHub API (`src/services/GithubService.ts`)** :
+  - Remplacement de l'URL brute avec branche `main` en dur par l'endpoint officiel `api.github.com/repos/{owner}/{repo}/readme` avec `Accept: application/vnd.github.raw`.
+  - Résolution dynamique de la branche par défaut (`master` pour `FacebookLike`, `main`, etc.) et du nom de fichier avec fallback.
 
 ---
 
-## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1)
+## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — 🚀 PROCHAINE ÉTAPE
 
-> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs, collègues et clients potentiels.
+> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels directement sur la page d'accueil.
 
 - [ ] **Section Parcours & Expériences (« Career Timeline »)** :
   - Concevoir une section interactive et esthétique sur la page d'accueil (design zinc-950, bordures subtiles et accents émeraude) :
@@ -136,4 +138,4 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-*Fichier initialisé le 10 septembre 2026.*
+*Dernière mise à jour : 10 septembre 2026 — PR #25 (SEO & README Fix).*
