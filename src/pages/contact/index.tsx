@@ -3,6 +3,7 @@ import { EmailInputs } from '@/services/EmailService';
 import { GithubService, owner } from '@/services/GithubService';
 import { Repo } from '@/types/types';
 import { loadGithubInformation } from '@/utils/RepoUtils';
+import SEO from '@/components/SEO';
 import { Box, Heading, Text, useToast } from '@chakra-ui/react';
 import type { GetStaticProps } from 'next';
 import Link from 'next/link';
@@ -182,6 +183,8 @@ export default function Contact({
 
   return (
     <>
+      <SEO page="contact" />
+
       <div className="flex flex-col gap-5 px-5 py-5 sm:px-20">
         <ContactHeader />
         <Box className="grid grid-cols-1 gap-5 lg:grid-cols-2">

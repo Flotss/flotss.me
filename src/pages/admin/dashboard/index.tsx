@@ -1,5 +1,5 @@
 import withAuth, { WithAuthProps } from '@/components/auth/withAuth';
-import Head from 'next/head';
+import SEO from '@/components/SEO';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -325,9 +325,7 @@ function AdminDashboard({ user }: WithAuthProps) {
 
   return (
     <>
-      <Head>
-        <title>Back Office Dashboard — flotss.me</title>
-      </Head>
+      <SEO page="dashboard" />
 
       {/* Floating Toast Notification */}
       {toastMessage && (

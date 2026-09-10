@@ -16,7 +16,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import type { GetStaticPaths, GetStaticProps } from 'next';
-import Head from 'next/head';
+import SEO from '@/components/SEO';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
@@ -106,11 +106,14 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
   if (!repo || loading || router.isFallback) {
     return (
       <>
-        <Head>
-          {(router.query.name && <title>Loading repository {router.query.name}...</title>) || (
-            <title>Loading repository...</title>
-          )}
-        </Head>
+        <SEO
+          page="projectDetail"
+          title={
+            router.query.name
+              ? `Loading repository ${router.query.name}...`
+              : 'Loading repository...'
+          }
+        />
         <div className="flex flex-col items-center justify-center space-y-6 px-5 py-8 sm:px-20">
           <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-12">
             <Container className="col-span-1 space-y-4 lg:col-span-6 xl:col-span-6">
@@ -154,9 +157,11 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
   // If the repository data is available, display it
   return (
     <>
-      <Head>
-        <title>{repo.name}</title>
-      </Head>
+      <SEO
+        page="projectDetail"
+        title={`${repo.name} — Florian Mangin`}
+        description={repo.description}
+      />
       <div className="flex flex-col items-center justify-center space-y-6 px-5 py-8 sm:px-20">
         {/* Top Hero Grid */}
         <div className="grid w-full grid-cols-1 gap-5 lg:grid-cols-12">
@@ -393,13 +398,7 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
         )}
 
         {/* Readme & Commits */}
-        {repo.commits ? (
-          <ReadmeAndCommits repo={repo} />
-        ) : (
-          <Head>
-            <title>Loading commits...</title>
-          </Head>
-        )}
+        {repo.commits ? <ReadmeAndCommits repo={repo} /> : null}
       </div>
     </>
   );
