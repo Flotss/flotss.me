@@ -10,10 +10,10 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 | :--- | :--- | :---: | :---: | :---: |
 | 🔴 **P1** | **SEO, Indexabilité & Référencement Contrôlé** | Élevé | Faible | ✅ **Terminé (PR #25)** |
 | 🔴 **P1** | **Correction Fetch READMEs (Branches `master`/`main`)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
-| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | 🚀 **Prêt à démarrer** |
-| 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ⏳ Planifié |
-| 🟡 **P2** | **Back-Office Enrichi (Démos, Images, Statut)** | Élevé | Modérée | ⏳ Planifié |
-| 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | ⏳ Planifié |
+| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | ✅ **Terminé (PR #25)** |
+| 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
+| 🟡 **P2** | **Back-Office Enrichi & Mini-CMS (Zéro Modale, Sidebar)** | Élevé | Modérée | ✅ **Terminé (PR #25)** |
+| 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | 🚀 **Prêt à démarrer** |
 | 🟢 **P3** | **Projets Phares (« Featured Case Studies »)** | Élevé | Modérée | ⏳ Planifié |
 | ⚪ **P4** | **Statistiques GitHub Globales & Activité** | Modéré | Modérée | 💡 Idée |
 | ⚪ **P4** | **Section Blog / Articles Techniques** | Modéré | Élevée | 💡 Idée |
@@ -44,24 +44,17 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — 🚀 PROCHAINE ÉTAPE
+## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — ✅ TERMINÉ
 
 > **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels directement sur la page d'accueil.
 
-- [ ] **Section Parcours & Expériences (« Career Timeline »)** :
-  - Concevoir une section interactive et esthétique sur la page d'accueil (design zinc-950, bordures subtiles et accents émeraude) :
-    - **Société Générale** *(Ingénieur d'Études & Développement)* :
-      - Applications ASP.NET Core / C#, migration d'architectures web, interfaces dynamiques Angular.
-      - Outils utilisés au quotidien par plus de 20 développeurs (gestion de branches, intégration Jira, monitoring SQL temps réel).
-      - Automatisation des processus de release et intégration CI/CD.
-    - **Dalkia (Groupe EDF)** *(Développeur Python)* :
-      - Solutions de redondance pour systèmes d'alarmes techniques industrielles.
-      - Conception de bases de données et fonctionnalité d'autocomplétion pour la hotline.
-    - **Formation & Cursus** :
-      - Diplôme d'Ingénieur / Master en informatique (ISEP / Université).
-- [ ] **Bouton d'accès direct au CV (PDF)** :
-  - Ajouter un bouton d'action directe « Télécharger mon CV » dans le Hero et/ou le Header.
-  - Permettre le téléchargement et la prévisualisation dans le navigateur.
+- [x] **Section Parcours & Expériences (« Career Timeline »)** :
+  - Conçue et intégrée sur la page d'accueil avec design zinc-950, bordures subtiles et accents émeraude :
+    - **Société Générale** *(Software Engineer)* : ASP.NET Core, Angular, Jira API, CI/CD, SQL Server.
+    - **Dalkia (Groupe EDF)** *(Python Developer)* : redondance alarmes industrielles, autocomplétion hotline, bases de données.
+    - **Formation & Cursus** *(ISEP)* : Diplôme d'Ingénieur / Master en informatique.
+- [x] **Bouton d'accès direct au CV (PDF)** :
+  - Bouton d'action direct « Resume » dans le Hero connecté au champ dynamique `resumeUrl`.
 - [ ] **Études de Cas sur les Projets Phares (« Featured Case Studies »)** :
   - Sélectionner 3 ou 4 projets majeurs (ex. `flotss.me`, `ObjectAidJava`, `NETVOD`) :
     - Ajouter des captures d'écran d'interface réelle et schémas d'architecture.
@@ -70,27 +63,27 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 3. 🎛️ Back-Office Enrichi & Mini-CMS (Priorité 2) — 📄 [Spécifications Détaillées](./BACKOFFICE_SPEC.md)
+## 3. 🎛️ Back-Office Enrichi & Mini-CMS (Priorité 2) — ✅ TERMINÉ — 📄 [Spécifications Détaillées](./BACKOFFICE_SPEC.md)
 
 > **Objectif** : Piloter l'ensemble du portfolio (projets, expériences, hero, liens sociaux, CV) directement depuis un studio d'administration moderne sans recompiler de code.
 
-- [ ] **Ergonomie Générale & Navigation (Sans Modale)** :
+- [x] **Ergonomie Générale & Navigation (Sans Modale)** :
   - Mise en place d'une **sidebar latérale par catégories** (*Projets*, *Expériences*, *Paramètres du Site*).
-  - **Règle absolue : aucune modale popup** — tous les formulaires d'édition sont intégrés inline, en accordéon dépliable ou panneau plein écran.
-- [ ] **Module Projets (`RepoDB`)** :
+  - **Règle absolue respectée : aucune modale popup** — tous les formulaires d'édition sont intégrés inline, en accordéon dépliable ou panneau pleine largeur.
+- [x] **Module Projets (`RepoDB`)** :
   - **Titre d'affichage personnalisé** (`displayName`) pour remplacer les slugs bruts de dépôts.
-  - **Image de couverture** (`coverImage`) pour chaque projet.
-  - **Statut « Work in Progress »** (`isWip`) pour marquer les projets en cours de développement.
-  - **Lien de Démo Live** (`demoUrl`).
+  - **Image de couverture** (`coverImage`) pour chaque projet avec prévisualisation en direct.
+  - **Statut « Work in Progress »** (`isWip`) pour marquer les projets en cours de développement avec badge public.
+  - **Lien de Démo Live** (`demoUrl`) avec bouton d'action public dans la fiche détaillée.
   - Visibilité, réordonnancement par glisser/déposer ou boutons, et description personnalisée.
-- [ ] **Module Expériences Pro & Formations (`Experience`)** :
+- [x] **Module Expériences Pro & Formations (`Experience`)** :
   - Modèle Prisma dédié pour administrer les expériences (Société Générale, Dalkia, Formation ISEP, etc.).
-  - Édition des intitulés, entreprises, dates, points-clés, tags de compétences.
-- [ ] **Module Paramètres du Site (`SiteSettings` & `SocialLink`)** :
-  - **Badge de disponibilité du Hero** : modification du texte (voyant fixe en vert émeraude).
-  - **Accroche & sous-titre de la page d'accueil**.
-  - **Lien / Fichier du CV** (`resumeUrl`).
-  - **Gestion dynamique des liens sociaux** : ajout/suppression avec sélecteur d'icônes vectorielles (GitHub, LinkedIn, X, Discord, etc.).
+  - Formulaire d'ajout inline au sommet et édition inline par poste (titre, entreprise, dates, points-clés, tags de compétences, ordre).
+- [x] **Module Paramètres du Site (`SiteSettings` & `SocialLink`)** :
+  - **Badge de disponibilité du Hero** : modification du texte avec voyant vert émeraude fixe et prévisualisation en direct.
+  - **Accroche & sous-titre de la page d'accueil** éditables dynamiquement.
+  - **Lien / Fichier du CV** (`resumeUrl`) avec prévisualisation.
+  - **Gestion dynamique des liens sociaux** : ajout/suppression avec sélecteur d'icônes vectorielles (`FaGithub`, `FaLinkedin`, `FaXTwitter`, `FaDiscord`, etc.).
 
 ---
 
