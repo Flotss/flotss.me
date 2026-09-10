@@ -45,4 +45,31 @@ describe('SEO Configuration and Rules', () => {
     expect(sitemapContent).not.toContain('/projects');
     expect(sitemapContent).not.toContain('/admin');
   });
+
+  it('should verify next.config.js configures X-Robots-Tag for /admin, /projects and /api', async () => {
+    const nextConfig = require('../next.config.js');
+    const headersList = await nextConfig.headers();
+
+    const adminHeader = headersList.find((h: any) => h.source === '/admin/:path*');
+    expect(adminHeader).toBeDefined();
+    expect(adminHeader.headers).toEqual(
+      expect.arrayContaining([
+        {
+          key: 'X-Robots-Tag',
+          value: 'noindex, nofollow, noarchive, nosnippet',
+        },
+      ]),
+    );
+
+    const projectsHeader = headersList.find((h: any) => h.source === '/projects/:path*');
+    expect(projectsHeader).toBeDefined();
+    expect(projectsHeader.headers).toEqual(
+      expect.arrayContaining([
+        {
+          key: 'X-Robots-Tag',
+          value: 'noindex, nofollow, noarchive, nosnippet',
+        },
+      ]),
+    );
+  });
 });

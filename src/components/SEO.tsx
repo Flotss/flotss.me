@@ -40,9 +40,12 @@ export default function SEO({ page, title, description, canonical, noindex, imag
       <meta name="author" content={defaultSEO.author} key="author" />
       <meta
         name="robots"
-        content={isNoIndex ? 'noindex, nofollow' : 'index, follow'}
+        content={isNoIndex ? 'noindex, nofollow, noarchive, nosnippet' : 'index, follow'}
         key="robots"
       />
+      {isNoIndex && (
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" key="googlebot" />
+      )}
       <link rel="canonical" href={canonicalUrl} key="canonical" />
 
       {/* Open Graph / Facebook */}
