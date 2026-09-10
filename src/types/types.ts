@@ -129,20 +129,3 @@ export type SocialLinkType = {
   createdAt?: string;
   updatedAt?: string;
 };
-
-export type ExperienceType = {
-  id: number;
-  title: string;
-  company: string;
-  location: string | null;
-  startDate: string;
-  endDate: string | null;
-  current: boolean;
-  type: 'work' | 'education';
-  description: string | null;
-  skills: string | null;
-  order: number;
-  visible: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-};

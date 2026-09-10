@@ -1,14 +1,13 @@
 import withAuth, { WithAuthProps } from '@/components/auth/withAuth';
 import SEO from '@/components/SEO';
 import { AVAILABLE_SOCIAL_ICONS, SocialIcon } from '@/components/icons/SocialIcon';
-import { ExperienceType, SiteSettingsType, SocialLinkType } from '@/types/types';
+import { SiteSettingsType, SocialLinkType } from '@/types/types';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FaArrowDown,
   FaArrowUp,
-  FaBriefcase,
   FaCheck,
   FaChevronDown,
   FaChevronUp,
@@ -16,7 +15,6 @@ import {
   FaExternalLinkAlt,
   FaEye,
   FaEyeSlash,
-  FaGraduationCap,
   FaImage,
   FaLayerGroup,
   FaList,
@@ -48,7 +46,7 @@ export interface AdminRepoRecord {
   updatedAt: string;
 }
 
-type NavCategory = 'projects-catalog' | 'projects-order' | 'experiences' | 'settings';
+type NavCategory = 'projects-catalog' | 'projects-order' | 'settings';
 type ViewMode = 'block' | 'list';
 
 function AdminDashboard({ user }: WithAuthProps) {
@@ -86,37 +84,6 @@ function AdminDashboard({ user }: WithAuthProps) {
   const [orderedRepos, setOrderedRepos] = useState<AdminRepoRecord[]>([]);
   const [hasOrderChanges, setHasOrderChanges] = useState(false);
   const [savingBatchOrder, setSavingBatchOrder] = useState(false);
-
-  // Experiences State
-  const [experiences, setExperiences] = useState<ExperienceType[]>([]);
-  const [loadingExperiences, setLoadingExperiences] = useState(false);
-  const [isAddingExperience, setIsAddingExperience] = useState(false);
-  const [expandedExpIds, setExpandedExpIds] = useState<Record<number, boolean>>({});
-  const [confirmDeleteExpId, setConfirmDeleteExpId] = useState<number | null>(null);
-  const [savingExpId, setSavingExpId] = useState<number | null>(null);
-
-  // New Experience Form
-  const [newExpForm, setNewExpForm] = useState<{
-    title: string;
-    company: string;
-    location: string;
-    startDate: string;
-    endDate: string;
-    current: boolean;
-    type: 'work' | 'education';
-    description: string;
-    skills: string;
-  }>({
-    title: '',
-    company: '',
-    location: '',
-    startDate: '',
-    endDate: '',
-    current: false,
-    type: 'work',
-    description: '',
-    skills: '',
-  });
 
   // Settings State
   const [siteSettings, setSiteSettings] = useState<SiteSettingsType>({
@@ -197,25 +164,7 @@ function AdminDashboard({ user }: WithAuthProps) {
     }
   }, [showToast]);
 
-  // 2. Fetch Experiences
-  const fetchExperiences = useCallback(async () => {
-    setLoadingExperiences(true);
-    try {
-      const res = await fetch('/api/admin/experiences');
-      if (res.ok) {
-        const data: ExperienceType[] = await res.json();
-        setExperiences(data);
-      } else {
-        showToast('Failed to load experiences', 'error');
-      }
-    } catch {
-      showToast('Network error loading experiences', 'error');
-    } finally {
-      setLoadingExperiences(false);
-    }
-  }, [showToast]);
-
-  // 3. Fetch Settings
+  // 2. Fetch Settings
   const fetchSettings = useCallback(async () => {
     setLoadingSettings(true);
     try {
@@ -237,9 +186,8 @@ function AdminDashboard({ user }: WithAuthProps) {
   // Initial Data Loading
   useEffect(() => {
     fetchRepos();
-    fetchExperiences();
     fetchSettings();
-  }, [fetchRepos, fetchExperiences, fetchSettings]);
+  }, [fetchRepos, fetchSettings]);
 
   // Logout
   const handleLogout = async () => {
@@ -415,109 +363,6 @@ function AdminDashboard({ user }: WithAuthProps) {
     }
   };
 
-  // Experience Handlers
-  const handleCreateExperience = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newExpForm.title.trim() || !newExpForm.company.trim() || !newExpForm.startDate.trim()) {
-      showToast('Title, company, and start date are required', 'error');
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/admin/experiences', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newExpForm),
-      });
-
-      if (res.ok) {
-        showToast('Experience added successfully.');
-        setIsAddingExperience(false);
-        setNewExpForm({
-          title: '',
-          company: '',
-          location: '',
-          startDate: '',
-          endDate: '',
-          current: false,
-          type: 'work',
-          description: '',
-          skills: '',
-        });
-        await fetchExperiences();
-      } else {
-        showToast('Failed to add experience', 'error');
-      }
-    } catch {
-      showToast('Network error creating experience', 'error');
-    }
-  };
-
-  const handleUpdateExperience = async (exp: ExperienceType) => {
-    setSavingExpId(exp.id);
-    try {
-      const res = await fetch('/api/admin/experiences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(exp),
-      });
-
-      if (res.ok) {
-        showToast(`Experience "${exp.title}" updated.`);
-        setExpandedExpIds((prev) => ({ ...prev, [exp.id]: false }));
-        await fetchExperiences();
-      } else {
-        showToast('Failed to update experience', 'error');
-      }
-    } catch {
-      showToast('Network error updating experience', 'error');
-    } finally {
-      setSavingExpId(null);
-    }
-  };
-
-  const handleDeleteExperience = async (id: number) => {
-    try {
-      const res = await fetch(`/api/admin/experiences?id=${id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
-        showToast('Experience deleted.');
-        setConfirmDeleteExpId(null);
-        await fetchExperiences();
-      } else {
-        showToast('Failed to delete experience', 'error');
-      }
-    } catch {
-      showToast('Network error deleting experience', 'error');
-    }
-  };
-
-  const moveExperience = async (index: number, direction: 'up' | 'down') => {
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= experiences.length) return;
-
-    const list = [...experiences];
-    const [moved] = list.splice(index, 1);
-    list.splice(targetIndex, 0, moved);
-
-    const reordered = list.map((item, idx) => ({ ...item, order: idx + 1 }));
-    setExperiences(reordered);
-
-    try {
-      await fetch('/api/admin/experiences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: reordered.map((r) => ({ id: r.id, order: r.order })),
-        }),
-      });
-      showToast('Experience order updated.');
-    } catch {
-      showToast('Failed to save experience order', 'error');
-    }
-  };
-
   // Settings Handlers
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -588,9 +433,8 @@ function AdminDashboard({ user }: WithAuthProps) {
       hidden: repos.filter((r) => !r.visible).length,
       customOrdered: repos.filter((r) => r.order > 0).length,
       wip: repos.filter((r) => r.isWip).length,
-      experiences: experiences.length,
     }),
-    [repos, experiences],
+    [repos],
   );
 
   return (
@@ -673,30 +517,6 @@ function AdminDashboard({ user }: WithAuthProps) {
                         {counts.customOrdered}
                       </span>
                     )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                  Curriculum & Bio
-                </p>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => setActiveCategory('experiences')}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
-                      activeCategory === 'experiences'
-                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm'
-                        : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <FaBriefcase className="h-3.5 w-3.5" />
-                      Career & Education
-                    </span>
-                    <span className="rounded-md bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-400">
-                      {counts.experiences}
-                    </span>
                   </button>
                 </div>
               </div>
@@ -801,16 +621,6 @@ function AdminDashboard({ user }: WithAuthProps) {
               }`}
             >
               Order ({counts.customOrdered})
-            </button>
-            <button
-              onClick={() => setActiveCategory('experiences')}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium ${
-                activeCategory === 'experiences'
-                  ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-900 text-zinc-400'
-              }`}
-            >
-              Experiences ({counts.experiences})
             </button>
             <button
               onClick={() => setActiveCategory('settings')}
@@ -1298,572 +1108,6 @@ function AdminDashboard({ user }: WithAuthProps) {
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* =========================================================================
-              VIEW 3: CAREER & EDUCATION EXPERIENCES (NO MODALS)
-              ========================================================================= */}
-          {activeCategory === 'experiences' && (
-            <div className="space-y-6">
-              {/* Header & Add Button */}
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/5 bg-zinc-900/30 p-5">
-                <div>
-                  <h2 className="text-base font-bold text-white">Career History & Education</h2>
-                  <p className="mt-0.5 text-xs text-zinc-400">
-                    Manage positions (Société Générale, Dalkia) and degrees displayed in the
-                    homepage timeline.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsAddingExperience(!isAddingExperience)}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-zinc-950 shadow-md shadow-emerald-500/20 transition-all hover:bg-emerald-400"
-                >
-                  <FaPlus className="h-3 w-3" />
-                  <span>{isAddingExperience ? 'Close Form' : 'Add Experience'}</span>
-                </button>
-              </div>
-
-              {/* INLINE ADD FORM (NO MODALS) */}
-              {isAddingExperience && (
-                <form
-                  onSubmit={handleCreateExperience}
-                  className="space-y-4 rounded-2xl border border-emerald-500/30 bg-zinc-900/60 p-6 backdrop-blur-xl"
-                >
-                  <h3 className="flex items-center gap-2 text-sm font-bold text-emerald-400">
-                    <FaBriefcase className="h-4 w-4" />
-                    New Career Entry
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                        Position / Degree Title *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newExpForm.title}
-                        onChange={(e) => setNewExpForm({ ...newExpForm, title: e.target.value })}
-                        placeholder="e.g. Software Engineer"
-                        className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                        Company / Institution *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newExpForm.company}
-                        onChange={(e) => setNewExpForm({ ...newExpForm, company: e.target.value })}
-                        placeholder="e.g. Société Générale"
-                        className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                        Location
-                      </label>
-                      <input
-                        type="text"
-                        value={newExpForm.location}
-                        onChange={(e) => setNewExpForm({ ...newExpForm, location: e.target.value })}
-                        placeholder="e.g. Paris La Défense"
-                        className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                        Start Date *
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={newExpForm.startDate}
-                        onChange={(e) =>
-                          setNewExpForm({ ...newExpForm, startDate: e.target.value })
-                        }
-                        placeholder="e.g. Sep 2023"
-                        className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                        End Date
-                      </label>
-                      <input
-                        type="text"
-                        disabled={newExpForm.current}
-                        value={newExpForm.current ? 'Present' : newExpForm.endDate}
-                        onChange={(e) => setNewExpForm({ ...newExpForm, endDate: e.target.value })}
-                        placeholder="e.g. Present"
-                        className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none disabled:opacity-50"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-6 pt-1">
-                    <label className="flex cursor-pointer items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={newExpForm.current}
-                        onChange={(e) =>
-                          setNewExpForm({
-                            ...newExpForm,
-                            current: e.target.checked,
-                            endDate: e.target.checked ? 'Present' : '',
-                          })
-                        }
-                        className="rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
-                      />
-                      <span className="text-xs text-zinc-300">Currently in this position</span>
-                    </label>
-
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-zinc-400">Category:</span>
-                      <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                        <input
-                          type="radio"
-                          name="expType"
-                          checked={newExpForm.type === 'work'}
-                          onChange={() => setNewExpForm({ ...newExpForm, type: 'work' })}
-                          className="text-emerald-500"
-                        />
-                        <span className="text-zinc-300">Work Experience</span>
-                      </label>
-                      <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                        <input
-                          type="radio"
-                          name="expType"
-                          checked={newExpForm.type === 'education'}
-                          onChange={() => setNewExpForm({ ...newExpForm, type: 'education' })}
-                          className="text-emerald-500"
-                        />
-                        <span className="text-zinc-300">Education</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                      Skills & Technologies (comma separated)
-                    </label>
-                    <input
-                      type="text"
-                      value={newExpForm.skills}
-                      onChange={(e) => setNewExpForm({ ...newExpForm, skills: e.target.value })}
-                      placeholder="e.g. C#, ASP.NET Core, Angular, TypeScript, SQL Server"
-                      className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                      Description & Key Achievements
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={newExpForm.description}
-                      onChange={(e) =>
-                        setNewExpForm({ ...newExpForm, description: e.target.value })
-                      }
-                      placeholder="Describe your missions, architecture challenges, and team accomplishments..."
-                      className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-end gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setIsAddingExperience(false)}
-                      className="rounded-xl px-4 py-2 text-xs font-medium text-zinc-400 hover:text-white"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-emerald-500 px-5 py-2 text-xs font-semibold text-zinc-950 transition-all hover:bg-emerald-400"
-                    >
-                      Create Experience
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* Experiences List */}
-              {loadingExperiences ? (
-                <div className="py-20 text-center text-zinc-500">
-                  <FaSync className="mx-auto mb-2 h-6 w-6 animate-spin text-emerald-400" />
-                  <p className="text-xs">Loading experiences...</p>
-                </div>
-              ) : experiences.length === 0 ? (
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/20 py-16 text-center text-zinc-500">
-                  <p className="text-sm">No experiences defined yet.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {experiences.map((exp, index) => {
-                    const isExpanded = Boolean(expandedExpIds[exp.id]);
-                    const isConfirmingDelete = confirmDeleteExpId === exp.id;
-
-                    return (
-                      <div
-                        key={exp.id}
-                        className="rounded-2xl border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-md transition-all hover:border-white/10"
-                      >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 space-y-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span
-                                className={`rounded-md px-2 py-0.5 text-[10px] font-semibold ${
-                                  exp.type === 'education'
-                                    ? 'border border-blue-500/30 bg-blue-500/10 text-blue-300'
-                                    : 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
-                                }`}
-                              >
-                                {exp.type === 'education' ? (
-                                  <span className="flex items-center gap-1">
-                                    <FaGraduationCap className="h-2.5 w-2.5" /> Education
-                                  </span>
-                                ) : (
-                                  <span className="flex items-center gap-1">
-                                    <FaBriefcase className="h-2.5 w-2.5" /> Work
-                                  </span>
-                                )}
-                              </span>
-
-                              <h3 className="truncate text-sm font-semibold text-white">
-                                {exp.title}
-                              </h3>
-                              <span className="text-xs font-medium text-zinc-400">
-                                @ {exp.company}
-                              </span>
-                            </div>
-
-                            <p className="text-xs text-zinc-400">
-                              {exp.startDate} – {exp.current ? 'Present' : exp.endDate || 'Present'}
-                              {exp.location && ` • ${exp.location}`}
-                            </p>
-
-                            {exp.skills && (
-                              <div className="flex flex-wrap gap-1.5 pt-1">
-                                {exp.skills.split(',').map((skill, sIdx) => (
-                                  <span
-                                    key={sIdx}
-                                    className="rounded-md border border-white/5 bg-white/[0.03] px-2 py-0.5 text-[10px] text-zinc-300"
-                                  >
-                                    {skill.trim()}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex flex-shrink-0 items-center gap-1.5">
-                            {/* Reorder arrows */}
-                            <button
-                              onClick={() => moveExperience(index, 'up')}
-                              disabled={index === 0}
-                              className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-20"
-                              title="Move Up"
-                            >
-                              <FaArrowUp className="h-3 w-3" />
-                            </button>
-                            <button
-                              onClick={() => moveExperience(index, 'down')}
-                              disabled={index === experiences.length - 1}
-                              className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-20"
-                              title="Move Down"
-                            >
-                              <FaArrowDown className="h-3 w-3" />
-                            </button>
-
-                            {/* Edit toggle */}
-                            <button
-                              onClick={() =>
-                                setExpandedExpIds((prev) => ({
-                                  ...prev,
-                                  [exp.id]: !isExpanded,
-                                }))
-                              }
-                              className={`rounded-lg border p-1.5 text-xs transition-all ${
-                                isExpanded
-                                  ? 'border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                                  : 'border-white/10 bg-white/[0.04] text-zinc-400 hover:text-white'
-                              }`}
-                              title={isExpanded ? 'Close edit panel' : 'Edit experience'}
-                            >
-                              {isExpanded ? (
-                                <FaChevronUp className="h-3 w-3" />
-                              ) : (
-                                <FaChevronDown className="h-3 w-3" />
-                              )}
-                            </button>
-
-                            {/* Delete (No modal: inline 2-step confirm) */}
-                            {isConfirmingDelete ? (
-                              <div className="flex items-center gap-1 rounded-xl border border-red-500/40 bg-red-950/80 p-1">
-                                <button
-                                  onClick={() => handleDeleteExperience(exp.id)}
-                                  className="rounded-lg bg-red-500 px-2 py-1 text-[10px] font-bold text-zinc-950 hover:bg-red-400"
-                                >
-                                  Confirm
-                                </button>
-                                <button
-                                  onClick={() => setConfirmDeleteExpId(null)}
-                                  className="rounded-lg px-2 py-1 text-[10px] text-zinc-400 hover:text-white"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setConfirmDeleteExpId(exp.id)}
-                                className="rounded-lg border border-red-500/20 bg-red-500/10 p-1.5 text-red-400 hover:bg-red-500/20 hover:text-red-300"
-                                title="Delete experience"
-                              >
-                                <FaTrash className="h-3 w-3" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* INLINE EDIT FORM (NO MODALS) */}
-                        {isExpanded && (
-                          <div className="mt-4 space-y-4 border-t border-white/10 pt-4">
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Position / Degree
-                                </label>
-                                <input
-                                  type="text"
-                                  value={exp.title}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id ? { ...i, title: e.target.value } : i,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Company / Institution
-                                </label>
-                                <input
-                                  type="text"
-                                  value={exp.company}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id ? { ...i, company: e.target.value } : i,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Location
-                                </label>
-                                <input
-                                  type="text"
-                                  value={exp.location || ''}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id ? { ...i, location: e.target.value } : i,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Start Date
-                                </label>
-                                <input
-                                  type="text"
-                                  value={exp.startDate}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id ? { ...i, startDate: e.target.value } : i,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  End Date
-                                </label>
-                                <input
-                                  type="text"
-                                  disabled={exp.current}
-                                  value={exp.current ? 'Present' : exp.endDate || ''}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id ? { ...i, endDate: e.target.value } : i,
-                                      ),
-                                    )
-                                  }
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none disabled:opacity-50"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-6">
-                              <label className="flex cursor-pointer items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={exp.current}
-                                  onChange={(e) =>
-                                    setExperiences((prev) =>
-                                      prev.map((i) =>
-                                        i.id === exp.id
-                                          ? {
-                                              ...i,
-                                              current: e.target.checked,
-                                              endDate: e.target.checked ? 'Present' : '',
-                                            }
-                                          : i,
-                                      ),
-                                    )
-                                  }
-                                  className="rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
-                                />
-                                <span className="text-xs text-zinc-300">
-                                  Currently in this position
-                                </span>
-                              </label>
-
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs text-zinc-400">Category:</span>
-                                <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                                  <input
-                                    type="radio"
-                                    name={`type-${exp.id}`}
-                                    checked={exp.type === 'work'}
-                                    onChange={() =>
-                                      setExperiences((prev) =>
-                                        prev.map((i) =>
-                                          i.id === exp.id ? { ...i, type: 'work' } : i,
-                                        ),
-                                      )
-                                    }
-                                    className="text-emerald-500"
-                                  />
-                                  <span className="text-zinc-300">Work</span>
-                                </label>
-                                <label className="flex cursor-pointer items-center gap-1.5 text-xs">
-                                  <input
-                                    type="radio"
-                                    name={`type-${exp.id}`}
-                                    checked={exp.type === 'education'}
-                                    onChange={() =>
-                                      setExperiences((prev) =>
-                                        prev.map((i) =>
-                                          i.id === exp.id ? { ...i, type: 'education' } : i,
-                                        ),
-                                      )
-                                    }
-                                    className="text-emerald-500"
-                                  />
-                                  <span className="text-zinc-300">Education</span>
-                                </label>
-                              </div>
-                            </div>
-
-                            <div>
-                              <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                Skills / Tech Stack
-                              </label>
-                              <input
-                                type="text"
-                                value={exp.skills || ''}
-                                onChange={(e) =>
-                                  setExperiences((prev) =>
-                                    prev.map((i) =>
-                                      i.id === exp.id ? { ...i, skills: e.target.value } : i,
-                                    ),
-                                  )
-                                }
-                                className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                Description
-                              </label>
-                              <textarea
-                                rows={3}
-                                value={exp.description || ''}
-                                onChange={(e) =>
-                                  setExperiences((prev) =>
-                                    prev.map((i) =>
-                                      i.id === exp.id ? { ...i, description: e.target.value } : i,
-                                    ),
-                                  )
-                                }
-                                className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                              />
-                            </div>
-
-                            <div className="flex items-center justify-end gap-2 pt-2">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setExpandedExpIds((prev) => ({
-                                    ...prev,
-                                    [exp.id]: false,
-                                  }))
-                                }
-                                className="rounded-xl px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white"
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleUpdateExperience(exp)}
-                                disabled={savingExpId === exp.id}
-                                className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/20 px-4 py-1.5 text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/30"
-                              >
-                                <FaSave
-                                  className={`h-3 w-3 ${savingExpId === exp.id ? 'animate-spin' : ''}`}
-                                />
-                                <span>{savingExpId === exp.id ? 'Saving...' : 'Save Changes'}</span>
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           )}
 

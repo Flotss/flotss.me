@@ -2,10 +2,9 @@ import Repos from '@/components/Repos';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useIsMobile } from '@/hooks/useIsMobile';
-import CareerTimeline from '@/components/CareerTimeline';
 import { prisma } from '@/lib/prisma';
 import { GithubService } from '@/services/GithubService';
-import { ExperienceType, Repo, SiteSettingsType, SocialLinkType } from '@/types/types';
+import { Repo, SiteSettingsType, SocialLinkType } from '@/types/types';
 import { sortRepos } from '@/utils/RepoUtils';
 import { Box, Grid, Image, Tooltip } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
@@ -30,16 +29,10 @@ type TechStack = {
 interface HomeProps {
   repos?: Repo[];
   settings?: SiteSettingsType;
-  experiences?: ExperienceType[];
   socialLinks?: SocialLinkType[];
 }
 
-export default function Home({
-  repos = [],
-  settings,
-  experiences = [],
-  socialLinks = [],
-}: HomeProps) {
+export default function Home({ repos = [], settings, socialLinks = [] }: HomeProps) {
   const isMobile = useIsMobile();
 
   const techStack: TechStack[] = [
@@ -258,9 +251,6 @@ export default function Home({
         </Box>
       </Box>
 
-      {/* Career Timeline Section */}
-      <CareerTimeline experiences={experiences} />
-
       {/* Projects section */}
       <Container className="mx-5 my-8 overflow-hidden px-0 sm:mx-20">
         <motion.div
@@ -279,15 +269,9 @@ export default function Home({
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   try {
     const githubService = new GithubService();
-    const [repos, settings, experiences, socialLinks] = await Promise.all([
+    const [repos, settings, socialLinks] = await Promise.all([
       githubService.getRepos().catch(() => []),
       prisma.siteSettings.findUnique({ where: { id: 1 } }).catch(() => null),
-      prisma.experience
-        .findMany({
-          where: { visible: true },
-          orderBy: [{ order: 'asc' }, { id: 'asc' }],
-        })
-        .catch(() => []),
       prisma.socialLink
         .findMany({
           where: { visible: true },
@@ -300,7 +284,6 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () => {
       props: {
         repos: JSON.parse(JSON.stringify(sortRepos(repos || []))),
         settings: settings ? JSON.parse(JSON.stringify(settings)) : null,
-        experiences: JSON.parse(JSON.stringify(experiences || [])),
         socialLinks: JSON.parse(JSON.stringify(socialLinks || [])),
       },
       revalidate: 60,

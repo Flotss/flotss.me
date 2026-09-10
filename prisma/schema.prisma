@@ -64,20 +64,3 @@ model SocialLink {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-model Experience {
-  id          Int      @id @default(autoincrement())
-  title       String   // e.g. "Software Engineer"
-  company     String   // e.g. "Société Générale"
-  location    String?  // e.g. "Paris La Défense"
-  startDate   String   // e.g. "Sep 2023"
-  endDate     String?  // e.g. "Present"
-  current     Boolean  @default(false)
-  type        String   @default("work") // "work" | "education"
-  description String?
-  skills      String?  // comma-separated tags: "C#, ASP.NET Core, Angular"
-  order       Int      @default(0)
-  visible     Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}

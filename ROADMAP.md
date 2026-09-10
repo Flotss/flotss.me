@@ -10,9 +10,9 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 | :--- | :--- | :---: | :---: | :---: |
 | 🔴 **P1** | **SEO, Indexabilité & Référencement Contrôlé** | Élevé | Faible | ✅ **Terminé (PR #25)** |
 | 🔴 **P1** | **Correction Fetch READMEs (Branches `master`/`main`)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
-| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | ✅ **Terminé (PR #25)** |
-| 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
-| 🟡 **P2** | **Back-Office Enrichi & Mini-CMS (Zéro Modale, Sidebar)** | Élevé | Modérée | ✅ **Terminé (PR #25)** |
+| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | ⏳ **Planifié (Prochaine PR dédiée)** |
+| 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ✅ **Terminé (PR #26)** |
+| 🟡 **P2** | **Back-Office Enrichi & Mini-CMS (Zéro Modale, Sidebar)** | Élevé | Modérée | ✅ **Terminé (PR #26)** |
 | 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | 🚀 **Prêt à démarrer** |
 | 🟢 **P3** | **Projets Phares (« Featured Case Studies »)** | Élevé | Modérée | ⏳ Planifié |
 | ⚪ **P4** | **Statistiques GitHub Globales & Activité** | Modéré | Modérée | 💡 Idée |
@@ -44,15 +44,12 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — ✅ TERMINÉ
+## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — ⏳ PLANIFIÉ (PROCHAINE PR)
 
-> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels directement sur la page d'accueil.
+> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels directement sur la page d'accueil dans une PR dédiée.
 
-- [x] **Section Parcours & Expériences (« Career Timeline »)** :
-  - Conçue et intégrée sur la page d'accueil avec design zinc-950, bordures subtiles et accents émeraude :
-    - **Société Générale** *(Software Engineer)* : ASP.NET Core, Angular, Jira API, CI/CD, SQL Server.
-    - **Dalkia (Groupe EDF)** *(Python Developer)* : redondance alarmes industrielles, autocomplétion hotline, bases de données.
-    - **Formation & Cursus** *(ISEP)* : Diplôme d'Ingénieur / Master en informatique.
+- [ ] **Section Parcours & Expériences (« Career Timeline »)** :
+  - Sera développée et intégrée dans une PR dédiée ultérieure.
 - [x] **Bouton d'accès direct au CV (PDF)** :
   - Bouton d'action direct « Resume » dans le Hero connecté au champ dynamique `resumeUrl`.
 - [ ] **Études de Cas sur les Projets Phares (« Featured Case Studies »)** :
