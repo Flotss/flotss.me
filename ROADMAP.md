@@ -70,36 +70,27 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 3. 🎛️ Back-Office Enrichi & Mini-CMS (Priorité 2)
+## 3. 🎛️ Back-Office Enrichi & Mini-CMS (Priorité 2) — 📄 [Spécifications Détaillées](./BACKOFFICE_SPEC.md)
 
-> **Objectif** : Piloter le contenu du portfolio directement depuis l'espace administrateur sans recompiler de code.
+> **Objectif** : Piloter l'ensemble du portfolio (projets, expériences, hero, liens sociaux, CV) directement depuis un studio d'administration moderne sans recompiler de code.
 
-- [ ] **Gestion du Statut de Disponibilité** :
-  - Ajouter une table `SiteSettings` ou `ProfileConfig` en base de données avec Prisma.
-  - Champs modifiables depuis le dashboard :
-    - Statut : *« Available for new opportunities »*, *« Open to interesting challenges »*, *« Employed at Société Générale »*.
-    - Disponibilité (badge animé vert/orange).
-- [ ] **Champs Personnalisés par Projet (`RepoDB`)** :
-  - Étendre le modèle Prisma `RepoDB` :
-    ```prisma
-    model RepoDB {
-      repoId      Int      @id(map: "RepoDescription_pkey")
-      description String?
-      createdAt   DateTime @default(now())
-      updatedAt   DateTime @updatedAt
-      name        String   @default("No name")
-      url         String?
-      visible     Boolean  @default(true)
-      order       Int      @default(0)
-      demoUrl     String?  // URL démo live
-      coverImage  String?  // Image de couverture
-      featured    Boolean  @default(false) // Projet mis en vedette
-      tags        String?  // Tags séparés par virgules (ex: "Fullstack, .NET, Angular")
-
-      @@map("Repository")
-    }
-    ```
-  - Interface d'édition dans le Back-Office pour renseigner ces champs facilement.
+- [ ] **Ergonomie Générale & Navigation (Sans Modale)** :
+  - Mise en place d'une **sidebar latérale par catégories** (*Projets*, *Expériences*, *Paramètres du Site*).
+  - **Règle absolue : aucune modale popup** — tous les formulaires d'édition sont intégrés inline, en accordéon dépliable ou panneau plein écran.
+- [ ] **Module Projets (`RepoDB`)** :
+  - **Titre d'affichage personnalisé** (`displayName`) pour remplacer les slugs bruts de dépôts.
+  - **Image de couverture** (`coverImage`) pour chaque projet.
+  - **Statut « Work in Progress »** (`isWip`) pour marquer les projets en cours de développement.
+  - **Lien de Démo Live** (`demoUrl`).
+  - Visibilité, réordonnancement par glisser/déposer ou boutons, et description personnalisée.
+- [ ] **Module Expériences Pro & Formations (`Experience`)** :
+  - Modèle Prisma dédié pour administrer les expériences (Société Générale, Dalkia, Formation ISEP, etc.).
+  - Édition des intitulés, entreprises, dates, points-clés, tags de compétences.
+- [ ] **Module Paramètres du Site (`SiteSettings` & `SocialLink`)** :
+  - **Badge de disponibilité du Hero** : modification du texte (voyant fixe en vert émeraude).
+  - **Accroche & sous-titre de la page d'accueil**.
+  - **Lien / Fichier du CV** (`resumeUrl`).
+  - **Gestion dynamique des liens sociaux** : ajout/suppression avec sélecteur d'icônes vectorielles (GitHub, LinkedIn, X, Discord, etc.).
 
 ---
 
