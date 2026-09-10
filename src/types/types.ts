@@ -32,6 +32,10 @@ export type Repo = {
   collaborators: Collaborator[];
   pullRequests: PullRequest[];
   order?: number;
+  displayName?: string;
+  coverImage?: string;
+  demoUrl?: string;
+  isWip?: boolean;
 };
 
 /**
@@ -103,4 +107,42 @@ export type License = {
   spdx_id: string;
   url: string;
   node_id: string;
+};
+
+export type SiteSettingsType = {
+  id: number;
+  availabilityText: string;
+  heroHeadline: string;
+  heroSubtitle: string;
+  resumeUrl: string | null;
+  updatedAt?: string;
+};
+
+export type SocialLinkType = {
+  id: number;
+  platform: string;
+  label: string;
+  url: string;
+  icon: string;
+  order: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type ExperienceType = {
+  id: number;
+  title: string;
+  company: string;
+  location: string | null;
+  startDate: string;
+  endDate: string | null;
+  current: boolean;
+  type: 'work' | 'education';
+  description: string | null;
+  skills: string | null;
+  order: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };

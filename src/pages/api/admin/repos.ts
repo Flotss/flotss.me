@@ -32,19 +32,39 @@ export default async function adminReposHandler(req: NextApiRequest, res: NextAp
   }
 
   if (req.method === 'PATCH' || req.method === 'PUT') {
-    const { items, repoId, visible, description, order } = req.body || {};
+    const { items, repoId, visible, description, order, displayName, coverImage, demoUrl, isWip } =
+      req.body || {};
 
     // Support batch update (useful for reordering all or multiple repos at once)
     if (Array.isArray(items)) {
       try {
-        const updates = items.map((item: { repoId: number; order?: number; visible?: boolean }) =>
-          prisma.repoDB.update({
-            where: { repoId: Number(item.repoId) },
-            data: {
-              ...(typeof item.order === 'number' ? { order: item.order } : {}),
-              ...(typeof item.visible === 'boolean' ? { visible: item.visible } : {}),
-            },
-          }),
+        const updates = items.map(
+          (item: {
+            repoId: number;
+            order?: number;
+            visible?: boolean;
+            displayName?: string | null;
+            coverImage?: string | null;
+            demoUrl?: string | null;
+            isWip?: boolean;
+          }) =>
+            prisma.repoDB.update({
+              where: { repoId: Number(item.repoId) },
+              data: {
+                ...(typeof item.order === 'number' ? { order: item.order } : {}),
+                ...(typeof item.visible === 'boolean' ? { visible: item.visible } : {}),
+                ...(typeof item.displayName === 'string' || item.displayName === null
+                  ? { displayName: item.displayName }
+                  : {}),
+                ...(typeof item.coverImage === 'string' || item.coverImage === null
+                  ? { coverImage: item.coverImage }
+                  : {}),
+                ...(typeof item.demoUrl === 'string' || item.demoUrl === null
+                  ? { demoUrl: item.demoUrl }
+                  : {}),
+                ...(typeof item.isWip === 'boolean' ? { isWip: item.isWip } : {}),
+              },
+            }),
         );
 
         await prisma.$transaction(updates);
@@ -67,6 +87,10 @@ export default async function adminReposHandler(req: NextApiRequest, res: NextAp
           ...(typeof visible === 'boolean' ? { visible } : {}),
           ...(typeof description === 'string' || description === null ? { description } : {}),
           ...(typeof order === 'number' ? { order } : {}),
+          ...(typeof displayName === 'string' || displayName === null ? { displayName } : {}),
+          ...(typeof coverImage === 'string' || coverImage === null ? { coverImage } : {}),
+          ...(typeof demoUrl === 'string' || demoUrl === null ? { demoUrl } : {}),
+          ...(typeof isWip === 'boolean' ? { isWip } : {}),
         },
       });
 

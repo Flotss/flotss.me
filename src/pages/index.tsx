@@ -2,8 +2,10 @@ import Repos from '@/components/Repos';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import CareerTimeline from '@/components/CareerTimeline';
+import { prisma } from '@/lib/prisma';
 import { GithubService } from '@/services/GithubService';
-import { Repo } from '@/types/types';
+import { ExperienceType, Repo, SiteSettingsType, SocialLinkType } from '@/types/types';
 import { sortRepos } from '@/utils/RepoUtils';
 import { Box, Grid, Image, Tooltip } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
@@ -12,7 +14,7 @@ import type { GetStaticProps } from 'next';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React from 'react';
-import { FaArrowRight, FaEnvelope } from 'react-icons/fa';
+import { FaArrowRight, FaEnvelope, FaFileAlt } from 'react-icons/fa';
 
 const HeroScene = dynamic(() => import('@/components/three/HeroScene'), {
   ssr: false,
@@ -27,9 +29,17 @@ type TechStack = {
 
 interface HomeProps {
   repos?: Repo[];
+  settings?: SiteSettingsType;
+  experiences?: ExperienceType[];
+  socialLinks?: SocialLinkType[];
 }
 
-export default function Home({ repos = [] }: HomeProps) {
+export default function Home({
+  repos = [],
+  settings,
+  experiences = [],
+  socialLinks = [],
+}: HomeProps) {
   const isMobile = useIsMobile();
 
   const techStack: TechStack[] = [
@@ -119,7 +129,7 @@ export default function Home({ repos = [] }: HomeProps) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
                 </span>
-                Available for new opportunities
+                {settings?.availabilityText || 'Available for new opportunities'}
               </motion.div>
 
               <motion.div
@@ -128,7 +138,21 @@ export default function Home({ repos = [] }: HomeProps) {
                 transition={{ duration: 0.8, ease: 'easeOut' }}
               >
                 <h1 className="text-center text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                  Hello ! My name is <span className="text-emerald-400">Florian Mangin</span>
+                  {settings?.heroHeadline ? (
+                    settings.heroHeadline.includes('Florian Mangin') ? (
+                      <>
+                        {settings.heroHeadline.split('Florian Mangin')[0]}
+                        <span className="text-emerald-400">Florian Mangin</span>
+                        {settings.heroHeadline.split('Florian Mangin')[1]}
+                      </>
+                    ) : (
+                      settings.heroHeadline
+                    )
+                  ) : (
+                    <>
+                      Hello ! My name is <span className="text-emerald-400">Florian Mangin</span>
+                    </>
+                  )}
                 </h1>
               </motion.div>
               <motion.p
@@ -137,8 +161,8 @@ export default function Home({ repos = [] }: HomeProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
-                Software Engineer passionate about crafting robust software, clean architectures,
-                and modern web applications.
+                {settings?.heroSubtitle ||
+                  'Software Engineer passionate about crafting robust software, clean architectures, and modern web applications.'}
               </motion.p>
 
               {/* Action Buttons */}
@@ -162,6 +186,17 @@ export default function Home({ repos = [] }: HomeProps) {
                   <FaEnvelope className="h-3.5 w-3.5 text-zinc-400" />
                   <span>Contact Me</span>
                 </Link>
+                {settings?.resumeUrl && (
+                  <a
+                    href={settings.resumeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-zinc-300 transition-all duration-200 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300 active:scale-95"
+                  >
+                    <FaFileAlt className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Resume</span>
+                  </a>
+                )}
               </motion.div>
             </div>
           </div>
@@ -223,6 +258,9 @@ export default function Home({ repos = [] }: HomeProps) {
         </Box>
       </Box>
 
+      {/* Career Timeline Section */}
+      <CareerTimeline experiences={experiences} />
+
       {/* Projects section */}
       <Container className="mx-5 my-8 overflow-hidden px-0 sm:mx-20">
         <motion.div
@@ -241,10 +279,29 @@ export default function Home({ repos = [] }: HomeProps) {
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   try {
     const githubService = new GithubService();
-    const repos = await githubService.getRepos();
+    const [repos, settings, experiences, socialLinks] = await Promise.all([
+      githubService.getRepos().catch(() => []),
+      prisma.siteSettings.findUnique({ where: { id: 1 } }).catch(() => null),
+      prisma.experience
+        .findMany({
+          where: { visible: true },
+          orderBy: [{ order: 'asc' }, { id: 'asc' }],
+        })
+        .catch(() => []),
+      prisma.socialLink
+        .findMany({
+          where: { visible: true },
+          orderBy: [{ order: 'asc' }, { id: 'asc' }],
+        })
+        .catch(() => []),
+    ]);
+
     return {
       props: {
         repos: JSON.parse(JSON.stringify(sortRepos(repos || []))),
+        settings: settings ? JSON.parse(JSON.stringify(settings)) : null,
+        experiences: JSON.parse(JSON.stringify(experiences || [])),
+        socialLinks: JSON.parse(JSON.stringify(socialLinks || [])),
       },
       revalidate: 60,
     };

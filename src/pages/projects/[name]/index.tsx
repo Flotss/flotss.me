@@ -170,8 +170,14 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
-                  {repo.name}
+                  {repo.displayName || repo.name}
                 </h1>
+                {repo.displayName && <span className="text-xs text-zinc-500">({repo.name})</span>}
+                {repo.isWip && (
+                  <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-300">
+                    Work In Progress
+                  </span>
+                )}
                 {repo.archived && (
                   <span className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs font-medium text-zinc-400">
                     Archived
@@ -306,9 +312,20 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
 
           {/* Quick Actions / Clone Card */}
           <Container className="col-span-1 flex flex-col justify-center space-y-3 lg:col-span-3 xl:col-span-3">
-            <h2 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Quick Actions
             </h2>
+            {repo.demoUrl && (
+              <a
+                href={repo.demoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2.5 text-xs font-semibold text-zinc-950 transition-all duration-200 hover:bg-emerald-400 hover:shadow-lg hover:shadow-emerald-500/20"
+              >
+                <FaExternalLinkAlt className="h-3 w-3" />
+                <span>Live Demo</span>
+              </a>
+            )}
             <a
               href={repo.html_url}
               target="_blank"
