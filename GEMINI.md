@@ -70,3 +70,11 @@ Welcome to the **flotss.me** repository! This document defines workspace rules, 
 - Interactive configuration can be accessed inside the CLI via `/config` or `/settings`.
 - Global CLI settings are stored in `~/.gemini/antigravity-cli/settings.json`.
 - When running commands requiring filesystem access outside the workspace or writing `.git`, use `BypassSandbox: true`.
+
+---
+
+## 6. Vercel Preview Links Rule
+
+- Whenever mentioning "preview", "aperçu", or inviting the user to test / view the build, **ALWAYS provide the direct Vercel Preview URL** (retrieved from GitHub PR checks / Vercel comments).
+- Never invite the user to check the preview without providing the clickable Vercel deployment and preview link.
+
