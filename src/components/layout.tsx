@@ -1,18 +1,16 @@
-import React from 'react';
+import { SocialLinkType } from '@/types/types';
 import { useRouter } from 'next/router';
 import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 import Footer from './Footer';
 import Header from './Header';
 
-/**
- * The Layout component provides a consistent structure for web pages within the application.
- * It includes a header, animated page content, and a footer.
- *
- * @param {Object} props - The component's props.
- * @param {React.ReactNode} props.children - The content to be rendered within the main content area.
- * @returns {React.ReactNode} - The rendered Layout component.
- */
-export default function Layout({ children }: { children: React.ReactNode }): React.ReactNode {
+interface LayoutProps {
+  children: React.ReactNode;
+  socialLinks?: SocialLinkType[];
+}
+
+export default function Layout({ children, socialLinks }: LayoutProps): React.ReactNode {
   const router = useRouter();
   const pageKey = router.asPath.split('?')[0];
 
@@ -33,7 +31,7 @@ export default function Layout({ children }: { children: React.ReactNode }): Rea
           </motion.div>
         </AnimatePresence>
       </main>
-      <Footer />
+      <Footer initialSocialLinks={socialLinks} />
     </>
   );
 }

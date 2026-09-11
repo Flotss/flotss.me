@@ -322,6 +322,13 @@ function AdminDashboard({ user }: WithAuthProps) {
 
       if (res.ok) {
         showToast('Site settings and social links saved.');
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('socialLinksUpdated', {
+              detail: socialLinks.filter((s) => s.visible),
+            }),
+          );
+        }
       } else {
         showToast('Failed to save settings', 'error');
       }
