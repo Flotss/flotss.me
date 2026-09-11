@@ -64,12 +64,17 @@ function ProjectCardComponent(props: ProjectCardProps) {
                   className={`truncate text-lg font-semibold tracking-tight transition-colors duration-200 ${
                     isPrivate ? 'text-zinc-600' : 'text-zinc-200 group-hover:text-emerald-400'
                   }`}
-                  title={name}
+                  title={props.repo.displayName || name}
                 >
-                  {name}
+                  {props.repo.displayName || name}
                 </h3>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
+                {props.repo.isWip && (
+                  <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
+                    IN PROGRESS
+                  </span>
+                )}
                 {isFork && (
                   <span className="rounded-md border border-zinc-800 bg-zinc-900/80 px-2 py-0.5 text-[10px] font-medium text-zinc-400">
                     FORKED

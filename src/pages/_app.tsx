@@ -22,7 +22,7 @@ export default function App({
       <div className="bg-grid-pattern relative flex min-h-screen flex-col bg-[#050505] text-[#e4e4e7]">
         <ThreeBackground />
         <div className="relative z-10 flex flex-1 flex-col">
-          <Layout>
+          <Layout socialLinks={pageProps?.socialLinks}>
             <Component {...pageProps} />
           </Layout>
         </div>

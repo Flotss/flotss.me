@@ -116,7 +116,7 @@ export class GithubService {
       // Filter visible repos and exclude private repos
       repos = repos.filter((repo) => !repo.private && (mapRepoDb.get(repo.id)?.visible ?? true));
 
-      // Set descriptions and custom display order
+      // Set descriptions, custom display order, and custom metadata
       repos.forEach((repo) => {
         const repoDb = mapRepoDb.get(repo.id);
         if (repoDb) {
@@ -125,6 +125,18 @@ export class GithubService {
           }
           if (repoDb.order !== undefined && repoDb.order > 0) {
             repo.order = repoDb.order;
+          }
+          if (repoDb.displayName) {
+            repo.displayName = repoDb.displayName;
+          }
+          if (repoDb.coverImage) {
+            repo.coverImage = repoDb.coverImage;
+          }
+          if (repoDb.demoUrl) {
+            repo.demoUrl = repoDb.demoUrl;
+          }
+          if (typeof repoDb.isWip === 'boolean') {
+            repo.isWip = repoDb.isWip;
           }
         }
       });
@@ -144,13 +156,25 @@ export class GithubService {
         },
       });
 
-      // Set descriptions and order
+      // Set descriptions, order, and custom metadata
       if (repoDb) {
         if (repoDb.description) {
           repo.description = repoDb.description;
         }
         if (repoDb.order !== undefined && repoDb.order > 0) {
           repo.order = repoDb.order;
+        }
+        if (repoDb.displayName) {
+          repo.displayName = repoDb.displayName;
+        }
+        if (repoDb.coverImage) {
+          repo.coverImage = repoDb.coverImage;
+        }
+        if (repoDb.demoUrl) {
+          repo.demoUrl = repoDb.demoUrl;
+        }
+        if (typeof repoDb.isWip === 'boolean') {
+          repo.isWip = repoDb.isWip;
         }
       }
     } catch (dbError) {

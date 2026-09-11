@@ -32,6 +32,10 @@ export type Repo = {
   collaborators: Collaborator[];
   pullRequests: PullRequest[];
   order?: number;
+  displayName?: string;
+  coverImage?: string;
+  demoUrl?: string;
+  isWip?: boolean;
 };
 
 /**
@@ -104,3 +108,50 @@ export type License = {
   url: string;
   node_id: string;
 };
+
+export type SiteSettingsType = {
+  id: number;
+  availabilityText: string;
+  heroHeadline: string;
+  heroSubtitle: string;
+  resumeUrl: string | null;
+  updatedAt?: string;
+};
+
+export type SocialLinkType = {
+  id: number;
+  platform: string;
+  label: string;
+  url: string;
+  icon: string;
+  order: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export interface AdminRepoRecord {
+  repoId: number;
+  name: string;
+  description: string | null;
+  url: string | null;
+  visible: boolean;
+  order: number;
+  displayName?: string | null;
+  coverImage?: string | null;
+  demoUrl?: string | null;
+  isWip?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NavCategory = 'projects-catalog' | 'projects-order' | 'settings';
+export type ViewMode = 'block' | 'list';
+
+export interface RepoEditFormData {
+  displayName: string;
+  description: string;
+  coverImage: string;
+  demoUrl: string;
+  isWip: boolean;
+}
