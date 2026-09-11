@@ -129,3 +129,29 @@ export type SocialLinkType = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+export interface AdminRepoRecord {
+  repoId: number;
+  name: string;
+  description: string | null;
+  url: string | null;
+  visible: boolean;
+  order: number;
+  displayName?: string | null;
+  coverImage?: string | null;
+  demoUrl?: string | null;
+  isWip?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NavCategory = 'projects-catalog' | 'projects-order' | 'settings';
+export type ViewMode = 'block' | 'list';
+
+export interface RepoEditFormData {
+  displayName: string;
+  description: string;
+  coverImage: string;
+  demoUrl: string;
+  isWip: boolean;
+}

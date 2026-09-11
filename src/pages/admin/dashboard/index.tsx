@@ -1,53 +1,21 @@
+import AdminMobileNav from '@/components/admin/AdminMobileNav';
+import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminToast, { ToastState } from '@/components/admin/AdminToast';
+import ProjectsCatalogView from '@/components/admin/ProjectsCatalogView';
+import ProjectsOrderView from '@/components/admin/ProjectsOrderView';
+import SiteSettingsView from '@/components/admin/SiteSettingsView';
 import withAuth, { WithAuthProps } from '@/components/auth/withAuth';
 import SEO from '@/components/SEO';
-import { AVAILABLE_SOCIAL_ICONS, SocialIcon } from '@/components/icons/SocialIcon';
-import { SiteSettingsType, SocialLinkType } from '@/types/types';
-import Link from 'next/link';
+import {
+  AdminRepoRecord,
+  NavCategory,
+  RepoEditFormData,
+  SiteSettingsType,
+  SocialLinkType,
+  ViewMode,
+} from '@/types/types';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  FaArrowDown,
-  FaArrowUp,
-  FaCheck,
-  FaChevronDown,
-  FaChevronUp,
-  FaCog,
-  FaExternalLinkAlt,
-  FaEye,
-  FaEyeSlash,
-  FaImage,
-  FaLayerGroup,
-  FaList,
-  FaPlus,
-  FaRedo,
-  FaSave,
-  FaSearch,
-  FaSignOutAlt,
-  FaSortAmountDown,
-  FaStar,
-  FaSync,
-  FaThLarge,
-  FaTrash,
-  FaUserShield,
-} from 'react-icons/fa';
-
-export interface AdminRepoRecord {
-  repoId: number;
-  name: string;
-  description: string | null;
-  url: string | null;
-  visible: boolean;
-  order: number;
-  displayName?: string | null;
-  coverImage?: string | null;
-  demoUrl?: string | null;
-  isWip?: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-type NavCategory = 'projects-catalog' | 'projects-order' | 'settings';
-type ViewMode = 'block' | 'list';
 
 function AdminDashboard({ user }: WithAuthProps) {
   const router = useRouter();
@@ -67,18 +35,7 @@ function AdminDashboard({ user }: WithAuthProps) {
   const [savedSuccessRepoId, setSavedSuccessRepoId] = useState<number | null>(null);
 
   // Editable fields map for repos
-  const [editedRepos, setEditedRepos] = useState<
-    Record<
-      number,
-      {
-        displayName: string;
-        description: string;
-        coverImage: string;
-        demoUrl: string;
-        isWip: boolean;
-      }
-    >
-  >({});
+  const [editedRepos, setEditedRepos] = useState<Record<number, RepoEditFormData>>({});
 
   // Ordering Tab Repos
   const [orderedRepos, setOrderedRepos] = useState<AdminRepoRecord[]>([]);
@@ -99,16 +56,13 @@ function AdminDashboard({ user }: WithAuthProps) {
   const [savingSettings, setSavingSettings] = useState(false);
 
   // Toast Notification
-  const [toastMessage, setToastMessage] = useState<{
-    text: string;
-    type: 'success' | 'error';
-  } | null>(null);
+  const [toastMessage, setToastMessage] = useState<ToastState | null>(null);
 
   const showToast = useCallback((text: string, type: 'success' | 'error' = 'success') => {
     setToastMessage({ text, type });
     setTimeout(() => {
-      (setToastMessage(null), 4000);
-    });
+      setToastMessage(null);
+    }, 4000);
   }, []);
 
   // 1. Fetch Repositories
@@ -134,16 +88,7 @@ function AdminDashboard({ user }: WithAuthProps) {
         setHasOrderChanges(false);
 
         // Initialize edited map
-        const formMap: Record<
-          number,
-          {
-            displayName: string;
-            description: string;
-            coverImage: string;
-            demoUrl: string;
-            isWip: boolean;
-          }
-        > = {};
+        const formMap: Record<number, RepoEditFormData> = {};
         data.forEach((r) => {
           formMap[r.repoId] = {
             displayName: r.displayName || '',
@@ -199,30 +144,29 @@ function AdminDashboard({ user }: WithAuthProps) {
     }
   };
 
-  // Sync GitHub
+  // Sync Repositories with GitHub
   const handleSyncGithub = async () => {
     setSyncingGithub(true);
     try {
       const res = await fetch('/api/admin/sync', { method: 'POST' });
-      const data = await res.json();
       if (res.ok) {
-        showToast(data.message || 'Repositories synced successfully from GitHub.');
+        showToast('Repositories synchronized with GitHub successfully.');
         await fetchRepos();
       } else {
-        showToast(data.message || 'Sync failed', 'error');
+        showToast('Failed to sync repositories', 'error');
       }
     } catch {
-      showToast('Sync request failed', 'error');
+      showToast('Network error during GitHub sync', 'error');
     } finally {
       setSyncingGithub(false);
     }
   };
 
-  // Toggle Project Visibility
+  // Toggle Visibility
   const handleToggleVisibility = async (repo: AdminRepoRecord) => {
-    const nextVisible = !repo.visible;
+    const nextState = !repo.visible;
     setRepos((prev) =>
-      prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: nextVisible } : r)),
+      prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: nextState } : r)),
     );
 
     try {
@@ -231,27 +175,28 @@ function AdminDashboard({ user }: WithAuthProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           repoId: repo.repoId,
-          visible: nextVisible,
+          visible: nextState,
         }),
       });
 
       if (!res.ok) {
+        // Rollback
         setRepos((prev) =>
-          prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: repo.visible } : r)),
+          prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: !nextState } : r)),
         );
         showToast('Failed to update visibility', 'error');
       } else {
-        showToast(`Repository "${repo.name}" is now ${nextVisible ? 'visible' : 'hidden'}.`);
+        showToast(`Repository "${repo.name}" is now ${nextState ? 'visible' : 'hidden'}.`);
       }
     } catch {
       setRepos((prev) =>
-        prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: repo.visible } : r)),
+        prev.map((r) => (r.repoId === repo.repoId ? { ...r, visible: !nextState } : r)),
       );
-      showToast('Failed to update visibility', 'error');
+      showToast('Network error updating visibility', 'error');
     }
   };
 
-  // Save Project Changes
+  // Save Repo Details (Inline, no modals)
   const handleSaveRepoChanges = async (repoId: number) => {
     const form = editedRepos[repoId];
     if (!form) return;
@@ -263,84 +208,78 @@ function AdminDashboard({ user }: WithAuthProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           repoId,
-          displayName: form.displayName || null,
-          description: form.description || null,
-          coverImage: form.coverImage || null,
-          demoUrl: form.demoUrl || null,
+          displayName: form.displayName,
+          description: form.description,
+          coverImage: form.coverImage,
+          demoUrl: form.demoUrl,
           isWip: form.isWip,
         }),
       });
 
       if (res.ok) {
+        setSavedSuccessRepoId(repoId);
+        showToast('Project updated successfully.');
+        setTimeout(() => setSavedSuccessRepoId(null), 2500);
+        // Refresh local repo representation
         setRepos((prev) =>
           prev.map((r) =>
             r.repoId === repoId
               ? {
                   ...r,
-                  displayName: form.displayName || null,
-                  description: form.description || null,
-                  coverImage: form.coverImage || null,
-                  demoUrl: form.demoUrl || null,
+                  displayName: form.displayName,
+                  description: form.description,
+                  coverImage: form.coverImage,
+                  demoUrl: form.demoUrl,
                   isWip: form.isWip,
                 }
               : r,
           ),
         );
-        setSavedSuccessRepoId(repoId);
-        setTimeout(() => setSavedSuccessRepoId(null), 2500);
-        showToast('Repository details saved successfully.');
       } else {
-        showToast('Failed to save repository details', 'error');
+        showToast('Failed to save project updates', 'error');
       }
     } catch {
-      showToast('Network error saving repository', 'error');
+      showToast('Network error while saving project', 'error');
     } finally {
       setSavingRepoId(null);
     }
   };
 
-  // Reordering helpers for Projects
+  // Reordering Helpers
   const moveOrderItem = (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= orderedRepos.length) return;
 
-    const newItems = [...orderedRepos];
-    const [moved] = newItems.splice(index, 1);
-    newItems.splice(targetIndex, 0, moved);
+    const list = [...orderedRepos];
+    const [moved] = list.splice(index, 1);
+    list.splice(targetIndex, 0, moved);
 
-    const indexed = newItems.map((item, idx) => ({
-      ...item,
-      order: idx + 1,
-    }));
-
-    setOrderedRepos(indexed);
+    setOrderedRepos(list);
     setHasOrderChanges(true);
   };
 
-  const moveOrderToExtremity = (index: number, extremity: 'top' | 'bottom') => {
-    const newItems = [...orderedRepos];
-    const [moved] = newItems.splice(index, 1);
-    if (extremity === 'top') {
-      newItems.unshift(moved);
+  const moveOrderToExtremity = (index: number, to: 'top' | 'bottom') => {
+    if (to === 'top' && index === 0) return;
+    if (to === 'bottom' && index === orderedRepos.length - 1) return;
+
+    const list = [...orderedRepos];
+    const [moved] = list.splice(index, 1);
+    if (to === 'top') {
+      list.unshift(moved);
     } else {
-      newItems.push(moved);
+      list.push(moved);
     }
 
-    const indexed = newItems.map((item, idx) => ({
-      ...item,
-      order: idx + 1,
-    }));
-
-    setOrderedRepos(indexed);
+    setOrderedRepos(list);
     setHasOrderChanges(true);
   };
 
   const handleSaveBatchOrder = async () => {
     setSavingBatchOrder(true);
     try {
-      const items = orderedRepos.map((r, idx) => ({
+      const items = orderedRepos.map((r, index) => ({
         repoId: r.repoId,
-        order: idx + 1,
+        order: index + 1,
       }));
 
       const res = await fetch('/api/admin/repos', {
@@ -350,11 +289,11 @@ function AdminDashboard({ user }: WithAuthProps) {
       });
 
       if (res.ok) {
-        showToast('Custom project order saved successfully.');
+        showToast('New project display order saved.');
         setHasOrderChanges(false);
         await fetchRepos();
       } else {
-        showToast('Failed to save project order', 'error');
+        showToast('Failed to update project order', 'error');
       }
     } catch {
       showToast('Error saving project order', 'error');
@@ -364,6 +303,10 @@ function AdminDashboard({ user }: WithAuthProps) {
   };
 
   // Settings Handlers
+  const handleUpdateSiteSettings = (field: keyof SiteSettingsType, value: string | null) => {
+    setSiteSettings((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingSettings(true);
@@ -378,9 +321,9 @@ function AdminDashboard({ user }: WithAuthProps) {
       });
 
       if (res.ok) {
-        showToast('Site settings and social links updated successfully.');
+        showToast('Site settings and social links saved.');
       } else {
-        showToast('Failed to save site settings', 'error');
+        showToast('Failed to save settings', 'error');
       }
     } catch {
       showToast('Network error saving settings', 'error');
@@ -390,37 +333,50 @@ function AdminDashboard({ user }: WithAuthProps) {
   };
 
   const handleAddSocialLink = () => {
-    const newLink: SocialLinkType = {
-      id: -Date.now(), // temporary negative ID
-      platform: 'link',
-      label: 'New Link',
-      url: 'https://',
-      icon: 'FaGlobe',
-      order: socialLinks.length + 1,
-      visible: true,
-    };
-    setSocialLinks([...socialLinks, newLink]);
+    const nextOrder = socialLinks.length + 1;
+    setSocialLinks([
+      ...socialLinks,
+      {
+        id: 0,
+        platform: 'custom',
+        label: 'New Link',
+        url: 'https://',
+        icon: 'FaGlobe',
+        order: nextOrder,
+        visible: true,
+      },
+    ]);
   };
 
   const handleRemoveSocialLink = (index: number) => {
     setSocialLinks(socialLinks.filter((_, i) => i !== index));
   };
 
-  // Filtered Repos
+  const handleUpdateSocialLink = (
+    index: number,
+    field: keyof SocialLinkType,
+    value: string | boolean,
+  ) => {
+    setSocialLinks(socialLinks.map((l, i) => (i === index ? { ...l, [field]: value } : l)));
+  };
+
+  // Filtered & Searched Repositories
   const filteredRepos = useMemo(() => {
     return repos.filter((repo) => {
-      const form = editedRepos[repo.repoId] || {};
-      const dispName = form.displayName || repo.displayName || repo.name;
-      const matchesSearch =
-        dispName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (repo.description || '').toLowerCase().includes(searchQuery.toLowerCase());
+      const form = editedRepos[repo.repoId];
+      const matchSearch =
+        (form?.displayName || repo.displayName || repo.name)
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        (form?.description || repo.description || '')
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
 
-      if (!matchesSearch) return false;
+      if (!matchSearch) return false;
 
       if (filterStatus === 'visible') return repo.visible;
       if (filterStatus === 'hidden') return !repo.visible;
-      if (filterStatus === 'wip') return Boolean(form.isWip || repo.isWip);
+      if (filterStatus === 'wip') return form ? form.isWip : repo.isWip;
       return true;
     });
   }, [repos, editedRepos, searchQuery, filterStatus]);
@@ -442,898 +398,102 @@ function AdminDashboard({ user }: WithAuthProps) {
       <SEO page="dashboard" title="Admin Studio | flotss.me" />
 
       {/* Floating Toast Notification */}
-      {toastMessage && (
-        <div
-          className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border px-5 py-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 ${
-            toastMessage.type === 'error'
-              ? 'border-red-500/40 bg-red-950/90 text-red-200 shadow-red-500/10'
-              : 'border-emerald-500/40 bg-zinc-900/95 text-emerald-300 shadow-emerald-500/10'
-          }`}
-        >
-          <span
-            className={`flex h-2.5 w-2.5 rounded-full ${
-              toastMessage.type === 'error' ? 'bg-red-500' : 'bg-emerald-400'
-            }`}
-          />
-          <p className="text-sm font-medium">{toastMessage.text}</p>
-        </div>
-      )}
+      <AdminToast toastMessage={toastMessage} />
 
       <div className="flex min-h-screen bg-zinc-950 text-zinc-100">
         {/* =========================================================================
             SIDEBAR NAVIGATION
             ========================================================================= */}
-        <aside className="flex hidden w-64 flex-shrink-0 flex-col justify-between border-r border-white/5 bg-zinc-950/80 p-5 backdrop-blur-xl md:flex">
-          <div>
-            {/* Studio Header & User Profile */}
-            <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-md shadow-emerald-500/10">
-                <FaUserShield className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold tracking-tight text-white">flotss.me Studio</h2>
-                <p className="max-w-[140px] truncate text-[11px] text-zinc-400">{user?.email}</p>
-              </div>
-            </div>
-
-            {/* Navigation Categories */}
-            <div className="space-y-6">
-              <div>
-                <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                  Repositories
-                </p>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => setActiveCategory('projects-catalog')}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
-                      activeCategory === 'projects-catalog'
-                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm'
-                        : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <FaLayerGroup className="h-3.5 w-3.5" />
-                      Projects Catalog
-                    </span>
-                    <span className="rounded-md bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-400">
-                      {counts.total}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveCategory('projects-order')}
-                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
-                      activeCategory === 'projects-order'
-                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm'
-                        : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
-                    }`}
-                  >
-                    <span className="flex items-center gap-2.5">
-                      <FaSortAmountDown className="h-3.5 w-3.5" />
-                      Display Order
-                    </span>
-                    {counts.customOrdered > 0 && (
-                      <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300">
-                        {counts.customOrdered}
-                      </span>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
-                  Configuration
-                </p>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => setActiveCategory('settings')}
-                    className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
-                      activeCategory === 'settings'
-                        ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm'
-                        : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
-                    }`}
-                  >
-                    <FaCog className="h-3.5 w-3.5" />
-                    Site Settings & Links
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar Footer Actions */}
-          <div className="space-y-2 border-t border-white/5 pt-6">
-            <button
-              onClick={handleSyncGithub}
-              disabled={syncingGithub}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-zinc-300 transition-all hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300 disabled:opacity-50"
-            >
-              <FaSync
-                className={`h-3 w-3 ${syncingGithub ? 'animate-spin text-emerald-400' : ''}`}
-              />
-              <span>{syncingGithub ? 'Syncing GitHub...' : 'Sync Repositories'}</span>
-            </button>
-
-            <Link
-              href="/"
-              target="_blank"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-white/5 bg-white/[0.02] px-3 py-2 text-xs font-medium text-zinc-400 transition-all hover:bg-white/[0.05] hover:text-zinc-200"
-            >
-              <FaExternalLinkAlt className="h-3 w-3" />
-              <span>View Public Site</span>
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400 transition-all hover:bg-red-500/20 hover:text-red-300"
-            >
-              <FaSignOutAlt className="h-3 w-3" />
-              <span>Sign Out</span>
-            </button>
-          </div>
-        </aside>
+        <AdminSidebar
+          userEmail={user?.email}
+          activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory}
+          counts={counts}
+          syncingGithub={syncingGithub}
+          onSyncGithub={handleSyncGithub}
+          onLogout={handleLogout}
+        />
 
         {/* =========================================================================
             MAIN CONTENT AREA (NO MODALS)
             ========================================================================= */}
         <main className="mx-auto max-w-7xl flex-1 overflow-y-auto p-5 sm:p-8">
           {/* Mobile Top Navigation Tabs */}
-          <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4 md:hidden">
-            <div className="flex items-center gap-2">
-              <FaUserShield className="h-4 w-4 text-emerald-400" />
-              <span className="text-sm font-bold text-white">flotss.me Studio</span>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleSyncGithub}
-                disabled={syncingGithub}
-                className="rounded-lg border border-white/10 bg-white/[0.04] p-2 text-xs text-zinc-300"
-              >
-                <FaSync className={`h-3 w-3 ${syncingGithub ? 'animate-spin' : ''}`} />
-              </button>
-              <button
-                onClick={handleLogout}
-                className="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-xs text-red-400"
-              >
-                <FaSignOutAlt className="h-3 w-3" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mb-4 flex gap-2 overflow-x-auto border-b border-white/5 pb-4 md:hidden">
-            <button
-              onClick={() => setActiveCategory('projects-catalog')}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium ${
-                activeCategory === 'projects-catalog'
-                  ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-900 text-zinc-400'
-              }`}
-            >
-              Projects ({counts.total})
-            </button>
-            <button
-              onClick={() => setActiveCategory('projects-order')}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium ${
-                activeCategory === 'projects-order'
-                  ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-900 text-zinc-400'
-              }`}
-            >
-              Order ({counts.customOrdered})
-            </button>
-            <button
-              onClick={() => setActiveCategory('settings')}
-              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium ${
-                activeCategory === 'settings'
-                  ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
-                  : 'bg-zinc-900 text-zinc-400'
-              }`}
-            >
-              Settings
-            </button>
-          </div>
+          <AdminMobileNav
+            activeCategory={activeCategory}
+            setActiveCategory={setActiveCategory}
+            counts={counts}
+            syncingGithub={syncingGithub}
+            onSyncGithub={handleSyncGithub}
+            onLogout={handleLogout}
+          />
 
           {/* =========================================================================
               VIEW 1: PROJECTS CATALOG (WITH INLINE EXPANDABLE DETAILS)
               ========================================================================= */}
           {activeCategory === 'projects-catalog' && (
-            <div>
-              {/* Header & Stats Banner */}
-              <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/40 p-4">
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                    Total Repos
-                  </p>
-                  <p className="mt-1 text-2xl font-bold text-white">{counts.total}</p>
-                </div>
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/40 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                      Public Visible
-                    </p>
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                  </div>
-                  <p className="mt-1 text-2xl font-bold text-emerald-400">{counts.visible}</p>
-                </div>
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/40 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                      Hidden
-                    </p>
-                    <span className="h-2 w-2 rounded-full bg-zinc-500" />
-                  </div>
-                  <p className="mt-1 text-2xl font-bold text-zinc-400">{counts.hidden}</p>
-                </div>
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/40 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">
-                      Work In Progress
-                    </p>
-                    <span className="h-2 w-2 rounded-full bg-amber-400" />
-                  </div>
-                  <p className="mt-1 text-2xl font-bold text-amber-300">{counts.wip}</p>
-                </div>
-              </div>
-
-              {/* Search & Filter Bar */}
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/5 bg-zinc-900/30 p-3">
-                <div className="relative min-w-[220px] flex-1">
-                  <FaSearch className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-500" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by title, repository or description..."
-                    className="w-full rounded-xl border border-white/5 bg-zinc-900/70 py-2 pl-9 pr-4 text-xs text-zinc-200 placeholder-zinc-500 focus:border-emerald-500/40 focus:outline-none"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <select
-                    value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value as any)}
-                    className="rounded-xl border border-white/5 bg-zinc-900/70 px-3 py-2 text-xs text-zinc-300 focus:border-emerald-500/40 focus:outline-none"
-                  >
-                    <option value="all">All Repositories</option>
-                    <option value="visible">Visible Only</option>
-                    <option value="hidden">Hidden Only</option>
-                    <option value="wip">Work in Progress Only</option>
-                  </select>
-
-                  <div className="flex items-center rounded-xl border border-white/5 bg-zinc-900/70 p-1">
-                    <button
-                      onClick={() => setViewMode('block')}
-                      className={`rounded-lg p-1.5 text-xs ${
-                        viewMode === 'block'
-                          ? 'bg-emerald-500/20 text-emerald-300'
-                          : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
-                      title="Card view"
-                    >
-                      <FaThLarge className="h-3 w-3" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`rounded-lg p-1.5 text-xs ${
-                        viewMode === 'list'
-                          ? 'bg-emerald-500/20 text-emerald-300'
-                          : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
-                      title="List view"
-                    >
-                      <FaList className="h-3 w-3" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Projects List / Grid */}
-              {loadingRepos ? (
-                <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
-                  <FaSync className="mb-3 h-6 w-6 animate-spin text-emerald-400" />
-                  <p className="text-xs">Loading repositories...</p>
-                </div>
-              ) : filteredRepos.length === 0 ? (
-                <div className="rounded-2xl border border-white/5 bg-zinc-900/20 py-16 text-center text-zinc-500">
-                  <p className="text-sm">No repositories found matching your filters.</p>
-                </div>
-              ) : (
-                <div
-                  className={
-                    viewMode === 'block' ? 'grid grid-cols-1 gap-4 md:grid-cols-2' : 'space-y-3'
-                  }
-                >
-                  {filteredRepos.map((repo) => {
-                    const form = editedRepos[repo.repoId] || {
-                      displayName: repo.displayName || '',
-                      description: repo.description || '',
-                      coverImage: repo.coverImage || '',
-                      demoUrl: repo.demoUrl || '',
-                      isWip: Boolean(repo.isWip),
-                    };
-                    const isExpanded = Boolean(expandedRepoIds[repo.repoId]);
-                    const isSaving = savingRepoId === repo.repoId;
-                    const isSaved = savedSuccessRepoId === repo.repoId;
-
-                    return (
-                      <div
-                        key={repo.repoId}
-                        className="rounded-2xl border border-white/5 bg-zinc-900/40 p-5 backdrop-blur-md transition-all hover:border-white/10"
-                      >
-                        {/* Summary Header */}
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0 space-y-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="truncate text-sm font-semibold text-white">
-                                {form.displayName ? form.displayName : repo.name}
-                              </h3>
-                              {form.displayName && (
-                                <span className="truncate text-[10px] text-zinc-500">
-                                  ({repo.name})
-                                </span>
-                              )}
-                              {form.isWip && (
-                                <span className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-300">
-                                  WIP
-                                </span>
-                              )}
-                              {repo.order > 0 && (
-                                <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300">
-                                  #{repo.order}
-                                </span>
-                              )}
-                            </div>
-                            <p className="line-clamp-2 text-xs text-zinc-400">
-                              {form.description || 'No description provided.'}
-                            </p>
-                          </div>
-
-                          <div className="flex flex-shrink-0 items-center gap-2">
-                            {/* Toggle visibility */}
-                            <button
-                              onClick={() => handleToggleVisibility(repo)}
-                              className={`rounded-xl border p-2 text-xs transition-all ${
-                                repo.visible
-                                  ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
-                                  : 'border-zinc-800 bg-zinc-900 text-zinc-500 hover:text-zinc-300'
-                              }`}
-                              title={repo.visible ? 'Visible on site' : 'Hidden from site'}
-                            >
-                              {repo.visible ? (
-                                <FaEye className="h-3.5 w-3.5" />
-                              ) : (
-                                <FaEyeSlash className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-
-                            {/* Inline Expand Button */}
-                            <button
-                              onClick={() =>
-                                setExpandedRepoIds((prev) => ({
-                                  ...prev,
-                                  [repo.repoId]: !isExpanded,
-                                }))
-                              }
-                              className={`rounded-xl border p-2 text-xs transition-all ${
-                                isExpanded
-                                  ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-                                  : 'border-white/10 bg-white/[0.04] text-zinc-400 hover:text-white'
-                              }`}
-                              title={isExpanded ? 'Collapse panel' : 'Edit details inline'}
-                            >
-                              {isExpanded ? (
-                                <FaChevronUp className="h-3.5 w-3.5" />
-                              ) : (
-                                <FaChevronDown className="h-3.5 w-3.5" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-
-                        {/* INLINE EXPANDABLE EDIT PANEL (NO MODALS) */}
-                        {isExpanded && (
-                          <div className="mt-4 space-y-4 border-t border-white/10 pt-4">
-                            {/* Custom Display Name */}
-                            <div>
-                              <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                Custom Display Title
-                              </label>
-                              <input
-                                type="text"
-                                value={form.displayName}
-                                onChange={(e) =>
-                                  setEditedRepos((prev) => ({
-                                    ...prev,
-                                    [repo.repoId]: {
-                                      ...form,
-                                      displayName: e.target.value,
-                                    },
-                                  }))
-                                }
-                                placeholder={repo.name}
-                                className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:border-emerald-500/50 focus:outline-none"
-                              />
-                            </div>
-
-                            {/* Cover Image & Preview */}
-                            <div>
-                              <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                Cover Image URL
-                              </label>
-                              <div className="flex gap-2">
-                                <input
-                                  type="text"
-                                  value={form.coverImage}
-                                  onChange={(e) =>
-                                    setEditedRepos((prev) => ({
-                                      ...prev,
-                                      [repo.repoId]: {
-                                        ...form,
-                                        coverImage: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                  placeholder="https://... or /projects/preview.png"
-                                  className="flex-1 rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                                {form.coverImage && (
-                                  <a
-                                    href={form.coverImage}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="rounded-xl border border-white/10 bg-white/[0.04] p-2 text-zinc-400 hover:text-white"
-                                    title="Open image"
-                                  >
-                                    <FaImage className="h-3.5 w-3.5" />
-                                  </a>
-                                )}
-                              </div>
-                              {form.coverImage && (
-                                <div className="mt-2 h-24 w-full overflow-hidden rounded-xl border border-white/5 bg-zinc-950">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img
-                                    src={form.coverImage}
-                                    alt="Cover preview"
-                                    className="h-full w-full object-cover"
-                                    onError={(e) => {
-                                      (e.target as HTMLElement).style.display = 'none';
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Live Demo URL & WIP Toggle */}
-                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Live Demo URL
-                                </label>
-                                <input
-                                  type="text"
-                                  value={form.demoUrl}
-                                  onChange={(e) =>
-                                    setEditedRepos((prev) => ({
-                                      ...prev,
-                                      [repo.repoId]: {
-                                        ...form,
-                                        demoUrl: e.target.value,
-                                      },
-                                    }))
-                                  }
-                                  placeholder="https://demo.flotss.me"
-                                  className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:border-emerald-500/50 focus:outline-none"
-                                />
-                              </div>
-
-                              <div>
-                                <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                  Status
-                                </label>
-                                <label className="mt-1.5 flex cursor-pointer items-center gap-2">
-                                  <input
-                                    type="checkbox"
-                                    checked={form.isWip}
-                                    onChange={(e) =>
-                                      setEditedRepos((prev) => ({
-                                        ...prev,
-                                        [repo.repoId]: {
-                                          ...form,
-                                          isWip: e.target.checked,
-                                        },
-                                      }))
-                                    }
-                                    className="rounded border-zinc-700 bg-zinc-900 text-emerald-500 focus:ring-emerald-500"
-                                  />
-                                  <span className="text-xs text-zinc-300">
-                                    Work In Progress (WIP)
-                                  </span>
-                                </label>
-                              </div>
-                            </div>
-
-                            {/* Description */}
-                            <div>
-                              <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                                Custom Description
-                              </label>
-                              <textarea
-                                rows={3}
-                                value={form.description}
-                                onChange={(e) =>
-                                  setEditedRepos((prev) => ({
-                                    ...prev,
-                                    [repo.repoId]: {
-                                      ...form,
-                                      description: e.target.value,
-                                    },
-                                  }))
-                                }
-                                placeholder="Describe the purpose, tech stack, and achievements of this project..."
-                                className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 placeholder-zinc-600 focus:border-emerald-500/50 focus:outline-none"
-                              />
-                            </div>
-
-                            {/* Save Actions */}
-                            <div className="flex items-center justify-end gap-2 pt-2">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setExpandedRepoIds((prev) => ({
-                                    ...prev,
-                                    [repo.repoId]: false,
-                                  }))
-                                }
-                                className="rounded-xl px-3 py-1.5 text-xs font-medium text-zinc-400 hover:text-white"
-                              >
-                                Collapse
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleSaveRepoChanges(repo.repoId)}
-                                disabled={isSaving}
-                                className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-semibold transition-all ${
-                                  isSaved
-                                    ? 'bg-emerald-500 text-zinc-950'
-                                    : 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500/30'
-                                }`}
-                              >
-                                {isSaved ? (
-                                  <>
-                                    <FaCheck className="h-3 w-3" />
-                                    <span>Saved !</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <FaSave
-                                      className={`h-3 w-3 ${isSaving ? 'animate-spin' : ''}`}
-                                    />
-                                    <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+            <ProjectsCatalogView
+              counts={counts}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+              viewMode={viewMode}
+              setViewMode={setViewMode}
+              loadingRepos={loadingRepos}
+              filteredRepos={filteredRepos}
+              editedRepos={editedRepos}
+              expandedRepoIds={expandedRepoIds}
+              savingRepoId={savingRepoId}
+              savedSuccessRepoId={savedSuccessRepoId}
+              onToggleVisibility={handleToggleVisibility}
+              onToggleExpand={(repoId) =>
+                setExpandedRepoIds((prev) => ({
+                  ...prev,
+                  [repoId]: !prev[repoId],
+                }))
+              }
+              onFieldChange={(repoId, field, val) =>
+                setEditedRepos((prev) => ({
+                  ...prev,
+                  [repoId]: {
+                    ...prev[repoId],
+                    [field]: val,
+                  },
+                }))
+              }
+              onSaveRepoChanges={handleSaveRepoChanges}
+            />
           )}
 
           {/* =========================================================================
               VIEW 2: DISPLAY ORDER MANAGEMENT (NO MODALS)
               ========================================================================= */}
           {activeCategory === 'projects-order' && (
-            <div className="space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/5 bg-zinc-900/30 p-5">
-                <div>
-                  <h2 className="text-base font-bold text-white">Project Display Ordering</h2>
-                  <p className="mt-0.5 text-xs text-zinc-400">
-                    Position #1 appears first on your portfolio. Repositories with custom order take
-                    precedence.
-                  </p>
-                </div>
-                <button
-                  onClick={handleSaveBatchOrder}
-                  disabled={!hasOrderChanges || savingBatchOrder}
-                  className={`inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all ${
-                    hasOrderChanges
-                      ? 'bg-emerald-500 text-zinc-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-400'
-                      : 'cursor-not-allowed border border-white/10 bg-zinc-900 text-zinc-500'
-                  }`}
-                >
-                  <FaSave className={`h-3.5 w-3.5 ${savingBatchOrder ? 'animate-spin' : ''}`} />
-                  <span>{savingBatchOrder ? 'Saving Order...' : 'Save New Order'}</span>
-                </button>
-              </div>
-
-              <div className="space-y-2">
-                {orderedRepos.map((item, index) => (
-                  <div
-                    key={item.repoId}
-                    className="flex items-center justify-between rounded-xl border border-white/5 bg-zinc-900/40 px-4 py-3 transition-all hover:border-white/10"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-xs font-bold text-emerald-400">
-                        {index + 1}
-                      </span>
-                      <div className="truncate">
-                        <p className="truncate text-xs font-semibold text-zinc-200">
-                          {item.displayName || item.name}
-                        </p>
-                        {item.displayName && (
-                          <p className="text-[10px] text-zinc-500">{item.name}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-shrink-0 items-center gap-1.5">
-                      <button
-                        onClick={() => moveOrderToExtremity(index, 'top')}
-                        disabled={index === 0}
-                        className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-30"
-                        title="Jump to Top"
-                      >
-                        <span className="text-[10px] font-bold">TOP</span>
-                      </button>
-                      <button
-                        onClick={() => moveOrderItem(index, 'up')}
-                        disabled={index === 0}
-                        className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-30"
-                        title="Move Up"
-                      >
-                        <FaArrowUp className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => moveOrderItem(index, 'down')}
-                        disabled={index === orderedRepos.length - 1}
-                        className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-30"
-                        title="Move Down"
-                      >
-                        <FaArrowDown className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => moveOrderToExtremity(index, 'bottom')}
-                        disabled={index === orderedRepos.length - 1}
-                        className="rounded-lg border border-white/5 bg-zinc-900 p-1.5 text-zinc-400 hover:text-white disabled:opacity-30"
-                        title="Jump to Bottom"
-                      >
-                        <span className="text-[10px] font-bold">END</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <ProjectsOrderView
+              orderedRepos={orderedRepos}
+              hasOrderChanges={hasOrderChanges}
+              savingBatchOrder={savingBatchOrder}
+              onMoveOrderItem={moveOrderItem}
+              onMoveOrderToExtremity={moveOrderToExtremity}
+              onSaveBatchOrder={handleSaveBatchOrder}
+            />
           )}
 
           {/* =========================================================================
-              VIEW 4: SITE SETTINGS & SOCIAL LINKS (NO MODALS)
+              VIEW 3: SITE SETTINGS & SOCIAL LINKS (NO MODALS)
               ========================================================================= */}
           {activeCategory === 'settings' && (
-            <form onSubmit={handleSaveSettings} className="space-y-6">
-              <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-white/5 bg-zinc-900/30 p-5">
-                <div>
-                  <h2 className="text-base font-bold text-white">Site Settings & Bio</h2>
-                  <p className="mt-0.5 text-xs text-zinc-400">
-                    Customize the homepage Hero text, availability indicator, resume link, and
-                    social networks.
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  disabled={savingSettings}
-                  className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-5 py-2.5 text-xs font-semibold text-zinc-950 shadow-lg shadow-emerald-500/20 transition-all hover:bg-emerald-400 disabled:opacity-50"
-                >
-                  <FaSave className={`h-3.5 w-3.5 ${savingSettings ? 'animate-spin' : ''}`} />
-                  <span>{savingSettings ? 'Saving Settings...' : 'Save Settings'}</span>
-                </button>
-              </div>
-
-              {/* Card 1: Hero Availability & Preview */}
-              <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-md">
-                <h3 className="flex items-center gap-2 text-sm font-bold text-white">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
-                  </span>
-                  Availability Status Badge
-                </h3>
-
-                <div>
-                  <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                    Badge Text
-                  </label>
-                  <input
-                    type="text"
-                    value={siteSettings.availabilityText}
-                    onChange={(e) =>
-                      setSiteSettings({ ...siteSettings, availabilityText: e.target.value })
-                    }
-                    placeholder="Available for new opportunities"
-                    className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-
-                {/* Live Badge Preview */}
-                <div className="rounded-xl border border-white/5 bg-zinc-950/60 p-4">
-                  <p className="mb-2 text-[10px] font-semibold uppercase text-zinc-500">
-                    Live Preview on Hero:
-                  </p>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-medium text-emerald-400">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-                    </span>
-                    {siteSettings.availabilityText || 'Available for new opportunities'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Headline & Subtitle */}
-              <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-md">
-                <h3 className="text-sm font-bold text-white">Hero Intro & Bio</h3>
-
-                <div>
-                  <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                    Main Headline
-                  </label>
-                  <input
-                    type="text"
-                    value={siteSettings.heroHeadline}
-                    onChange={(e) =>
-                      setSiteSettings({ ...siteSettings, heroHeadline: e.target.value })
-                    }
-                    placeholder="Hello ! My name is Florian Mangin"
-                    className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                    Subtitle / Bio
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={siteSettings.heroSubtitle}
-                    onChange={(e) =>
-                      setSiteSettings({ ...siteSettings, heroSubtitle: e.target.value })
-                    }
-                    placeholder="Software Engineer passionate about crafting robust software..."
-                    className="w-full rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Card 3: Curriculum Vitae (CV) */}
-              <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-md">
-                <h3 className="text-sm font-bold text-white">Curriculum Vitae (CV) Document</h3>
-
-                <div>
-                  <label className="mb-1 block text-[11px] font-medium text-zinc-400">
-                    Resume Document URL (local path or external link)
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={siteSettings.resumeUrl || ''}
-                      onChange={(e) =>
-                        setSiteSettings({ ...siteSettings, resumeUrl: e.target.value })
-                      }
-                      placeholder="/cv.pdf"
-                      className="flex-1 rounded-xl border border-white/10 bg-zinc-950 px-3 py-2 text-xs text-zinc-200 focus:border-emerald-500/50 focus:outline-none"
-                    />
-                    {siteSettings.resumeUrl && (
-                      <a
-                        href={siteSettings.resumeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-zinc-300 hover:text-white"
-                      >
-                        <FaExternalLinkAlt className="h-3 w-3" />
-                        Preview
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 4: Social Links Management */}
-              <div className="space-y-4 rounded-2xl border border-white/5 bg-zinc-900/40 p-6 backdrop-blur-md">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white">Social Networks & Links</h3>
-                  <button
-                    type="button"
-                    onClick={handleAddSocialLink}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-500/20"
-                  >
-                    <FaPlus className="h-3 w-3" />
-                    <span>Add Link</span>
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  {socialLinks.map((link, idx) => (
-                    <div
-                      key={link.id || idx}
-                      className="flex flex-wrap items-center gap-3 rounded-xl border border-white/5 bg-zinc-950/60 p-3"
-                    >
-                      {/* Icon Preview & Selector */}
-                      <div className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
-                          <SocialIcon iconName={link.icon} className="h-4 w-4" />
-                        </div>
-                        <select
-                          value={link.icon}
-                          onChange={(e) =>
-                            setSocialLinks(
-                              socialLinks.map((l, i) =>
-                                i === idx ? { ...l, icon: e.target.value } : l,
-                              ),
-                            )
-                          }
-                          className="rounded-lg border border-white/10 bg-zinc-900 px-2 py-1.5 text-xs text-zinc-200 focus:outline-none"
-                        >
-                          {AVAILABLE_SOCIAL_ICONS.map((opt) => (
-                            <option key={opt.key} value={opt.key}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Label */}
-                      <div className="w-28">
-                        <input
-                          type="text"
-                          value={link.label}
-                          onChange={(e) =>
-                            setSocialLinks(
-                              socialLinks.map((l, i) =>
-                                i === idx ? { ...l, label: e.target.value } : l,
-                              ),
-                            )
-                          }
-                          placeholder="Label"
-                          className="w-full rounded-lg border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none"
-                        />
-                      </div>
-
-                      {/* URL */}
-                      <div className="min-w-[200px] flex-1">
-                        <input
-                          type="text"
-                          value={link.url}
-                          onChange={(e) =>
-                            setSocialLinks(
-                              socialLinks.map((l, i) =>
-                                i === idx ? { ...l, url: e.target.value } : l,
-                              ),
-                            )
-                          }
-                          placeholder="https://..."
-                          className="w-full rounded-lg border border-white/10 bg-zinc-900 px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none"
-                        />
-                      </div>
-
-                      {/* Delete link */}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSocialLink(idx)}
-                        className="rounded-lg border border-red-500/20 bg-red-500/10 p-2 text-red-400 hover:bg-red-500/20"
-                        title="Remove link"
-                      >
-                        <FaTrash className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </form>
+            <SiteSettingsView
+              siteSettings={siteSettings}
+              onUpdateSettings={handleUpdateSiteSettings}
+              socialLinks={socialLinks}
+              onAddSocialLink={handleAddSocialLink}
+              onUpdateSocialLink={handleUpdateSocialLink}
+              onRemoveSocialLink={handleRemoveSocialLink}
+              savingSettings={savingSettings}
+              onSaveSettings={handleSaveSettings}
+            />
           )}
         </main>
       </div>
