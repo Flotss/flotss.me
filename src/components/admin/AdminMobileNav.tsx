@@ -8,6 +8,7 @@ interface AdminMobileNavProps {
   counts: {
     total: number;
     customOrdered: number;
+    experiences?: number;
   };
   syncingGithub: boolean;
   onSyncGithub: () => void;
@@ -70,6 +71,16 @@ export default function AdminMobileNav({
           }`}
         >
           Order ({counts.customOrdered})
+        </button>
+        <button
+          onClick={() => setActiveCategory('experiences')}
+          className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium ${
+            activeCategory === 'experiences'
+              ? 'border border-emerald-500/40 bg-emerald-500/20 text-emerald-300'
+              : 'bg-zinc-900 text-zinc-400'
+          }`}
+        >
+          Experiences {counts.experiences !== undefined ? `(${counts.experiences})` : ''}
         </button>
         <button
           onClick={() => setActiveCategory('settings')}

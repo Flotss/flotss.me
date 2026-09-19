@@ -2,6 +2,7 @@ import { NavCategory } from '@/types/types';
 import Link from 'next/link';
 import React from 'react';
 import {
+  FaBriefcase,
   FaCog,
   FaExternalLinkAlt,
   FaLayerGroup,
@@ -18,6 +19,7 @@ interface AdminSidebarProps {
   counts: {
     total: number;
     customOrdered: number;
+    experiences?: number;
   };
   syncingGithub: boolean;
   onSyncGithub: () => void;
@@ -86,6 +88,32 @@ export default function AdminSidebar({
                 {counts.customOrdered > 0 && (
                   <span className="rounded-md border border-emerald-500/30 bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300">
                     {counts.customOrdered}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
+              Career & Journey
+            </p>
+            <div className="space-y-1">
+              <button
+                onClick={() => setActiveCategory('experiences')}
+                className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all ${
+                  activeCategory === 'experiences'
+                    ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 shadow-sm'
+                    : 'text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200'
+                }`}
+              >
+                <span className="flex items-center gap-2.5">
+                  <FaBriefcase className="h-3.5 w-3.5" />
+                  Experience & Education
+                </span>
+                {counts.experiences !== undefined && counts.experiences > 0 && (
+                  <span className="rounded-md bg-zinc-800/80 px-1.5 py-0.5 text-[10px] text-zinc-400">
+                    {counts.experiences}
                   </span>
                 )}
               </button>

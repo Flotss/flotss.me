@@ -31,6 +31,13 @@ export const pagesSEO: Record<string, PageSEO> = {
     canonical: 'https://flotss.me/contact',
     noindex: false,
   },
+  experience: {
+    title: 'Experience & Education — Florian Mangin',
+    description:
+      'Career timeline, professional experiences, academic degrees, and engineering accomplishments of Florian Mangin.',
+    canonical: 'https://flotss.me/experience',
+    noindex: false,
+  },
   projects: {
     title: 'Projects — Florian Mangin',
     description: 'Explore software engineering projects and repositories by Florian Mangin.',

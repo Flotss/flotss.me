@@ -172,7 +172,7 @@ const Repos = React.memo((props: ReposProps) => {
         </Box>
       </section>
       {props.limit && filteredRepos.length > props.limit && (
-        <Box className="mb-8 mt-6 flex justify-center">
+        <Box className="mt-6 flex justify-center">
           <button
             className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-7 py-3 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white hover:shadow-lg hover:shadow-emerald-500/10 active:translate-y-0"
             onClick={() => {

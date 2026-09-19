@@ -10,7 +10,7 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 | :--- | :--- | :---: | :---: | :---: |
 | 🔴 **P1** | **SEO, Indexabilité & Référencement Contrôlé** | Élevé | Faible | ✅ **Terminé (PR #25)** |
 | 🔴 **P1** | **Correction Fetch READMEs (Branches `master`/`main`)** | Élevé | Faible | ✅ **Terminé (PR #25)** |
-| 🔴 **P1** | **Section Expérience & Timeline Pro (Accueil)** | Très élevé | Modérée | ⏳ **Planifié (Prochaine PR dédiée)** |
+| 🔴 **P1** | **Page Dédiée Expérience & Career Timeline (`/experience`)** | Très élevé | Modérée | ✅ **Terminé** |
 | 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ✅ **Terminé (PR #26)** |
 | 🟡 **P2** | **Back-Office Enrichi & Mini-CMS (Zéro Modale, Sidebar)** | Élevé | Modérée | ✅ **Terminé (PR #26)** |
 | 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | 🚀 **Prêt à démarrer** |
@@ -44,12 +44,16 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 
 ---
 
-## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — ⏳ PLANIFIÉ (PROCHAINE PR)
+## 2. 💼 Expérience & Crédibilité Professionnelle (Priorité 1) — ✅ TERMINÉ
 
-> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels directement sur la page d'accueil dans une PR dédiée.
+> **Objectif** : Mettre en lumière la valeur ajoutée concrète pour les recruteurs et clients potentiels sur une page dédiée (`/experience`) et administrable sans recompiler de code.
 
-- [ ] **Section Parcours & Expériences (« Career Timeline »)** :
-  - Sera développée et intégrée dans une PR dédiée ultérieure.
+- [x] **Page Dédiée Parcours & Expériences (« Career Timeline » à `/experience`)** :
+  - Timeline verticale continue à nœuds lumineux émeraude (`emerald-400`).
+  - Imbrication simultanée côte-à-côte des expériences en parallèle (Société Générale & ISEP).
+  - Éléments seuls centrés sur la timeline (Dalkia, Hanze University, IUT Charlemagne).
+  - Logos officiels vectoriels/PNG, puces de réalisations clés avec métriques du CV (−90 %, −2 jours/mois), et tags de compétences.
+  - Module d'administration autonome complet en Back-Office sans modale (CRUD, ordre, statut actif/terminé).
 - [x] **Bouton d'accès direct au CV (PDF)** :
   - Bouton d'action direct « Resume » dans le Hero connecté au champ dynamique `resumeUrl`.
 - [ ] **Études de Cas sur les Projets Phares (« Featured Case Studies »)** :

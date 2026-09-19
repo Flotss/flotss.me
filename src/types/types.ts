@@ -145,7 +145,7 @@ export interface AdminRepoRecord {
   updatedAt: string;
 }
 
-export type NavCategory = 'projects-catalog' | 'projects-order' | 'settings';
+export type NavCategory = 'projects-catalog' | 'projects-order' | 'experiences' | 'settings';
 export type ViewMode = 'block' | 'list';
 
 export interface RepoEditFormData {
@@ -154,4 +154,23 @@ export interface RepoEditFormData {
   coverImage: string;
   demoUrl: string;
   isWip: boolean;
+}
+
+export interface ExperienceType {
+  id: number;
+  title: string;
+  company: string;
+  location?: string | null;
+  startDate: string;
+  endDate?: string | null;
+  current: boolean;
+  type: 'work' | 'education';
+  description?: string | null;
+  highlights?: string | null;
+  skills?: string | null;
+  logoUrl?: string | null;
+  order: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
