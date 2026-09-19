@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { FaCode, FaEnvelope, FaHome, FaProjectDiagram, FaBars } from 'react-icons/fa';
+import { FaCode, FaEnvelope, FaHome, FaProjectDiagram, FaBars, FaBriefcase } from 'react-icons/fa';
 import { useState } from 'react';
 import { IconType } from 'react-icons/lib';
 import React from 'react';
@@ -57,6 +57,12 @@ export default function Header() {
       label: 'Projects',
       icon: FaProjectDiagram,
       isSelected: currentPath.startsWith('/projects'),
+    },
+    {
+      href: '/experience',
+      label: 'Experience',
+      icon: FaBriefcase,
+      isSelected: currentPath.startsWith('/experience'),
     },
     {
       href: '/contact',

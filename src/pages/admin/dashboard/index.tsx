@@ -1,6 +1,7 @@
 import AdminMobileNav from '@/components/admin/AdminMobileNav';
 import AdminSidebar from '@/components/admin/AdminSidebar';
 import AdminToast, { ToastState } from '@/components/admin/AdminToast';
+import ExperiencesManager from '@/components/admin/ExperiencesManager';
 import ProjectsCatalogView from '@/components/admin/ProjectsCatalogView';
 import ProjectsOrderView from '@/components/admin/ProjectsOrderView';
 import SiteSettingsView from '@/components/admin/SiteSettingsView';
@@ -8,6 +9,7 @@ import withAuth, { WithAuthProps } from '@/components/auth/withAuth';
 import SEO from '@/components/SEO';
 import {
   AdminRepoRecord,
+  ExperienceType,
   NavCategory,
   RepoEditFormData,
   SiteSettingsType,
@@ -54,6 +56,10 @@ function AdminDashboard({ user }: WithAuthProps) {
   const [socialLinks, setSocialLinks] = useState<SocialLinkType[]>([]);
   const [loadingSettings, setLoadingSettings] = useState(false);
   const [savingSettings, setSavingSettings] = useState(false);
+
+  // Experiences State
+  const [experiences, setExperiences] = useState<ExperienceType[]>([]);
+  const [loadingExperiences, setLoadingExperiences] = useState(false);
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<ToastState | null>(null);
@@ -128,11 +134,30 @@ function AdminDashboard({ user }: WithAuthProps) {
     }
   }, [showToast]);
 
+  // 3. Fetch Experiences
+  const fetchExperiences = useCallback(async () => {
+    setLoadingExperiences(true);
+    try {
+      const res = await fetch('/api/admin/experiences');
+      if (res.ok) {
+        const data: ExperienceType[] = await res.json();
+        setExperiences(data);
+      } else {
+        showToast('Failed to load experiences', 'error');
+      }
+    } catch {
+      showToast('Network error loading experiences', 'error');
+    } finally {
+      setLoadingExperiences(false);
+    }
+  }, [showToast]);
+
   // Initial Data Loading
   useEffect(() => {
     fetchRepos();
     fetchSettings();
-  }, [fetchRepos, fetchSettings]);
+    fetchExperiences();
+  }, [fetchRepos, fetchSettings, fetchExperiences]);
 
   // Logout
   const handleLogout = async () => {
@@ -396,8 +421,9 @@ function AdminDashboard({ user }: WithAuthProps) {
       hidden: repos.filter((r) => !r.visible).length,
       customOrdered: repos.filter((r) => r.order > 0).length,
       wip: repos.filter((r) => r.isWip).length,
+      experiences: experiences.length,
     }),
-    [repos],
+    [repos, experiences],
   );
 
   return (
@@ -488,7 +514,18 @@ function AdminDashboard({ user }: WithAuthProps) {
           )}
 
           {/* =========================================================================
-              VIEW 3: SITE SETTINGS & SOCIAL LINKS (NO MODALS)
+              VIEW 3: CAREER & EDUCATION EXPERIENCES (NO MODALS)
+              ========================================================================= */}
+          {activeCategory === 'experiences' && (
+            <ExperiencesManager
+              experiences={experiences}
+              onRefresh={fetchExperiences}
+              showToast={showToast}
+            />
+          )}
+
+          {/* =========================================================================
+              VIEW 4: SITE SETTINGS & SOCIAL LINKS (NO MODALS)
               ========================================================================= */}
           {activeCategory === 'settings' && (
             <SiteSettingsView

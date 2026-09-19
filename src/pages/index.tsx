@@ -1,4 +1,5 @@
 import HeroSection from '@/components/home/HeroSection';
+import HomeBottomCTA from '@/components/home/HomeBottomCTA';
 import Repos from '@/components/Repos';
 import { Container } from '@/components/StyledBox';
 import Title from '@/components/Title';
@@ -206,6 +207,9 @@ export default function Home({
           <Repos repos={repos} limit={isMobile ? 3 : 6} />
         </motion.div>
       </Container>
+
+      {/* Bottom Closing CTA */}
+      <HomeBottomCTA settings={settings} />
     </>
   );
 }
