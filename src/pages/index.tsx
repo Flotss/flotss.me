@@ -11,7 +11,7 @@ import { Box, Image, Tooltip } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import type { GetStaticProps } from 'next';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 type TechStack = {
   name: string;
@@ -26,8 +26,46 @@ interface HomeProps {
   socialLinks?: SocialLinkType[];
 }
 
-export default function Home({ repos = [], settings, socialLinks = [] }: HomeProps) {
+export default function Home({
+  repos = [],
+  settings: initialSettings,
+  socialLinks = [],
+}: HomeProps) {
   const isMobile = useIsMobile();
+  const [settings, setSettings] = useState<SiteSettingsType | undefined>(initialSettings);
+
+  // Sync with initialSettings if SSG props change
+  useEffect(() => {
+    if (initialSettings) {
+      setSettings(initialSettings);
+    }
+  }, [initialSettings]);
+
+  // Client-side fetch to ensure immediate fresh settings even with static cache
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/get/settings')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data) {
+          setSettings(data);
+        }
+      })
+      .catch(() => {});
+
+    // Listen to real-time settings updates from Admin Studio
+    const handleSettingsUpdated = (event: CustomEvent<SiteSettingsType> | Event) => {
+      if ('detail' in event && event.detail) {
+        setSettings(event.detail);
+      }
+    };
+
+    window.addEventListener('siteSettingsUpdated', handleSettingsUpdated);
+    return () => {
+      isMounted = false;
+      window.removeEventListener('siteSettingsUpdated', handleSettingsUpdated);
+    };
+  }, []);
 
   const techStack: TechStack[] = [
     {
