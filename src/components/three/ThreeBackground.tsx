@@ -25,7 +25,7 @@ export default function ThreeBackground() {
         <Suspense fallback={null}>
           <ambientLight intensity={0.3} />
           <pointLight position={[10, 10, 10]} intensity={0.5} color="#34d399" />
-          <pointLight position={[-10, -10, -5]} intensity={0.3} color="#8b5cf6" />
+          <pointLight position={[-10, -10, -5]} intensity={0.3} color="#059669" />
           <ParticleField />
           <FloatingGeometry />
         </Suspense>

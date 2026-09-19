@@ -14,6 +14,7 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
 | 🟡 **P2** | **Téléchargement Direct du CV (PDF)** | Élevé | Faible | ✅ **Terminé (PR #26)** |
 | 🟡 **P2** | **Back-Office Enrichi & Mini-CMS (Zéro Modale, Sidebar)** | Élevé | Modérée | ✅ **Terminé (PR #26)** |
 | 🟢 **P3** | **Command Palette (`Cmd + K`)** | Élevé (UX) | Modérée | 🚀 **Prêt à démarrer** |
+| 🟢 **P3** | **Améliorations Three.js (HeroScene & Particules)** | Élevé (Visuel) | Faible | ✅ **Terminé** |
 | 🟢 **P3** | **Projets Phares (« Featured Case Studies »)** | Élevé | Modérée | ⏳ Planifié |
 | ⚪ **P4** | **Statistiques GitHub Globales & Activité** | Modéré | Modérée | 💡 Idée |
 | ⚪ **P4** | **Section Blog / Articles Techniques** | Modéré | Élevée | 💡 Idée |
@@ -102,9 +103,12 @@ Ce document répertorie l'ensemble des améliorations recommandées et planifié
     - Total de commits et contributions.
     - Donut chart ou bar chart de répartition des langages sur l'ensemble du profil.
     - Étoiles totales accumulées.
-- [ ] **Améliorations Three.js (HeroScene)** :
-  - Rendre la scène 3D réactive aux mouvements de souris (effet de parallaxe subtil ou onde).
-  - Détection automatique des appareils à faible consommation pour désactiver les rendus superflus.
+- [x] **Améliorations Three.js (HeroScene & ParticleField)** :
+  - Parallaxe interactive fluide au pointeur (`InteractiveParallax`) et multi-couches de profondeur sur la sphère centrale et les anneaux orbitaux.
+  - Densité adaptative de particules sur mobile (allégée de 175 à 85 particules, division par 4 de la charge GPU/CPU).
+  - Économie d'énergie automatique lorsque l'onglet est inactif (`document.hidden`).
+  - Prise en charge de `prefers-reduced-motion` pour l'accessibilité.
+  - Harmonisation de la palette lumineuse avec les accents émeraude officiels (`#059669` / `#34d399`).
 
 ---
 

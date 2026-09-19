@@ -1,11 +1,10 @@
-import { useRef, useMemo, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 
-const PARTICLE_COUNT = 200;
 const CONNECTION_DISTANCE = 2.5;
-const MOUSE_INFLUENCE = 3;
-const MOUSE_RADIUS = 5;
+const MOUSE_INFLUENCE = 2.8;
+const MOUSE_RADIUS = 4.5;
 
 export default function ParticleField() {
   const pointsRef = useRef<THREE.Points>(null);
@@ -13,40 +12,56 @@ export default function ParticleField() {
   const mouseRef = useRef(new THREE.Vector3(0, 0, 0));
   const { viewport } = useThree();
 
+  const isMobile = useMemo(
+    () => typeof window !== 'undefined' && (window.innerWidth < 768 || 'ontouchstart' in window),
+    [],
+  );
+
+  const prefersReducedMotion = useMemo(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+
+  // Dynamic particle count: 85 on mobile to eliminate CPU/battery throttle, 175 on desktop
+  const particleCount = useMemo(() => (isMobile ? 85 : 175), [isMobile]);
+
   const { positions, velocities, particleColors } = useMemo(() => {
-    const positions = new Float32Array(PARTICLE_COUNT * 3);
-    const velocities = new Float32Array(PARTICLE_COUNT * 3);
-    const particleColors = new Float32Array(PARTICLE_COUNT * 3);
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const positions = new Float32Array(particleCount * 3);
+    const velocities = new Float32Array(particleCount * 3);
+    const particleColors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 20;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 14;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
-      velocities[i * 3] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.01;
-      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.005;
+      velocities[i * 3] = (Math.random() - 0.5) * 0.008;
+      velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.008;
+      velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.004;
 
       const t = Math.random();
-      if (t < 0.4) {
-        // Emerald
+      if (t < 0.45) {
+        // Emerald primary
         particleColors[i * 3] = 0.1;
         particleColors[i * 3 + 1] = 0.8;
         particleColors[i * 3 + 2] = 0.5;
-      } else if (t < 0.7) {
-        // Mint / soft teal
+      } else if (t < 0.75) {
+        // Soft mint
         particleColors[i * 3] = 0.2;
         particleColors[i * 3 + 1] = 0.85;
         particleColors[i * 3 + 2] = 0.65;
       } else {
-        // Neutral white
-        particleColors[i * 3] = 0.7;
-        particleColors[i * 3 + 1] = 0.75;
-        particleColors[i * 3 + 2] = 0.7;
+        // Subtle neutral
+        particleColors[i * 3] = 0.65;
+        particleColors[i * 3 + 1] = 0.7;
+        particleColors[i * 3 + 2] = 0.65;
       }
     }
     return { positions, velocities, particleColors };
-  }, []);
+  }, [particleCount]);
 
-  const maxLines = PARTICLE_COUNT * 20;
+  const maxLines = useMemo(() => particleCount * 18, [particleCount]);
   const linePositions = useMemo(() => new Float32Array(maxLines * 6), [maxLines]);
   const lineColors = useMemo(() => new Float32Array(maxLines * 6), [maxLines]);
 
@@ -69,13 +84,13 @@ export default function ParticleField() {
   const pointsMat = useMemo(
     () =>
       new THREE.PointsMaterial({
-        size: 0.06,
+        size: isMobile ? 0.05 : 0.06,
         vertexColors: true,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.85,
         sizeAttenuation: true,
       }),
-    [],
+    [isMobile],
   );
 
   const linesMat = useMemo(
@@ -83,42 +98,48 @@ export default function ParticleField() {
       new THREE.LineBasicMaterial({
         vertexColors: true,
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.28,
       }),
     [],
   );
 
   const onPointerMove = useCallback(
     (e: PointerEvent) => {
+      if (isMobile) return;
       mouseRef.current.x = ((e.clientX / window.innerWidth) * 2 - 1) * (viewport.width / 2);
       mouseRef.current.y = (-(e.clientY / window.innerHeight) * 2 + 1) * (viewport.height / 2);
     },
-    [viewport],
+    [viewport, isMobile],
   );
 
   useEffect(() => {
-    window.addEventListener('pointermove', onPointerMove);
+    if (isMobile) return;
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
     return () => window.removeEventListener('pointermove', onPointerMove);
-  }, [onPointerMove]);
+  }, [onPointerMove, isMobile]);
 
   useFrame((_, delta) => {
     if (!pointsRef.current || !linesRef.current) return;
+    // Energy saver: pause physics when browser tab is inactive
+    if (typeof document !== 'undefined' && document.hidden) return;
 
     const pos = positions;
-    const clampedDelta = Math.min(delta, 0.1);
+    const clampedDelta = Math.min(delta, 0.08);
 
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
+    for (let i = 0; i < particleCount; i++) {
       const ix = i * 3;
       const iy = i * 3 + 1;
       const iz = i * 3 + 2;
 
-      const dx = pos[ix] - mouseRef.current.x;
-      const dy = pos[iy] - mouseRef.current.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < MOUSE_RADIUS && dist > 0.01) {
-        const force = ((MOUSE_RADIUS - dist) / MOUSE_RADIUS) * MOUSE_INFLUENCE * clampedDelta;
-        velocities[ix] += (dx / dist) * force;
-        velocities[iy] += (dy / dist) * force;
+      if (!prefersReducedMotion && !isMobile) {
+        const dx = pos[ix] - mouseRef.current.x;
+        const dy = pos[iy] - mouseRef.current.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < MOUSE_RADIUS && dist > 0.01) {
+          const force = ((MOUSE_RADIUS - dist) / MOUSE_RADIUS) * MOUSE_INFLUENCE * clampedDelta;
+          velocities[ix] += (dx / dist) * force;
+          velocities[iy] += (dy / dist) * force;
+        }
       }
 
       velocities[ix] *= 0.98;
@@ -140,8 +161,8 @@ export default function ParticleField() {
     pointsGeo.attributes.position.needsUpdate = true;
 
     let lineIndex = 0;
-    for (let i = 0; i < PARTICLE_COUNT && lineIndex < maxLines; i++) {
-      for (let j = i + 1; j < PARTICLE_COUNT && lineIndex < maxLines; j++) {
+    for (let i = 0; i < particleCount && lineIndex < maxLines; i++) {
+      for (let j = i + 1; j < particleCount && lineIndex < maxLines; j++) {
         const dx = pos[i * 3] - pos[j * 3];
         const dy = pos[i * 3 + 1] - pos[j * 3 + 1];
         const dz = pos[i * 3 + 2] - pos[j * 3 + 2];

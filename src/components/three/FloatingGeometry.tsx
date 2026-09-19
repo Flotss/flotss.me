@@ -8,13 +8,18 @@ export default function FloatingGeometry() {
   const wireRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
+    if (typeof document !== 'undefined' && document.hidden) return;
+    const pointerInfluence = state.pointer.x * 0.08;
+
     if (meshRef.current) {
       meshRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.2;
       meshRef.current.rotation.y += 0.003;
+      meshRef.current.rotation.z = pointerInfluence;
     }
     if (wireRef.current) {
       wireRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.3) * 0.2;
       wireRef.current.rotation.y += 0.003;
+      wireRef.current.rotation.z = pointerInfluence;
     }
   });
 
