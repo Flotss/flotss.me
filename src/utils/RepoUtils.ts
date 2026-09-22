@@ -67,30 +67,25 @@ export const saveRepoDescription = async (repos: Repo[]): Promise<void> => {
 };
 
 export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
+  if (!repos || repos.length === 0) return;
   try {
-    // Create a new repo record if not exists
-    await Promise.all(
-      repos.map(async (repo) => {
-        try {
-          const existingRepo = await prisma.repoDB.findUnique({ where: { repoId: repo.id } });
-          if (!existingRepo) {
-            await prisma.repoDB.create({
-              data: {
-                repoId: repo.id,
-                description: repo.description,
-                name: repo.name,
-                url: repo.url,
-              },
-            });
-          }
-        } catch (e: any) {
-          // Change the type annotation of 'e' to 'any'
-          if (e.code !== 'P2002') {
-            console.error('Error creating repo record:', e);
-          }
-        }
-      }),
-    );
+    const existingRepos = await prisma.repoDB.findMany({
+      select: { repoId: true },
+    });
+    const existingIds = new Set(existingRepos.map((r) => r.repoId));
+
+    const missingRepos = repos.filter((repo) => !existingIds.has(repo.id));
+    if (missingRepos.length > 0) {
+      await prisma.repoDB.createMany({
+        data: missingRepos.map((repo) => ({
+          repoId: repo.id,
+          description: repo.description,
+          name: repo.name,
+          url: repo.url,
+        })),
+        skipDuplicates: true,
+      });
+    }
   } catch (err) {
     console.warn('Could not connect to DB in createIfNotExists:', err);
   }

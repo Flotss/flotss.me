@@ -15,9 +15,9 @@ import {
   Input,
   Radio,
   RadioGroup,
-  ScaleFade,
   Stack,
 } from '@chakra-ui/react';
+import { AnimatePresence, motion, Variants } from 'framer-motion';
 import { useRouter } from 'next/router';
 import React, { useEffect, useMemo, useState } from 'react';
 
@@ -40,6 +40,30 @@ type ReposProps = {
  * @returns {JSX.Element} - The rendered Repos component.
  */
 const EMPTY_REPOS: Repo[] = [];
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 16, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 260,
+      damping: 20,
+    },
+  },
+};
 
 const Repos = React.memo((props: ReposProps) => {
   Repos.displayName = 'Repos';
@@ -81,6 +105,19 @@ const Repos = React.memo((props: ReposProps) => {
   }, [setReposCount, repoCount]);
 
   const router = useRouter();
+  const [isPropelling, setIsPropelling] = useState(false);
+
+  useEffect(() => {
+    router.prefetch('/projects');
+  }, [router]);
+
+  const handleExploreClick = () => {
+    if (isPropelling) return;
+    setIsPropelling(true);
+    setTimeout(() => {
+      router.push('/projects');
+    }, 150);
+  };
 
   const clearFilters = () => {
     properties.forEach((prop) => prop.setValue(false));
@@ -89,7 +126,7 @@ const Repos = React.memo((props: ReposProps) => {
   };
 
   const skeletons = Array.from({ length: props.limit ?? 6 }).map((_, index) => (
-    <ProjectCardSkeleton key={index} isMobile={isMobile} />
+    <ProjectCardSkeleton key={`skeleton-${index}`} isMobile={isMobile} />
   ));
 
   return (
@@ -151,7 +188,10 @@ const Repos = React.memo((props: ReposProps) => {
             isMobile={isMobile}
           />
         )}
-        <Box
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           className={`margin-auto col-span-1 flex w-full flex-wrap items-stretch justify-center gap-x-5 gap-y-5 lg:flex-row ${
             props.filterVisible ? 'lg:col-span-4' : 'lg:col-span-5'
           }`}
@@ -159,9 +199,9 @@ const Repos = React.memo((props: ReposProps) => {
           {loading
             ? skeletons
             : filteredRepos.slice(0, props.limit).map((repo) => (
-                <ScaleFade key={repo.id} initialScale={0.9} in={true}>
-                  <ProjectCard key={repo.id} repo={repo} isMobile={isMobile} />
-                </ScaleFade>
+                <motion.div key={`repo-${repo.id}`} variants={itemVariants}>
+                  <ProjectCard repo={repo} isMobile={isMobile} />
+                </motion.div>
               ))}
           {!loading && filteredRepos.length === 0 && (
             <Title
@@ -169,21 +209,48 @@ const Repos = React.memo((props: ReposProps) => {
               className="mt-10 sm:text-xl mdrepo:text-xl lgrepo:text-xl"
             />
           )}
-        </Box>
+        </motion.div>
       </section>
       {props.limit && filteredRepos.length > props.limit && (
         <Box className="mt-6 flex justify-center">
-          <button
-            className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-7 py-3 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white hover:shadow-lg hover:shadow-emerald-500/10 active:translate-y-0"
-            onClick={() => {
-              router.push('/projects');
-            }}
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.95 }}
+            animate={
+              isPropelling
+                ? {
+                    scale: [1, 0.94, 1.05, 1],
+                    borderColor: 'rgba(52, 211, 153, 0.8)',
+                    boxShadow: '0 0 25px rgba(52, 211, 153, 0.35)',
+                  }
+                : undefined
+            }
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-white/10 bg-white/[0.04] px-7 py-3 text-sm font-medium text-zinc-300 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/40 hover:bg-emerald-500/10 hover:text-white hover:shadow-lg hover:shadow-emerald-500/15"
+            onClick={handleExploreClick}
           >
-            <span>Explore All Projects</span>
-            <span className="text-sm text-zinc-400 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-emerald-300">
+            {/* Onde émeraude au clic */}
+            <AnimatePresence>
+              {isPropelling && (
+                <motion.span
+                  className="pointer-events-none absolute inset-0 rounded-full bg-emerald-400/35"
+                  initial={{ scale: 0.6, opacity: 1 }}
+                  animate={{ scale: 2.2, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.45, ease: 'easeOut' }}
+                />
+              )}
+            </AnimatePresence>
+
+            <span className="relative z-10">Explore All Projects</span>
+            <motion.span
+              className="relative z-10 text-sm text-zinc-400 transition-colors duration-300 group-hover:text-emerald-300"
+              animate={isPropelling ? { x: [0, 8, 4] } : { x: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
               →
-            </span>
-          </button>
+            </motion.span>
+          </motion.button>
         </Box>
       )}
     </>
@@ -308,7 +375,11 @@ const Filters = (props: FilterProps) => {
               {Array.from(languages)
                 .filter((lang) => Boolean(lang && lang.trim().length > 0))
                 .map((lang, index) => (
-                  <Radio key={index} value={lang} disabled={!languageCountMap.has(lang)}>
+                  <Radio
+                    key={`lang-filter-${lang}-${index}`}
+                    value={lang}
+                    disabled={!languageCountMap.has(lang)}
+                  >
                     {lang}{' '}
                     {languageCountMap.has(lang) && <span>({languageCountMap.get(lang)})</span>}
                   </Radio>

@@ -38,7 +38,7 @@ export default function SocialLinksManager({
         ) : (
           socialLinks.map((link, idx) => (
             <div
-              key={link.id || idx}
+              key={link.id ? `admin-social-id-${link.id}` : `admin-social-temp-${idx}`}
               className="flex flex-wrap items-center gap-3 rounded-xl border border-white/5 bg-zinc-950/60 p-3"
             >
               {/* Icon Preview & Selector */}

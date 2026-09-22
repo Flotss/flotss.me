@@ -68,6 +68,16 @@ export default async function adminReposHandler(req: NextApiRequest, res: NextAp
         );
 
         await prisma.$transaction(updates);
+
+        try {
+          if (typeof res.revalidate === 'function') {
+            await res.revalidate('/');
+            await res.revalidate('/projects');
+          }
+        } catch (revalidateError) {
+          console.warn('On-demand revalidation warning for repos:', revalidateError);
+        }
+
         return res.status(200).json({ success: true, count: items.length });
       } catch (e: any) {
         return res
@@ -93,6 +103,15 @@ export default async function adminReposHandler(req: NextApiRequest, res: NextAp
           ...(typeof isWip === 'boolean' ? { isWip } : {}),
         },
       });
+
+      try {
+        if (typeof res.revalidate === 'function') {
+          await res.revalidate('/');
+          await res.revalidate('/projects');
+        }
+      } catch (revalidateError) {
+        console.warn('On-demand revalidation warning for repos:', revalidateError);
+      }
 
       return res.status(200).json({ success: true, repo: updated });
     } catch (e: any) {

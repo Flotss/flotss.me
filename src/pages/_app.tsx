@@ -10,6 +10,20 @@ const ThreeBackground = dynamic(() => import('@/components/three/ThreeBackground
   ssr: false,
 });
 
+// Suppress upstream Three.js r183 deprecation noise from @react-three/fiber's internal THREE.Clock usage
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn;
+  console.warn = (...args: unknown[]) => {
+    if (
+      typeof args[0] === 'string' &&
+      args[0].includes('THREE.Clock: This module has been deprecated')
+    ) {
+      return;
+    }
+    originalWarn.apply(console, args);
+  };
+}
+
 export default function App({
   Component,
   pageProps,

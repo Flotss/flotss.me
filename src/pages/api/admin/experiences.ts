@@ -73,6 +73,14 @@ export default async function adminExperiencesHandler(req: NextApiRequest, res: 
         },
       });
 
+      try {
+        if (typeof res.revalidate === 'function') {
+          await res.revalidate('/experience');
+        }
+      } catch (revalidateError) {
+        console.warn('On-demand revalidation warning for experiences:', revalidateError);
+      }
+
       return res.status(201).json({ success: true, experience: created });
     } catch (e: any) {
       return res.status(500).json({ message: e.message || 'Failed to create experience' });
@@ -96,6 +104,15 @@ export default async function adminExperiencesHandler(req: NextApiRequest, res: 
         );
 
         await prisma.$transaction(updates);
+
+        try {
+          if (typeof res.revalidate === 'function') {
+            await res.revalidate('/experience');
+          }
+        } catch (revalidateError) {
+          console.warn('On-demand revalidation warning for experiences:', revalidateError);
+        }
+
         return res.status(200).json({ success: true, count: items.length });
       } catch (e: any) {
         return res.status(500).json({ message: e.message || 'Failed to batch update experiences' });
@@ -156,6 +173,14 @@ export default async function adminExperiencesHandler(req: NextApiRequest, res: 
         },
       });
 
+      try {
+        if (typeof res.revalidate === 'function') {
+          await res.revalidate('/experience');
+        }
+      } catch (revalidateError) {
+        console.warn('On-demand revalidation warning for experiences:', revalidateError);
+      }
+
       return res.status(200).json({ success: true, experience: updated });
     } catch (e: any) {
       return res.status(500).json({ message: e.message || 'Failed to update experience' });
@@ -174,6 +199,14 @@ export default async function adminExperiencesHandler(req: NextApiRequest, res: 
       await prisma.experience.delete({
         where: { id: expId },
       });
+
+      try {
+        if (typeof res.revalidate === 'function') {
+          await res.revalidate('/experience');
+        }
+      } catch (revalidateError) {
+        console.warn('On-demand revalidation warning for experiences:', revalidateError);
+      }
 
       return res.status(200).json({ success: true, deletedId: expId });
     } catch (e: any) {
