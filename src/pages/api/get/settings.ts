@@ -19,7 +19,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    res.setHeader('Cache-Control', 'public, s-maxage=10, stale-while-revalidate=60');
+    res.setHeader(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+    );
     return res.status(200).json(settings);
   } catch (error) {
     console.error('Error fetching public site settings:', error);

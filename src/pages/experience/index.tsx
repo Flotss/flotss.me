@@ -2,7 +2,7 @@ import CareerTimeline from '@/components/experience/CareerTimeline';
 import SEO from '@/components/SEO';
 import Title from '@/components/Title';
 import { prisma } from '@/lib/prisma';
-import { ExperienceType, SiteSettingsType } from '@/types/types';
+import { ExperienceType, SiteSettingsType, SocialLinkType } from '@/types/types';
 import type { GetStaticProps } from 'next';
 import React, { useEffect, useState } from 'react';
 import { FaDownload, FaFileAlt } from 'react-icons/fa';
@@ -10,6 +10,7 @@ import { FaDownload, FaFileAlt } from 'react-icons/fa';
 interface ExperiencePageProps {
   initialExperiences: ExperienceType[];
   settings?: SiteSettingsType | null;
+  socialLinks?: SocialLinkType[];
 }
 
 export default function ExperiencePage({
@@ -19,29 +20,27 @@ export default function ExperiencePage({
   const [experiences, setExperiences] = useState<ExperienceType[]>(initialExperiences);
   const [settings, setSettings] = useState<SiteSettingsType | null | undefined>(ssgSettings);
 
-  // Hydrate experiences client-side for immediate freshness
   useEffect(() => {
-    let isMounted = true;
-    fetch('/api/get/experiences')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && Array.isArray(data)) {
-          setExperiences(data);
-        }
-      })
-      .catch(() => {});
+    if (initialExperiences) {
+      setExperiences(initialExperiences);
+    }
+  }, [initialExperiences]);
 
-    fetch('/api/get/settings')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && data) {
-          setSettings(data);
-        }
-      })
-      .catch(() => {});
+  useEffect(() => {
+    if (ssgSettings) {
+      setSettings(ssgSettings);
+    }
+  }, [ssgSettings]);
 
+  useEffect(() => {
+    const handleSettingsUpdated = (event: CustomEvent<SiteSettingsType> | Event) => {
+      if ('detail' in event && event.detail) {
+        setSettings(event.detail);
+      }
+    };
+    window.addEventListener('siteSettingsUpdated', handleSettingsUpdated);
     return () => {
-      isMounted = false;
+      window.removeEventListener('siteSettingsUpdated', handleSettingsUpdated);
     };
   }, []);
 
@@ -96,28 +95,34 @@ export default function ExperiencePage({
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps<ExperiencePageProps> = async () => {
   try {
-    const experiences = await prisma.experience.findMany({
-      where: { visible: true },
-      orderBy: [{ order: 'asc' }, { id: 'asc' }],
-    });
-
-    const settings = await prisma.siteSettings.findUnique({
-      where: { id: 1 },
-      select: {
-        id: true,
-        availabilityText: true,
-        heroHeadline: true,
-        heroSubtitle: true,
-        resumeUrl: true,
-      },
-    });
+    const [experiences, settings, socialLinks] = await Promise.all([
+      prisma.experience.findMany({
+        where: { visible: true },
+        orderBy: [{ order: 'asc' }, { id: 'asc' }],
+      }),
+      prisma.siteSettings.findUnique({
+        where: { id: 1 },
+        select: {
+          id: true,
+          availabilityText: true,
+          heroHeadline: true,
+          heroSubtitle: true,
+          resumeUrl: true,
+        },
+      }),
+      prisma.socialLink.findMany({
+        where: { visible: true },
+        orderBy: [{ order: 'asc' }, { id: 'asc' }],
+      }),
+    ]);
 
     return {
       props: {
         initialExperiences: JSON.parse(JSON.stringify(experiences)),
         settings: settings ? JSON.parse(JSON.stringify(settings)) : null,
+        socialLinks: JSON.parse(JSON.stringify(socialLinks || [])),
       },
       revalidate: 60,
     };
@@ -127,6 +132,7 @@ export const getStaticProps: GetStaticProps = async () => {
       props: {
         initialExperiences: [],
         settings: null,
+        socialLinks: [],
       },
       revalidate: 60,
     };

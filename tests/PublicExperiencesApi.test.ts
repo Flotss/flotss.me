@@ -74,8 +74,9 @@ describe('Public Experiences API Handler (/api/get/experiences)', () => {
     });
     expect(res.setHeader).toHaveBeenCalledWith(
       'Cache-Control',
-      'public, s-maxage=10, stale-while-revalidate=60',
+      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
     );
+
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(mockExperiences);
   });

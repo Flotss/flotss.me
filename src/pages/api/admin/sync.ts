@@ -20,6 +20,15 @@ export default async function syncHandler(req: NextApiRequest, res: NextApiRespo
   try {
     const githubService = new GithubService();
     const repos = await githubService.getRepos();
+    try {
+      if (typeof res.revalidate === 'function') {
+        await res.revalidate('/');
+        await res.revalidate('/projects');
+      }
+    } catch (revalidateError) {
+      console.warn('On-demand revalidation warning for repos:', revalidateError);
+    }
+
     return res.status(200).json({
       success: true,
       message: `Successfully synced ${repos.length} repositories from GitHub.`,

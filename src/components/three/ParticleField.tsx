@@ -1,5 +1,6 @@
 import { useRef, useMemo, useCallback, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
+import Router from 'next/router';
 import * as THREE from 'three';
 
 const PARTICLE_COUNT = 200;
@@ -11,6 +12,7 @@ export default function ParticleField() {
   const pointsRef = useRef<THREE.Points>(null);
   const linesRef = useRef<THREE.LineSegments>(null);
   const mouseRef = useRef(new THREE.Vector3(0, 0, 0));
+  const isWarping = useRef(false);
   const { viewport } = useThree();
 
   const { positions, velocities, particleColors } = useMemo(() => {
@@ -101,6 +103,32 @@ export default function ParticleField() {
     return () => window.removeEventListener('pointermove', onPointerMove);
   }, [onPointerMove]);
 
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    const handleStart = () => {
+      clearTimeout(timeoutId);
+      isWarping.current = true;
+    };
+    const handleComplete = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        isWarping.current = false;
+      }, 350);
+    };
+
+    Router.events.on('routeChangeStart', handleStart);
+    Router.events.on('routeChangeComplete', handleComplete);
+    Router.events.on('routeChangeError', handleComplete);
+
+    return () => {
+      clearTimeout(timeoutId);
+      Router.events.off('routeChangeStart', handleStart);
+      Router.events.off('routeChangeComplete', handleComplete);
+      Router.events.off('routeChangeError', handleComplete);
+    };
+  }, []);
+
   useFrame((_, delta) => {
     if (!pointsRef.current || !linesRef.current) return;
 
@@ -111,6 +139,11 @@ export default function ParticleField() {
       const ix = i * 3;
       const iy = i * 3 + 1;
       const iz = i * 3 + 2;
+
+      // Poussée warp vers l'avant lors de la navigation
+      if (isWarping.current) {
+        velocities[iz] += 0.038;
+      }
 
       const dx = pos[ix] - mouseRef.current.x;
       const dy = pos[iy] - mouseRef.current.y;

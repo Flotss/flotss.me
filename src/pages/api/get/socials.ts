@@ -13,7 +13,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       orderBy: [{ order: 'asc' }, { id: 'asc' }],
     });
 
-    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
+    res.setHeader(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+    );
     return res.status(200).json(socialLinks);
   } catch (error) {
     console.error('Error fetching public social links:', error);

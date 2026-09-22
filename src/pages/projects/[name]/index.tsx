@@ -388,7 +388,7 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
               <div className="flex h-2 w-full overflow-hidden rounded-full bg-white/5">
                 {repo.languages.map((language, idx) => (
                   <div
-                    key={language.name || idx}
+                    key={`lang-bar-${language.name || idx}-${idx}`}
                     style={{
                       width: `${language.percentage}%`,
                       backgroundColor: LANGUAGE_COLORS[language.name] || '#10b981',
@@ -400,7 +400,10 @@ export default function Project({ repo: initialRepo, error: initialError }: Proj
               </div>
               <div className="flex flex-wrap items-center gap-4 pt-1">
                 {repo.languages.map((language, idx) => (
-                  <div key={language.name || idx} className="flex items-center gap-1.5 text-xs">
+                  <div
+                    key={`lang-legend-${language.name || idx}-${idx}`}
+                    className="flex items-center gap-1.5 text-xs"
+                  >
                     <span
                       className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: LANGUAGE_COLORS[language.name] || '#10b981' }}
@@ -478,7 +481,7 @@ const ReadmeAndCommits = ({ repo }: ReadmeAndCommitsProps) => {
           )}
           {commits.map((commit, index) => (
             <div
-              key={index}
+              key={`commit-${commit.url || index}`}
               className="group flex flex-col gap-2 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-500/30 hover:bg-white/[0.05] hover:shadow-md hover:shadow-emerald-500/5"
             >
               <div className="flex items-start justify-between gap-2">

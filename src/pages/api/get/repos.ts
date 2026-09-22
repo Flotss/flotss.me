@@ -43,6 +43,10 @@ export default async function handler(
     }
 
     // Renvoi de la liste des dépôts
+    res.setHeader(
+      'Cache-Control',
+      'public, max-age=60, s-maxage=3600, stale-while-revalidate=86400',
+    );
     res.status(200).json(repos);
   } catch (e: any) {
     // Gestion des erreurs

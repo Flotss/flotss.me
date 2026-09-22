@@ -1,6 +1,23 @@
+/**
+ * @jest-environment node
+ */
+import { prisma } from '../src/lib/prisma';
+import {
+  createIfNotExists,
+  getLanguageValues,
+  getMapCountOfLang,
+  sortRepos,
+} from '@/utils/RepoUtils';
 import { Repo } from '@/types/types';
-import { getLanguageValues, getMapCountOfLang, sortRepos } from '@/utils/RepoUtils';
-import { describe, expect, it } from '@jest/globals';
+
+jest.mock('../src/lib/prisma', () => ({
+  prisma: {
+    repoDB: {
+      findMany: jest.fn(),
+      createMany: jest.fn(),
+    },
+  },
+}));
 
 describe('sortRepos', () => {
   it('should sort repos based on pinned, archived, and private status by default', () => {
@@ -98,5 +115,63 @@ describe('getLanguageValues and getMapCountOfLang', () => {
     expect(countMap.get('TypeScript')).toBe(2);
     expect(countMap.get('Java')).toBe(1);
     expect(countMap.has('')).toBe(false);
+  });
+});
+
+describe('createIfNotExists', () => {
+  it('should do nothing when repos array is empty', async () => {
+    (prisma.repoDB.findMany as jest.Mock).mockClear();
+    (prisma.repoDB.createMany as jest.Mock).mockClear();
+
+    await createIfNotExists([]);
+
+    expect(prisma.repoDB.findMany).not.toHaveBeenCalled();
+    expect(prisma.repoDB.createMany).not.toHaveBeenCalled();
+  });
+
+  it('should batch find existing repos and create missing ones in a single query', async () => {
+    (prisma.repoDB.findMany as jest.Mock).mockReset();
+    (prisma.repoDB.createMany as jest.Mock).mockReset();
+
+    (prisma.repoDB.findMany as jest.Mock).mockResolvedValue([{ repoId: 101 }]);
+    (prisma.repoDB.createMany as jest.Mock).mockResolvedValue({ count: 1 });
+
+    const repos = [
+      { id: 101, name: 'ExistingRepo', description: 'desc1', url: 'https://github.com/1' } as Repo,
+      { id: 102, name: 'NewRepo', description: 'desc2', url: 'https://github.com/2' } as Repo,
+    ];
+
+    await createIfNotExists(repos);
+
+    expect(prisma.repoDB.findMany).toHaveBeenCalledTimes(1);
+    expect(prisma.repoDB.createMany).toHaveBeenCalledTimes(1);
+    expect(prisma.repoDB.createMany).toHaveBeenCalledWith({
+      data: [
+        {
+          repoId: 102,
+          description: 'desc2',
+          name: 'NewRepo',
+          url: 'https://github.com/2',
+        },
+      ],
+      skipDuplicates: true,
+    });
+  });
+
+  it('should not call createMany if all repos already exist', async () => {
+    (prisma.repoDB.findMany as jest.Mock).mockReset();
+    (prisma.repoDB.createMany as jest.Mock).mockReset();
+
+    (prisma.repoDB.findMany as jest.Mock).mockResolvedValue([{ repoId: 101 }, { repoId: 102 }]);
+
+    const repos = [
+      { id: 101, name: 'Repo1', description: 'desc1', url: 'https://github.com/1' } as Repo,
+      { id: 102, name: 'Repo2', description: 'desc2', url: 'https://github.com/2' } as Repo,
+    ];
+
+    await createIfNotExists(repos);
+
+    expect(prisma.repoDB.findMany).toHaveBeenCalledTimes(1);
+    expect(prisma.repoDB.createMany).not.toHaveBeenCalled();
   });
 });
