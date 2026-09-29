@@ -1,5 +1,4 @@
 import { owner } from '@/services/GithubService';
-import { prisma } from '@/lib/prisma';
 import { Repo } from '@/types/types';
 import { useToast } from '@chakra-ui/react';
 import { Dispatch } from 'react';
@@ -43,52 +42,6 @@ export const sortRepos = (repos: Repo[]): Repo[] => {
     // If everything else is equal, sort alphabetically
     return (a.name || '').localeCompare(b.name || '');
   });
-};
-
-export const saveRepoDescription = async (repos: Repo[]): Promise<void> => {
-  try {
-    await Promise.all(
-      repos.map(async (repo) => {
-        await prisma.repoDB.upsert({
-          update: { description: repo.description, name: repo.name, url: repo.url },
-          create: {
-            repoId: repo.id,
-            description: repo.description,
-            name: repo.name,
-            url: repo.url,
-          },
-          where: { repoId: repo.id },
-        });
-      }),
-    );
-  } catch (err) {
-    console.warn('Could not save repo descriptions:', err);
-  }
-};
-
-export const createIfNotExists = async (repos: Repo[]): Promise<void> => {
-  if (!repos || repos.length === 0) return;
-  try {
-    const existingRepos = await prisma.repoDB.findMany({
-      select: { repoId: true },
-    });
-    const existingIds = new Set(existingRepos.map((r) => r.repoId));
-
-    const missingRepos = repos.filter((repo) => !existingIds.has(repo.id));
-    if (missingRepos.length > 0) {
-      await prisma.repoDB.createMany({
-        data: missingRepos.map((repo) => ({
-          repoId: repo.id,
-          description: repo.description,
-          name: repo.name,
-          url: repo.url,
-        })),
-        skipDuplicates: true,
-      });
-    }
-  } catch (err) {
-    console.warn('Could not connect to DB in createIfNotExists:', err);
-  }
 };
 
 export const getMapCountOfLang = (reposParam: Repo[]): Map<string, number> => {

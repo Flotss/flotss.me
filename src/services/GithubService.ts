@@ -1,5 +1,5 @@
 import { Collaborator, Commit, Language, PullRequest, Repo } from '@/types/types';
-import { createIfNotExists, sortRepos } from '@/utils/RepoUtils';
+import { sortRepos } from '@/utils/RepoUtils';
 import { prisma } from '@/lib/prisma';
 import assert from 'assert';
 import { isValidRepoName, isValidUserName } from '@/utils/ValidationUtils';
@@ -9,6 +9,7 @@ const headers: any = {
   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
 };
 export const owner: string = 'Flotss';
+let isDatabaseAvailable = true;
 
 export class GithubService {
   private prisma = prisma;
@@ -100,7 +101,6 @@ export class GithubService {
     // Filter out private repositories completely
     repos = repos.filter((rep) => !rep.private);
 
-    await createIfNotExists(repos);
     repos = await this.enrichReposDb(repos);
     repos = sortRepos(repos);
 
@@ -108,6 +108,9 @@ export class GithubService {
   }
 
   private async enrichReposDb(repos: Repo[]): Promise<Repo[]> {
+    if (!isDatabaseAvailable || !process.env.DATABASE_URL) {
+      return repos;
+    }
     try {
       // GET ALL REPOS IN DB
       const reposDB = await this.prisma.repoDB.findMany();
@@ -140,14 +143,18 @@ export class GithubService {
           }
         }
       });
-    } catch (dbError) {
-      console.warn('Could not enrich repos from DB:', dbError);
+    } catch (dbError: any) {
+      isDatabaseAvailable = false;
+      console.warn('Could not enrich repos from DB:', dbError?.message || dbError);
     }
 
     return repos;
   }
 
   private async enrichRepoDb(repo: Repo): Promise<Repo> {
+    if (!isDatabaseAvailable || !process.env.DATABASE_URL) {
+      return repo;
+    }
     try {
       // GET REPO IN DB
       const repoDb = await this.prisma.repoDB.findFirst({
@@ -177,8 +184,9 @@ export class GithubService {
           repo.isWip = repoDb.isWip;
         }
       }
-    } catch (dbError) {
-      console.warn('Could not enrich repo from DB:', dbError);
+    } catch (dbError: any) {
+      isDatabaseAvailable = false;
+      console.warn('Could not enrich repo from DB:', dbError?.message || dbError);
     }
 
     return repo;
@@ -466,15 +474,21 @@ export class GithubService {
 
       const commitPromises = commitsResponse.map((commit: any) => ({
         author: {
-          name: commit.commit.author.name,
-          date: commit.commit.author.date,
+          name: commit.commit?.author?.name || '',
+          date: commit.commit?.author?.date || '',
         },
-        message: commit.commit.message,
+        message: commit.commit?.message || '',
         url: commit.html_url,
       }));
 
       const commitsToAdd = await Promise.all(commitPromises);
       commits = commits.concat(commitsToAdd);
+
+      // Avoid infinite pagination on massive repositories (cap at 500 commits or last page)
+      if (page >= 5 || commitsResponse.length < per_page) {
+        pageEnd = true;
+        continue;
+      }
 
       page++;
     }
