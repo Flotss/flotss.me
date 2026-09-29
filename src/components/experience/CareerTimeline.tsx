@@ -278,7 +278,7 @@ export default function CareerTimeline({ experiences }: CareerTimelineProps) {
                         {getDynamicGroupRoleLabel(group.workItems, 'work')}
                       </div>
                       {group.workItems.map((item) => (
-                        <ExperienceCard key={item.id} experience={item} />
+                        <ExperienceCard key={`work-${item.id}`} experience={item} />
                       ))}
                     </div>
 
@@ -288,7 +288,7 @@ export default function CareerTimeline({ experiences }: CareerTimelineProps) {
                         {getDynamicGroupRoleLabel(group.educationItems, 'education')}
                       </div>
                       {group.educationItems.map((item) => (
-                        <ExperienceCard key={item.id} experience={item} />
+                        <ExperienceCard key={`edu-${item.id}`} experience={item} />
                       ))}
                     </div>
                   </div>
@@ -326,7 +326,7 @@ export default function CareerTimeline({ experiences }: CareerTimelineProps) {
                 <div className="pl-9 sm:pl-12 lg:pl-0">
                   <div className="mx-auto max-w-2xl space-y-6">
                     {items.map((item) => (
-                      <ExperienceCard key={item.id} experience={item} />
+                      <ExperienceCard key={`exp-item-${item.id}`} experience={item} />
                     ))}
                   </div>
                 </div>

@@ -76,20 +76,24 @@ export default function HeroSection({ settings }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <a
+              <motion.a
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.95 }}
                 href="#projects"
-                className="group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400 active:scale-95"
+                className="group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-zinc-950 shadow-lg shadow-emerald-500/20 transition-all duration-200 hover:bg-emerald-400"
               >
                 <span>Explore Projects</span>
                 <FaArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </a>
-              <Link
-                href="/experience"
-                className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300 active:scale-95"
-              >
-                <FaBriefcase className="h-3.5 w-3.5 text-emerald-400 transition-transform duration-200 group-hover:scale-110" />
-                <span>Career Timeline</span>
-              </Link>
+              </motion.a>
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  href="/experience"
+                  className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-6 py-2.5 text-sm font-medium text-zinc-200 backdrop-blur-md transition-all duration-200 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300"
+                >
+                  <FaBriefcase className="h-3.5 w-3.5 text-emerald-400 transition-transform duration-200 group-hover:scale-110" />
+                  <span>Career Timeline</span>
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
         </div>

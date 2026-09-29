@@ -42,19 +42,8 @@ export default function Home({
     }
   }, [initialSettings]);
 
-  // Client-side fetch to ensure immediate fresh settings even with static cache
+  // Listen to real-time settings updates from Admin Studio
   useEffect(() => {
-    let isMounted = true;
-    fetch('/api/get/settings')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && data) {
-          setSettings(data);
-        }
-      })
-      .catch(() => {});
-
-    // Listen to real-time settings updates from Admin Studio
     const handleSettingsUpdated = (event: CustomEvent<SiteSettingsType> | Event) => {
       if ('detail' in event && event.detail) {
         setSettings(event.detail);
@@ -63,7 +52,6 @@ export default function Home({
 
     window.addEventListener('siteSettingsUpdated', handleSettingsUpdated);
     return () => {
-      isMounted = false;
       window.removeEventListener('siteSettingsUpdated', handleSettingsUpdated);
     };
   }, []);
@@ -146,7 +134,7 @@ export default function Home({
         <Box className="flex flex-wrap justify-center gap-3 sm:gap-4">
           {techStack.map((tech: TechStack, index: number) => (
             <motion.div
-              key={index}
+              key={`tech-${tech.name}-${index}`}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.05 * index }}

@@ -155,6 +155,15 @@ export default async function adminSettingsHandler(req: NextApiRequest, res: Nex
         orderBy: [{ order: 'asc' }, { id: 'asc' }],
       });
 
+      try {
+        if (typeof res.revalidate === 'function') {
+          await res.revalidate('/');
+          await res.revalidate('/experience');
+        }
+      } catch (revalidateError) {
+        console.warn('On-demand revalidation warning for settings:', revalidateError);
+      }
+
       return res.status(200).json({
         success: true,
         settings,

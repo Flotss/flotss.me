@@ -80,19 +80,9 @@ export default function Footer({ initialSocialLinks }: FooterProps) {
     }
   }, [initialSocialLinks]);
 
-  // Fetch dynamic social links on mount
+  // Listen for real-time updates from Admin Studio
   useEffect(() => {
     let isMounted = true;
-    fetch('/api/get/socials')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (isMounted && Array.isArray(data) && data.length > 0) {
-          setSocialLinks(data);
-        }
-      })
-      .catch(() => {});
-
-    // Listen for real-time updates from Admin Studio
     const handleSocialsUpdated = (event: CustomEvent<SocialLinkType[]> | Event) => {
       if ('detail' in event && Array.isArray(event.detail)) {
         setSocialLinks(event.detail.filter((l) => l.visible));
@@ -123,7 +113,7 @@ export default function Footer({ initialSocialLinks }: FooterProps) {
       <nav className="flex items-center gap-3 sm:gap-4">
         {socialLinks.map((link, idx) => (
           <SocialButton
-            key={link.id || idx}
+            key={`footer-social-${link.id ?? idx}-${idx}`}
             label={link.label || 'Social Link'}
             href={link.url}
             color="#34d399"

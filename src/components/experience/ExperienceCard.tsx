@@ -165,7 +165,7 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
 
               return (
                 <li
-                  key={hIdx}
+                  key={`exp-${experience.id}-hl-${hIdx}`}
                   className="flex items-start gap-2.5 text-xs text-zinc-300 sm:text-sm"
                 >
                   <span
@@ -197,7 +197,7 @@ export default function ExperienceCard({ experience }: ExperienceCardProps) {
         <div className="mt-5 flex flex-wrap gap-1.5 border-t border-white/5 pt-3.5">
           {skillsList.map((skill, sIdx) => (
             <span
-              key={sIdx}
+              key={`exp-${experience.id}-skill-${skill}-${sIdx}`}
               className="rounded-lg border border-white/5 bg-white/[0.03] px-2.5 py-1 text-[11px] font-medium text-zinc-300 transition-colors duration-200 group-hover:border-white/10 group-hover:text-white"
             >
               {skill}

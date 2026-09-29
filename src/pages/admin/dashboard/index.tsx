@@ -346,11 +346,16 @@ function AdminDashboard({ user }: WithAuthProps) {
       });
 
       if (res.ok) {
+        const data = await res.json();
+        if (data.socialLinks && Array.isArray(data.socialLinks)) {
+          setSocialLinks(data.socialLinks);
+        }
         showToast('Site settings and social links saved.');
         if (typeof window !== 'undefined') {
+          const freshLinks: SocialLinkType[] = data.socialLinks || socialLinks;
           window.dispatchEvent(
             new CustomEvent('socialLinksUpdated', {
-              detail: socialLinks.filter((s) => s.visible),
+              detail: freshLinks.filter((s) => s.visible),
             }),
           );
         }
@@ -366,10 +371,12 @@ function AdminDashboard({ user }: WithAuthProps) {
 
   const handleAddSocialLink = () => {
     const nextOrder = socialLinks.length + 1;
+    // Generate a temporary negative ID to avoid any key collision before saving to DB
+    const tempId = -Date.now();
     setSocialLinks([
       ...socialLinks,
       {
-        id: 0,
+        id: tempId,
         platform: 'custom',
         label: 'New Link',
         url: 'https://',

@@ -1,6 +1,8 @@
-import { Repo } from '@/types/types';
+/**
+ * @jest-environment node
+ */
 import { getLanguageValues, getMapCountOfLang, sortRepos } from '@/utils/RepoUtils';
-import { describe, expect, it } from '@jest/globals';
+import { Repo } from '@/types/types';
 
 describe('sortRepos', () => {
   it('should sort repos based on pinned, archived, and private status by default', () => {
